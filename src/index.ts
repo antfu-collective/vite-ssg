@@ -1,5 +1,5 @@
 import { createSSRApp, Component, App } from 'vue'
-import { createMemoryHistory, createRouter, createWebHistory, Router, RouteRecordRaw } from 'vue-router'
+import { createMemoryHistory, createRouter, createWebHistory, Router, RouteRecordRaw, RouterOptions as VueRouterOptions } from 'vue-router'
 
 export interface ViteSSGContext {
   app: App<Element>
@@ -8,24 +8,26 @@ export interface ViteSSGContext {
   isClient: boolean
 }
 
+type PartialKeys<T, Keys extends keyof T> = Omit<T, Keys> & Partial<Pick<T, Keys>>
+
+export type RouterOptions = PartialKeys<VueRouterOptions, 'history'>
+
 export function ViteSSG(
   App: Component,
-  _routes: RouteRecordRaw[] | 'voie-pages' = 'voie-pages',
+  routerOptions: RouterOptions,
   fn?: (context: ViteSSGContext) => void,
 ) {
   const isClient = typeof window !== 'undefined'
-
-  const routes: RouteRecordRaw[] = typeof _routes === 'string'
-    ? require(_routes)
-    : _routes
 
   function createApp(client = false) {
     const app = createSSRApp(App)
 
     const router = createRouter({
       history: client ? createWebHistory() : createMemoryHistory(),
-      routes,
+      ...routerOptions,
     })
+
+    const { routes } = routerOptions
 
     app.use(router)
 

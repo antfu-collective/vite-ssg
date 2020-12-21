@@ -2,7 +2,36 @@
 
 Server-side generation for Vite.
 
-> WIP
+## Install
+
+```bash
+npm i -D vite-ssg
+```
+
+```diff
+{
+  "scripts": {
+    "dev": "vite",
+-    "build": "vite build"
++    "build": "vite-ssg build"
+  }
+}
+```
+
+```ts
+// src/main.ts
+import { ViteSSG } from 'vite-ssg'
+import App from './App.vue'
+
+// `export const createApp` is required
+export const createApp = ViteSSG(
+  App, // the root component
+  { routes }, // vue-router options
+  ({ app, router, isClient }) => {
+
+  }
+)
+```
 
 ## Thanks to the Prior works
 
