@@ -1,19 +1,19 @@
-# vite-ssg
+# Vite SSG
 
 Server-side generation for Vite.
 
 ## Install
 
-```bash
-npm i -D vite-ssg
-```
+<pre>
+<b>npm i -D vite-ssg</b> <em>vue-router @vue/server-renderer @vue/compiler-sfc</em>
+</pre>
 
 ```diff
 {
   "scripts": {
     "dev": "vite",
--    "build": "vite build"
-+    "build": "vite-ssg build"
+-   "build": "vite build"
++   "build": "vite-ssg build"
   }
 }
 ```
@@ -25,13 +25,26 @@ import App from './App.vue'
 
 // `export const createApp` is required
 export const createApp = ViteSSG(
-  App, // the root component
-  { routes }, // vue-router options
+  // the root component
+  App,
+  // vue-router options
+  { routes },
+  // function to have custom setups
   ({ app, router, isClient }) => {
 
   }
 )
 ```
+
+### Client Only
+
+```html
+<client-only>
+  <your-components>
+</client-only>
+```
+
+A component `ClientOnly` is registered globally along with the app creation.
 
 ## Example
 
