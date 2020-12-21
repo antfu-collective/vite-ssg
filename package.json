@@ -1,7 +1,7 @@
 {
   "name": "vite-ssg",
   "description": "Server-side generation for Vite",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -30,18 +30,20 @@
     "release": "npx bumpp --commit --tag && npm publish && git push"
   },
   "dependencies": {
-    "fs-extra": "^9.0.1"
+    "fs-extra": "^9.0.1",
+    "yargs": "^16.2.0"
   },
   "peerDependencies": {
-    "vue": "^3.0.4",
-    "vue-router": "^4.0.1",
-    "vite": "^1.0.0-rc.13",
     "@vue/compiler-sfc": "^3.0.4",
-    "@vue/server-renderer": "^3.0.4"
+    "@vue/server-renderer": "^3.0.4",
+    "vite": "^1.0.0-rc.13",
+    "vue": "^3.0.4",
+    "vue-router": "^4.0.1"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.4.3",
     "@types/fs-extra": "^9.0.5",
+    "@types/yargs": "^15.0.12",
     "@typescript-eslint/eslint-plugin": "^4.10.0",
     "@vue/compiler-sfc": "^3.0.4",
     "@vue/server-renderer": "^3.0.4",

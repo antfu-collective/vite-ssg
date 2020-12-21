@@ -4,7 +4,7 @@ import { build as clientBuild, ssrBuild, resolveConfig, ResolvedConfig } from 'v
 import { renderToString } from '@vue/server-renderer'
 import type { ViteSSGContext } from './index'
 
-export async function build() {
+export async function build({ script = 'sync' }) {
   const config = await resolveConfig(process.env.MODE || process.env.NODE_ENV || 'production')
   const root = config.root || process.cwd()
   const ssgOut = join(root, '.vite-ssg-dist')
@@ -20,7 +20,7 @@ export async function build() {
     },
   }
 
-  console.log(`[vite-ssg] Build for client + server...`)
+  console.log('[vite-ssg] Build for client + server...')
 
   await Promise.all([
     clientBuild(config),
@@ -30,13 +30,16 @@ export async function build() {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { createApp } = require(join(ssgOut, '_assets/main.js')) as { createApp(client: boolean): ViteSSGContext }
   const out = join(root, config.outDir || 'dist')
-  const indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
+  let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
 
   const { routes } = createApp(false)
   // ignore dynamic routes
   const routesPathes = routes.map(i => i.path).filter(i => !i.includes(':'))
 
-  console.log(`[vite-ssg] Rendering Pages...`)
+  if (script && script !== 'async')
+    indexHTML = indexHTML.replace(/<script type="module" /g, `<script type="module" ${script} `)
+
+  console.log('[vite-ssg] Rendering Pages...')
   await Promise.all(
     routesPathes.map(async(route) => {
       const { app, router } = createApp(false)
@@ -52,5 +55,5 @@ export async function build() {
 
   await fs.remove(ssgOut)
 
-  console.log(`[vite-ssg] Build finished.`)
+  console.log('[vite-ssg] Build finished.')
 }

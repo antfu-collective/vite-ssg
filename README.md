@@ -33,6 +33,10 @@ export const createApp = ViteSSG(
 )
 ```
 
+## Example
+
+See [Vitesse](https://github.com/antfu/vitesse).
+
 ## Thanks to the Prior works
 
 - [vitepress](https://github.com/vuejs/vitepress/tree/master/src/node/build)
