@@ -1,9 +1,7 @@
-import { defineComponent, h } from 'vue'
+import { defineComponent } from 'vue'
 
 export const ClientOnly = defineComponent({
   render() {
-    if (this.$slots.default)
-      return h(this.$slots.default, [])
-    return null
+    return this.$slots.default && this.$slots.default({})
   },
 })
