@@ -8,7 +8,7 @@ export interface ViteSSGContext {
   isClient: boolean
 }
 
-export async function ViteSSG(
+export function ViteSSG(
   App: Component,
   _routes: RouteRecordRaw[] | 'voie-pages' = 'voie-pages',
   fn?: (context: ViteSSGContext) => void,
