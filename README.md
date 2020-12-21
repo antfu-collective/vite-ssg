@@ -31,7 +31,7 @@ export const createApp = ViteSSG(
   { routes },
   // function to have custom setups
   ({ app, router, isClient }) => {
-
+    // install plugins etc.
   }
 )
 ```
@@ -44,13 +44,33 @@ export const createApp = ViteSSG(
 </client-only>
 ```
 
-A component `ClientOnly` is registered globally along with the app creation.
+Component `ClientOnly` is registered globally along with the app creation.
+
+## Comparsion
+
+### Use [Vitepress](https://github.com/vuejs/vitepress) when you want:
+
+- Zero config, out-of-box
+- Single-purpose documentation site
+- Lightweight ([No double payload](https://twitter.com/youyuxi/status/1274834280091389955))
+
+Cons:
+- ⛔️ No plugin support, no access to Vite config
+
+### Use Vite SSG when you want:
+
+- More controls on the build process and tooling
+- The flexible plugin systems
+- Multi-purpose application with some SSG to improve SEO and loading speed
+
+Cons:
+- ⛔️ Double payload
 
 ## Example
 
-See [Vitesse](https://github.com/antfu/vitesse).
+See [Vitesse](https://github.com/antfu/vitesse)
 
-## Thanks to the Prior works
+## Thanks to the prior work
 
 - [vitepress](https://github.com/vuejs/vitepress/tree/master/src/node/build)
 - [vue3-vite-ssr-example](https://github.com/tbgse/vue3-vite-ssr-example)
