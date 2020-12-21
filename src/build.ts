@@ -36,7 +36,7 @@ export async function build({ script = 'sync' }) {
   // ignore dynamic routes
   const routesPathes = routes.map(i => i.path).filter(i => !i.includes(':'))
 
-  if (script && script !== 'async')
+  if (script && script !== 'sync')
     indexHTML = indexHTML.replace(/<script type="module" /g, `<script type="module" ${script} `)
 
   console.log('[vite-ssg] Rendering Pages...')
