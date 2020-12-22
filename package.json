@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "fs-extra": "^9.0.1",
+    "jsdom": "^16.4.0",
     "yargs": "^16.2.0"
   },
   "peerDependencies": {
@@ -43,6 +44,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^0.4.3",
     "@types/fs-extra": "^9.0.5",
+    "@types/jsdom": "^16.2.5",
     "@types/yargs": "^15.0.12",
     "@typescript-eslint/eslint-plugin": "^4.10.0",
     "@vue/compiler-sfc": "^3.0.4",

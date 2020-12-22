@@ -2,9 +2,10 @@ import { join, dirname } from 'path'
 import fs from 'fs-extra'
 import { build as clientBuild, ssrBuild, resolveConfig, ResolvedConfig } from 'vite'
 import { renderToString } from '@vue/server-renderer'
+import { JSDOM } from 'jsdom'
 import type { ViteSSGContext } from './index'
 
-export async function build({ script = 'sync' }) {
+export async function build({ script = 'sync', mock = true } = {}) {
   const config = await resolveConfig(process.env.MODE || process.env.NODE_ENV || 'production')
   const root = config.root || process.cwd()
   const ssgOut = join(root, '.vite-ssg-dist')
@@ -38,6 +39,13 @@ export async function build({ script = 'sync' }) {
 
   if (script && script !== 'sync')
     indexHTML = indexHTML.replace(/<script type="module" /g, `<script type="module" ${script} `)
+
+  if (mock) {
+    const jsdom = new JSDOM()
+    // @ts-ignore
+    global.window = jsdom.window
+    Object.assign(global, jsdom.window)
+  }
 
   console.log('[vite-ssg] Rendering Pages...')
   await Promise.all(

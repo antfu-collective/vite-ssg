@@ -16,6 +16,11 @@ yargs
           choices: ['defer', 'async', 'sync'],
           describe: 'Rewrites script loading timing',
         })
+        .option('mock', {
+          type: 'boolean',
+          default: true,
+          describe: 'Mock browser globals (window, document, etc.) for SSG',
+        })
     },
     (args) => {
       build(args)
