@@ -5,7 +5,7 @@ import { renderToString } from '@vue/server-renderer'
 import { JSDOM } from 'jsdom'
 import type { ViteSSGContext } from './index'
 
-export async function build({ script = 'sync', mock = true } = {}) {
+export async function build({ script = 'sync', mock = false } = {}) {
   const config = await resolveConfig(process.env.MODE || process.env.NODE_ENV || 'production')
   const root = config.root || process.cwd()
   const ssgOut = join(root, '.vite-ssg-dist')

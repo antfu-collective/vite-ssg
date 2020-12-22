@@ -18,14 +18,19 @@ yargs
         })
         .option('mock', {
           type: 'boolean',
-          default: true,
+          default: false,
           describe: 'Mock browser globals (window, document, etc.) for SSG',
         })
     },
     (args) => {
       build(args)
-        .catch(console.error)
-        .then(() => process.exit(0))
+        .catch((err) => {
+          console.error(err)
+          process.exit(1)
+        })
+        .then(() => {
+          process.exit(0)
+        })
     },
   )
   .showHelpOnFail(false)
