@@ -1,4 +1,4 @@
-import { join, dirname } from 'path'
+import { join, dirname, resolve } from 'path'
 import fs from 'fs-extra'
 import { build as clientBuild, ssrBuild, resolveConfig, ResolvedConfig } from 'vite'
 import { renderToString } from '@vue/server-renderer'
@@ -6,11 +6,23 @@ import { JSDOM } from 'jsdom'
 import type { ViteSSGContext } from './index'
 
 export async function build({ script = 'sync', mock = false } = {}) {
-  const config = await resolveConfig(process.env.MODE || process.env.NODE_ENV || 'production')
-  const root = config.root || process.cwd()
+  const mode = process.env.MODE || process.env.NODE_ENV || 'production'
+  const config = await resolveConfig(mode)
+  const cwd = process.cwd()
+  const root = config.root || cwd
   const ssgOut = join(root, '.vite-ssg-dist')
-  const ssrConfig: ResolvedConfig = {
-    ...config,
+
+  let ssrConfig: ResolvedConfig
+
+  if (fs.existsSync(resolve(cwd, 'vite.ssg.config.js')))
+    ssrConfig = await resolveConfig(mode, resolve(cwd, 'vite.ssg.config.js'))
+  else if (fs.existsSync(resolve(cwd, 'vite.ssg.config.ts')))
+    ssrConfig = await resolveConfig(mode, resolve(cwd, 'vite.ssg.config.ts'))
+  else
+    ssrConfig = config
+
+  ssrConfig = {
+    ...ssrConfig,
     outDir: ssgOut,
     rollupInputOptions: {
       ...config.rollupInputOptions,
