@@ -22,6 +22,7 @@ export async function build({ script = 'sync', mock = false } = {}) {
     ssrConfig = config
 
   ssrConfig = {
+    esbuildTarget: 'es2018',
     ...ssrConfig,
     outDir: ssgOut,
     rollupInputOptions: {
