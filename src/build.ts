@@ -1,49 +1,79 @@
-import { join, dirname, resolve } from 'path'
+import { join, dirname } from 'path'
 import fs from 'fs-extra'
-import { build as clientBuild, ssrBuild, resolveConfig, ResolvedConfig } from 'vite'
+import { build as viteBuild, resolveConfig, UserConfig } from 'vite'
 import { renderToString } from '@vue/server-renderer'
 import { JSDOM } from 'jsdom'
+import { ExternalOption } from 'rollup'
 import type { ViteSSGContext } from './index'
+
+function resolveExternal(
+  userExternal: ExternalOption | undefined,
+): ExternalOption {
+  const required = ['vue', /^@vue\//]
+  if (!userExternal)
+    return required
+
+  if (Array.isArray(userExternal)) {
+    return [...required, ...userExternal]
+  }
+  else if (typeof userExternal === 'function') {
+    return (src, importer, isResolved) => {
+      if (src === 'vue' || /^@vue\//.test(src))
+        return true
+
+      return userExternal(src, importer, isResolved)
+    }
+  }
+  else {
+    return [...required, userExternal]
+  }
+}
 
 export async function build({ script = 'sync', mock = false } = {}) {
   const mode = process.env.MODE || process.env.NODE_ENV || 'production'
-  const config = await resolveConfig(mode)
+  const config = await resolveConfig({}, 'build', mode)
+
   const cwd = process.cwd()
   const root = config.root || cwd
   const ssgOut = join(root, '.vite-ssg-dist')
 
-  let ssrConfig: ResolvedConfig
-
-  if (fs.existsSync(resolve(cwd, 'vite.ssg.config.js')))
-    ssrConfig = await resolveConfig(mode, resolve(cwd, 'vite.ssg.config.js'))
-  else if (fs.existsSync(resolve(cwd, 'vite.ssg.config.ts')))
-    ssrConfig = await resolveConfig(mode, resolve(cwd, 'vite.ssg.config.ts'))
-  else
-    ssrConfig = config
-
-  ssrConfig = {
-    esbuildTarget: 'es2018',
-    ...ssrConfig,
-    outDir: ssgOut,
-    rollupInputOptions: {
-      ...config.rollupInputOptions,
-      input: {
-        main: join(root, './src/main.ts'),
+  const ssrConfig: UserConfig = {
+    esbuild: {
+      target: 'es2018',
+    },
+    build: {
+      ssr: true,
+      outDir: ssgOut,
+      minify: false,
+      cssCodeSplit: false,
+      rollupOptions: {
+        external: resolveExternal(config.build?.rollupOptions?.external),
+        input: {
+          main: join(root, './src/main.ts'),
+        },
+        preserveEntrySignatures: 'allow-extension',
+        output: [{
+          format: 'cjs',
+          exports: 'named',
+          entryFileNames: '[name].js',
+        }],
       },
-      preserveEntrySignatures: 'allow-extension',
     },
   }
 
-  console.log('[vite-ssg] Build for client + server...')
+  console.log('[vite-ssg] Build for client...')
 
-  await Promise.all([
-    clientBuild(config),
-    ssrBuild(ssrConfig),
-  ])
+  await viteBuild()
+
+  console.log('[vite-ssg] Build for server...')
+
+  process.env.VITE_SSR = 'true'
+  process.env.VITE_SSG = 'true'
+  await viteBuild(ssrConfig)
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { createApp } = require(join(ssgOut, '_assets/main.js')) as { createApp(client: boolean): ViteSSGContext }
-  const out = join(root, config.outDir || 'dist')
+  const { createApp } = require(join(ssgOut, 'main.js')) as { createApp(client: boolean): ViteSSGContext }
+  const out = join(root, config.build.outDir || 'dist')
   let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
 
   const { routes } = createApp(false)
@@ -66,6 +96,7 @@ export async function build({ script = 'sync', mock = false } = {}) {
       const { app, router } = createApp(false)
       router.push(route)
       await router.isReady()
+      // @ts-ignore
       const content = await renderToString(app)
       const relativeRoute = (route.endsWith('/') ? `${route}index` : route).slice(1)
       const html = indexHTML.replace('<div id="app">', `<div id="app" data-server-rendered="true">${content}`)

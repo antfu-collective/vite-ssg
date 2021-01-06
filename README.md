@@ -4,11 +4,14 @@ Server-side generation for Vite.
 
 ## Install
 
+> ℹ️ **Vite 2 is supported from `v0.2.x`, Vite 1's support is discontinued.**
+
 <pre>
 <b>npm i -D vite-ssg</b> <em>vue-router @vue/server-renderer @vue/compiler-sfc</em>
 </pre>
 
 ```diff
+// package.json
 {
   "scripts": {
     "dev": "vite",
@@ -34,6 +37,19 @@ export const createApp = ViteSSG(
     // install plugins etc.
   }
 )
+```
+
+```js
+// vite.config.js
+import Vue from '@vitejs/plugin-vue'
+
+export default {
+  plugins: [
+    Vue({
+      ssr: !!process.env.VITE_SSG // <-- add this
+    })
+  ]
+}
 ```
 
 ### Client Only
