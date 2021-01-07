@@ -38,9 +38,6 @@ export async function build({ script = 'sync', mock = false } = {}) {
   const ssgOut = join(root, '.vite-ssg-dist')
 
   const ssrConfig: UserConfig = {
-    esbuild: {
-      target: 'es2020',
-    },
     build: {
       ssr: true,
       outDir: ssgOut,
