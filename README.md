@@ -6,6 +6,8 @@ Server-side generation for Vite.
 
 > ℹ️ **Vite 2 is supported from `v0.2.x`, Vite 1's support is discontinued.**
 
+> ℹ️ **Need Node.js version >= 14**
+
 <pre>
 <b>npm i -D vite-ssg</b> <em>vue-router @vue/server-renderer @vue/compiler-sfc</em>
 </pre>
