@@ -78,7 +78,7 @@ export async function build({ script = 'sync', mock = false } = {}) {
 
   const { routes } = createApp(false)
   // ignore dynamic routes
-  const routesPathes = routes.map(i => i.path).filter(i => !i.includes(':'))
+  const routesPaths = routes.map(i => i.path).filter(i => !i.includes(':'))
 
   if (script && script !== 'sync')
     indexHTML = indexHTML.replace(/<script type="module" /g, `<script type="module" ${script} `)
@@ -92,7 +92,7 @@ export async function build({ script = 'sync', mock = false } = {}) {
 
   console.log('[vite-ssg] Rendering Pages...')
   await Promise.all(
-    routesPathes.map(async(route) => {
+    routesPaths.map(async(route) => {
       const { app, router } = createApp(false)
       router.push(route)
       await router.isReady()
