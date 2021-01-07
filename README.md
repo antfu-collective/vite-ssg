@@ -2,11 +2,11 @@
 
 Server-side generation for Vite.
 
-## Install
-
 > ℹ️ **Vite 2 is supported from `v0.2.x`, Vite 1's support is discontinued.**
 
-> ℹ️ **Need Node.js version >= 14**
+## Install
+
+> **This library requires Node.js version >= 14**
 
 <pre>
 <b>npm i -D vite-ssg</b> <em>vue-router @vue/server-renderer @vue/compiler-sfc</em>
@@ -72,9 +72,6 @@ Component `ClientOnly` is registered globally along with the app creation.
 - Single-purpose documentation site
 - Lightweight ([No double payload](https://twitter.com/youyuxi/status/1274834280091389955))
 
-Cons:
-- ⛔️ No plugin support, no access to Vite config
-
 ### Use Vite SSG when you want:
 
 - More controls on the build process and tooling
@@ -82,7 +79,7 @@ Cons:
 - Multi-purpose application with some SSG to improve SEO and loading speed
 
 Cons:
-- ⛔️ Double payload
+- Double payload
 
 ## Example
 
