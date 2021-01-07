@@ -39,7 +39,7 @@ export async function build({ script = 'sync', mock = false } = {}) {
 
   const ssrConfig: UserConfig = {
     esbuild: {
-      target: 'es2018',
+      target: 'es2020',
     },
     build: {
       ssr: true,
