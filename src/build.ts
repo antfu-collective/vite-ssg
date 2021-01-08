@@ -1,4 +1,5 @@
-import { join, dirname } from 'path'
+import { join, dirname, relative } from 'path'
+import chalk from 'chalk'
 import fs from 'fs-extra'
 import { build as viteBuild, resolveConfig, UserConfig } from 'vite'
 import { renderToString } from '@vue/server-renderer'
@@ -99,6 +100,11 @@ export async function build({ script = 'sync', mock = false } = {}) {
       const html = indexHTML.replace('<div id="app">', `<div id="app" data-server-rendered="true">${content}`)
       await fs.ensureDir(join(out, dirname(relativeRoute)))
       await fs.writeFile(join(out, `${relativeRoute}.html`), html, 'utf-8')
+      config.logger.info(
+        `${chalk.gray('[write]')} ${chalk.blue(
+          `${relativeRoute}.html`,
+        )} ${(html.length / 1024).toFixed(2)}kb`,
+      )
     }),
   )
 
