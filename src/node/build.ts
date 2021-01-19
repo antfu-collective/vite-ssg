@@ -1,11 +1,12 @@
-import { join, dirname, relative } from 'path'
+import { join, dirname } from 'path'
 import chalk from 'chalk'
 import fs from 'fs-extra'
 import { build as viteBuild, resolveConfig, UserConfig } from 'vite'
 import { renderToString } from '@vue/server-renderer'
+import { renderHeadToString } from '@vueuse/head'
 import { JSDOM } from 'jsdom'
 import { ExternalOption } from 'rollup'
-import type { ViteSSGContext } from './index'
+import type { ViteSSGContext } from '../client'
 
 function resolveExternal(
   userExternal: ExternalOption | undefined,
@@ -91,19 +92,22 @@ export async function build({ script = 'sync', mock = false } = {}) {
   console.log('[vite-ssg] Rendering Pages...')
   await Promise.all(
     routesPaths.map(async(route) => {
-      const { app, router } = createApp(false)
+      const { app, router, head } = createApp(false)
       router.push(route)
       await router.isReady()
       // @ts-ignore
       const content = await renderToString(app)
+      const headCtx = await renderHeadToString(head)
+
+      const html = renderHTML(indexHTML, { appContent: content, ...headCtx })
+
       const relativeRoute = (route.endsWith('/') ? `${route}index` : route).slice(1)
-      const html = indexHTML.replace('<div id="app">', `<div id="app" data-server-rendered="true">${content}`)
+      const filename = `${relativeRoute}.html`
       await fs.ensureDir(join(out, dirname(relativeRoute)))
-      await fs.writeFile(join(out, `${relativeRoute}.html`), html, 'utf-8')
+      await fs.writeFile(join(out, filename), html, 'utf-8')
+
       config.logger.info(
-        `${chalk.gray('[write]')} ${chalk.blue(
-          `${relativeRoute}.html`,
-        )} ${(html.length / 1024).toFixed(2)}kb`,
+        `${chalk.gray('[write]')} ${chalk.blue(filename)} ${(html.length / 1024).toFixed(2)}kb`,
       )
     }),
   )
@@ -111,4 +115,13 @@ export async function build({ script = 'sync', mock = false } = {}) {
   await fs.remove(ssgOut)
 
   console.log('[vite-ssg] Build finished.')
+}
+
+function renderHTML(indexHTML: string, { appContent, headTags, htmlAttrs, bodyAttrs }: { appContent: string; headTags: string; htmlAttrs: string; bodyAttrs: string}) {
+  // TODO: merge existing tags
+  return indexHTML
+    .replace('<html', `<html ${htmlAttrs}`)
+    .replace('<body', `<body ${bodyAttrs}`)
+    .replace('</head>', `${headTags}</head>`)
+    .replace('<div id="app">', `<div id="app" data-server-rendered="true">${appContent}`)
 }
