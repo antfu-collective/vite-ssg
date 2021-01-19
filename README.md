@@ -2,6 +2,8 @@
 
 Server-side generation for Vite.
 
+[![NPM version](https://img.shields.io/npm/v/vite-ssg?color=a1b858)](https://www.npmjs.com/package/vite-ssg)
+
 > ℹ️ **Vite 2 is supported from `v0.2.x`, Vite 1's support is discontinued.**
 
 ## Install
