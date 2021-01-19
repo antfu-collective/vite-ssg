@@ -1,11 +1,11 @@
-import { join, dirname, relative } from 'path'
+import { join, dirname } from 'path'
 import chalk from 'chalk'
 import fs from 'fs-extra'
 import { build as viteBuild, resolveConfig, UserConfig } from 'vite'
 import { renderToString } from '@vue/server-renderer'
 import { JSDOM } from 'jsdom'
 import { ExternalOption } from 'rollup'
-import type { ViteSSGContext } from './index'
+import type { ViteSSGContext } from '../client'
 
 function resolveExternal(
   userExternal: ExternalOption | undefined,
@@ -36,7 +36,9 @@ export async function build({ script = 'sync', mock = false } = {}) {
 
   const cwd = process.cwd()
   const root = config.root || cwd
-  const ssgOut = join(root, '.vite-ssg-dist')
+  const ssgOut = join(root, '.vite-ssg-temp')
+  if (fs.existsSync(ssgOut))
+    await fs.remove(ssgOut)
 
   const ssrConfig: UserConfig = {
     build: {
@@ -59,11 +61,11 @@ export async function build({ script = 'sync', mock = false } = {}) {
     },
   }
 
-  console.log('[vite-ssg] Build for client...')
+  console.log(`${chalk.gray('[vite-ssg]')} ${chalk.yellow('Build for client...')}`)
 
   await viteBuild()
 
-  console.log('[vite-ssg] Build for server...')
+  console.log(`\n${chalk.gray('[vite-ssg]')} ${chalk.yellow('Build for server...')}`)
 
   process.env.VITE_SSR = 'true'
   process.env.VITE_SSG = 'true'
@@ -71,15 +73,15 @@ export async function build({ script = 'sync', mock = false } = {}) {
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { createApp } = require(join(ssgOut, 'main.js')) as { createApp(client: boolean): ViteSSGContext }
-  const out = join(root, config.build.outDir || 'dist')
+  const outDir = config.build.outDir || 'dist'
+  const out = join(root, outDir)
   let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
 
   const { routes } = createApp(false)
   // ignore dynamic routes
   const routesPaths = routes.map(i => i.path).filter(i => !i.includes(':'))
 
-  if (script && script !== 'sync')
-    indexHTML = indexHTML.replace(/<script type="module" /g, `<script type="module" ${script} `)
+  indexHTML = rewriteScripts(indexHTML, script)
 
   if (mock) {
     const jsdom = new JSDOM()
@@ -88,27 +90,49 @@ export async function build({ script = 'sync', mock = false } = {}) {
     Object.assign(global, jsdom.window)
   }
 
-  console.log('[vite-ssg] Rendering Pages...')
+  console.log(`\n${chalk.gray('[vite-ssg]')} ${chalk.yellow('Rendering Pages...')}`)
+
   await Promise.all(
     routesPaths.map(async(route) => {
-      const { app, router } = createApp(false)
+      const { app, router, head } = createApp(false)
+
       router.push(route)
       await router.isReady()
-      // @ts-ignore
-      const content = await renderToString(app)
+
+      const appHTML = await renderToString(app)
+
+      const jsdom = new JSDOM(indexHTML)
+      head.updateDOM(jsdom.window.document)
+
+      const html = renderHTML(jsdom.serialize(), appHTML)
+
       const relativeRoute = (route.endsWith('/') ? `${route}index` : route).slice(1)
-      const html = indexHTML.replace('<div id="app">', `<div id="app" data-server-rendered="true">${content}`)
+      const filename = `${relativeRoute}.html`
       await fs.ensureDir(join(out, dirname(relativeRoute)))
-      await fs.writeFile(join(out, `${relativeRoute}.html`), html, 'utf-8')
+      await fs.writeFile(join(out, filename), html, 'utf-8')
+
       config.logger.info(
-        `${chalk.gray('[write]')} ${chalk.blue(
-          `${relativeRoute}.html`,
-        )} ${(html.length / 1024).toFixed(2)}kb`,
+        `${chalk.dim(`${outDir}/`)}${chalk.cyan(filename)}\t${chalk.dim(getSize(html))}`,
       )
     }),
   )
 
   await fs.remove(ssgOut)
 
-  console.log('[vite-ssg] Build finished.')
+  console.log(`\n${chalk.gray('[vite-ssg]')} ${chalk.green('Build finished.')}`)
+}
+
+function getSize(str: string) {
+  return `${(str.length / 1024).toFixed(2)}kb`
+}
+
+function rewriteScripts(indexHTML: string, mode?: string) {
+  if (!mode || mode === 'sync')
+    return indexHTML
+  return indexHTML.replace(/<script type="module" /g, `<script type="module" ${mode} `)
+}
+
+function renderHTML(indexHTML: string, appHTML: string) {
+  return indexHTML
+    .replace('<div id="app">', `<div id="app" data-server-rendered="true">${appHTML}`)
 }
