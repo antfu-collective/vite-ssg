@@ -1,12 +1,9 @@
 import { createSSRApp, Component, App, createApp as createClientApp } from 'vue'
 import { createMemoryHistory, createRouter, createWebHistory, Router, RouteRecordRaw, RouterOptions as VueRouterOptions } from 'vue-router'
-import { createHead } from '@vueuse/head'
+import { createHead, Head } from '@vueuse/head'
 import { ClientOnly } from './components/ClientOnly'
 
 type PartialKeys<T, Keys extends keyof T> = Omit<T, Keys> & Partial<Pick<T, Keys>>
-type ReturnType<T> = T extends () => infer R ? R: never
-
-export type Head = ReturnType<typeof createHead>
 
 export interface ViteSSGContext {
   app: App<Element>
