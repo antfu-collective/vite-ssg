@@ -90,7 +90,7 @@ export async function build({ script = 'sync', mock = false } = {}) {
     Object.assign(global, jsdom.window)
   }
 
-  console.log(`\n${chalk.gray('[vite-ssg]')} ${chalk.yellow('Rendering Pages...')}`)
+  console.log(`\n${chalk.gray('[vite-ssg]')} ${chalk.yellow('Rendering Pages...')} ${chalk.blue(`(${routesPaths.length})`)}`)
 
   await Promise.all(
     routesPaths.map(async(route) => {
