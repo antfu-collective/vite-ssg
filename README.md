@@ -64,6 +64,34 @@ export default {
 
 Component `ClientOnly` is registered globally along with the app creation.
 
+## Document head
+
+From `v0.4.0`, we ships [`@vueuse/head`](https://github.com/vueuse/head) to manage the document head out-of-box. You can directly use it in your pages/components, for example:
+
+```vue
+<template>
+  <button @click="count++">Click</button>
+</template>
+
+<script setup>
+import { useHead } from '@vueuse/head'
+
+useHead({
+  title: 'Website Title',
+  meta: [
+    {
+      name: `description`,
+      content: `Website description`,
+    },
+  ],
+})
+</script>
+```
+
+That's all, no configuration needed. Vite SSG will handle the server-side rendering and merging automatically.
+
+Refer to [`@vueuse/head`'s docs](https://github.com/vueuse/head) for more usage about `useHead`.
+
 ## Comparsion
 
 ### Use [Vitepress](https://github.com/vuejs/vitepress) when you want:
