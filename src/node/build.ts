@@ -65,6 +65,8 @@ export async function build({ script = 'sync', mock = false } = {}) {
     }
   })
 
+  await fs.move(join(out, 'manifest.json'), join(ssgOut, 'manifest.json'))
+
   console.log(`\n${chalk.gray('[vite-ssg]')} ${chalk.yellow('Build for server...')}`)
 
   process.env.VITE_SSR = 'true'
@@ -75,7 +77,7 @@ export async function build({ script = 'sync', mock = false } = {}) {
   const { createApp } = require(join(ssgOut, 'main.js')) as { createApp(client: boolean): ViteSSGContext }
   
   let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
-  const manifest = JSON.parse(await fs.readFile(join(out, 'manifest.json'), 'utf-8'))
+  const manifest = JSON.parse(await fs.readFile(join(ssgOut, 'manifest.json'), 'utf-8'))
   // TODO: render preloadLinks from ssrManifest
   // const ssrManifest = JSON.parse(await fs.readFile(join(out, 'ssr-manifest.json'), 'utf-8'))
 
@@ -125,7 +127,6 @@ export async function build({ script = 'sync', mock = false } = {}) {
   )
 
   await fs.remove(ssgOut)
-  await fs.remove(join(out, 'manifest.json'))
 
   console.log(`\n${chalk.gray('[vite-ssg]')} ${chalk.green('Build finished.')}`)
 }
