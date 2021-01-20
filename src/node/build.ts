@@ -125,6 +125,7 @@ export async function build({ script = 'sync', mock = false } = {}) {
   )
 
   await fs.remove(ssgOut)
+  await fs.remove(join(out, 'manifest.json')
 
   console.log(`\n${chalk.gray('[vite-ssg]')} ${chalk.green('Build finished.')}`)
 }
