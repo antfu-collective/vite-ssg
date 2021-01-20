@@ -2,34 +2,15 @@ import { join, dirname } from 'path'
 import chalk from 'chalk'
 import fs from 'fs-extra'
 import { build as viteBuild, resolveConfig, UserConfig } from 'vite'
-import { DEFAULT_ASSETS_RE } from './constants'
 import { renderToString } from '@vue/server-renderer'
 import { JSDOM } from 'jsdom'
-import { ExternalOption } from 'rollup'
 import type { ViteSSGContext } from '../client'
+import { DEFAULT_ASSETS_RE } from './constants'
 
-function resolveExternal(
-  userExternal: ExternalOption | undefined,
-): ExternalOption {
-  const required = ['vue', /^@vue\//]
-  if (!userExternal)
-    return required
-
-  if (Array.isArray(userExternal)) {
-    return [...required, ...userExternal]
-  }
-  else if (typeof userExternal === 'function') {
-    return (src, importer, isResolved) => {
-      if (src === 'vue' || /^@vue\//.test(src))
-        return true
-
-      return userExternal(src, importer, isResolved)
-    }
-  }
-  else {
-    return [...required, userExternal]
-  }
-}
+type ViteManifest = Record<string, {
+  file: string
+  imports?: string[]
+}>
 
 export async function build({ script = 'sync', mock = false } = {}) {
   const mode = process.env.MODE || process.env.NODE_ENV || 'production'
@@ -51,7 +32,7 @@ export async function build({ script = 'sync', mock = false } = {}) {
       minify: false,
       cssCodeSplit: false,
       rollupOptions: {
-        input: join(root, './src/main.ts')
+        input: join(root, './src/main.ts'),
       },
     },
   }
@@ -60,9 +41,9 @@ export async function build({ script = 'sync', mock = false } = {}) {
 
   await viteBuild({
     build: {
-      ssrManifest: true,
+      // TODO: ssrManifest: true,
       manifest: true,
-    }
+    },
   })
 
   console.log(`\n${chalk.gray('[vite-ssg]')} ${chalk.yellow('Build for server...')}`)
@@ -71,16 +52,14 @@ export async function build({ script = 'sync', mock = false } = {}) {
   process.env.VITE_SSG = 'true'
   await viteBuild(ssrConfig)
 
-  await fs.move(join(out, 'manifest.json'), join(ssgOut, 'manifest.json'))
-  await fs.move(join(out, 'ssr-manifest.json'), join(ssgOut, 'ssr-manifest.json'))
+  const manifest: ViteManifest = JSON.parse(await fs.readFile(join(out, 'manifest.json'), 'utf-8'))
+  // TODO: render preloadLinks from ssrManifest
+  // const ssrManifest = JSON.parse(await fs.readFile(join(out, 'ssr-manifest.json'), 'utf-8'))
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { createApp } = require(join(ssgOut, 'main.js')) as { createApp(client: boolean): ViteSSGContext }
-  
+
   let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
-  const manifest = JSON.parse(await fs.readFile(join(ssgOut, 'manifest.json'), 'utf-8'))
-  // TODO: render preloadLinks from ssrManifest
-  // const ssrManifest = JSON.parse(await fs.readFile(join(out, 'ssr-manifest.json'), 'utf-8'))
 
   const { routes } = createApp(false)
   // ignore dynamic routes
@@ -142,12 +121,12 @@ function rewriteScripts(indexHTML: string, mode?: string) {
   return indexHTML.replace(/<script type="module" /g, `<script type="module" ${mode} `)
 }
 
-function rewriteAssets(appHTML: string, manifest?: string) {
-  Object.keys(manifest).forEach(key => {
-    if (appHTML.includes(key) && DEFAULT_ASSETS_RE.test(key)) {
-      appHTML = appHTML.replace(key, manifest[key].file)
-    }
-  })
+function rewriteAssets(appHTML: string, manifest: ViteManifest) {
+  Object.keys(manifest)
+    .forEach((key) => {
+      if (DEFAULT_ASSETS_RE.test(key))
+        appHTML = appHTML.replace(key, manifest[key].file)
+    })
   return appHTML
 }
 
