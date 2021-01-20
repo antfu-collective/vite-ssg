@@ -43,19 +43,6 @@ export const createApp = ViteSSG(
 )
 ```
 
-```js
-// vite.config.js
-import Vue from '@vitejs/plugin-vue'
-
-export default {
-  plugins: [
-    Vue({
-      ssr: !!process.env.VITE_SSG // <-- add this
-    })
-  ]
-}
-```
-
 ### Client Only
 
 ```html

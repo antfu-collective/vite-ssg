@@ -7,7 +7,7 @@ import Vue from '@vitejs/plugin-vue'
 const config: UserConfig = {
   plugins: [
     Vue({
-      ssr: !!process.env.VITE_SSG,
+      include: [/\.vue$/, /\.md$/],
     }),
     Pages({
       extensions: ['vue', 'md'],
