@@ -65,13 +65,13 @@ export async function build({ script = 'sync', mock = false } = {}) {
     }
   })
 
-  await fs.move(join(out, 'manifest.json'), join(ssgOut, 'manifest.json'))
-
   console.log(`\n${chalk.gray('[vite-ssg]')} ${chalk.yellow('Build for server...')}`)
 
   process.env.VITE_SSR = 'true'
   process.env.VITE_SSG = 'true'
   await viteBuild(ssrConfig)
+
+  await fs.move(join(out, 'manifest.json'), join(ssgOut, 'manifest.json'))
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { createApp } = require(join(ssgOut, 'main.js')) as { createApp(client: boolean): ViteSSGContext }
@@ -126,7 +126,7 @@ export async function build({ script = 'sync', mock = false } = {}) {
     }),
   )
 
-  await fs.remove(ssgOut)
+  // await fs.remove(ssgOut)
 
   console.log(`\n${chalk.gray('[vite-ssg]')} ${chalk.green('Build finished.')}`)
 }
