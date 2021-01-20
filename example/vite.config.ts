@@ -12,7 +12,9 @@ const config: UserConfig = {
     Pages({
       extensions: ['vue', 'md'],
     }),
-    Markdown(),
+    Markdown({
+      headEnabled: true,
+    }),
     Components({
       customLoaderMatcher: path => path.endsWith('.md'),
     }),

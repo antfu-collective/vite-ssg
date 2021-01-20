@@ -1,3 +1,7 @@
+---
+title: Index Page
+---
+
 # Hello
 
 This is a counter

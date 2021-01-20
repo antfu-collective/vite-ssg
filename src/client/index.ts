@@ -1,4 +1,3 @@
-import 'vite/dynamic-import-polyfill'
 import { createSSRApp, Component, App, createApp as createClientApp } from 'vue'
 import { createMemoryHistory, createRouter, createWebHistory, Router, RouteRecordRaw, RouterOptions as VueRouterOptions } from 'vue-router'
 import { createHead, Head } from '@vueuse/head'
