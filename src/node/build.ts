@@ -72,6 +72,7 @@ export async function build({ script = 'sync', mock = false } = {}) {
   await viteBuild(ssrConfig)
 
   await fs.move(join(out, 'manifest.json'), join(ssgOut, 'manifest.json'))
+  await fs.move(join(out, 'ssr-manifest.json'), join(ssgOut, 'ssr-manifest.json'))
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { createApp } = require(join(ssgOut, 'main.js')) as { createApp(client: boolean): ViteSSGContext }
