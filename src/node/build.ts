@@ -126,7 +126,7 @@ export async function build({ script = 'sync', mock = false } = {}) {
     }),
   )
 
-  // await fs.remove(ssgOut)
+  await fs.remove(ssgOut)
 
   console.log(`\n${chalk.gray('[vite-ssg]')} ${chalk.green('Build finished.')}`)
 }
