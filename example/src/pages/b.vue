@@ -1,5 +1,6 @@
 <template>
   <p>Hello I am B</p>
+  <img src="../assets/test.jpg" alt="">
 </template>
 
 <script setup lang="ts">
