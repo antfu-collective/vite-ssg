@@ -81,6 +81,23 @@ That's all, no configuration needed. Vite SSG will handle the server-side render
 
 Refer to [`@vueuse/head`'s docs](https://github.com/vueuse/head) for more usage about `useHead`.
 
+## Configuration 
+
+You can pass options to Vite SSG in the `ssgOptions` field of your `vite.config.js`
+
+```js
+// vite.config.js
+
+export default {
+  plugins: [ /*...*/ ],
+  ssgOptions: {
+    script: 'async',
+  },
+}
+```
+
+See [src/types.ts] for more options avaliable.
+
 ## Comparsion
 
 ### Use [Vitepress](https://github.com/vuejs/vitepress) when you want:

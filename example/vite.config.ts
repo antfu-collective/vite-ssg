@@ -19,6 +19,9 @@ const config: UserConfig = {
       customLoaderMatcher: path => path.endsWith('.md'),
     }),
   ],
+  ssgOptions: {
+    script: 'async',
+  },
 }
 
 export default config

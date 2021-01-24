@@ -1,29 +1,16 @@
-import { createSSRApp, Component, App, createApp as createClientApp } from 'vue'
-import { createMemoryHistory, createRouter, createWebHistory, Router, RouteRecordRaw, RouterOptions as VueRouterOptions } from 'vue-router'
-import { createHead, Head } from '@vueuse/head'
+import { createSSRApp, Component, createApp as createClientApp } from 'vue'
+import { createMemoryHistory, createRouter, createWebHistory } from 'vue-router'
+import { createHead } from '@vueuse/head'
+import { RouterOptions, ViteSSGContext, ViteSSGClientOptions } from '../types'
 import { ClientOnly } from './components/ClientOnly'
 
-type PartialKeys<T, Keys extends keyof T> = Omit<T, Keys> & Partial<Pick<T, Keys>>
-
-export interface ViteSSGContext {
-  app: App<Element>
-  router: Router
-  routes: RouteRecordRaw[]
-  head: Head
-  isClient: boolean
-}
-
-export interface ViteSSGOptions {
-  registerComponents?: boolean
-}
-
-export type RouterOptions = PartialKeys<VueRouterOptions, 'history'>
+export * from '../types'
 
 export function ViteSSG(
   App: Component,
   routerOptions: RouterOptions,
   fn?: (context: ViteSSGContext) => void,
-  options: ViteSSGOptions = {},
+  options: ViteSSGClientOptions = {},
 ) {
   const { registerComponents = true } = options
   const isClient = typeof window !== 'undefined'

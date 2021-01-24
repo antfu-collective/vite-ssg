@@ -4,7 +4,7 @@ import fs from 'fs-extra'
 import { build as viteBuild, resolveConfig, UserConfig } from 'vite'
 import { renderToString } from '@vue/server-renderer'
 import { JSDOM } from 'jsdom'
-import type { ViteSSGContext } from '../client'
+import { ViteSSGContext, ViteSSGOptions } from '../client'
 import { DEFAULT_ASSETS_RE } from './constants'
 
 type ViteManifest = Record<string, {
@@ -12,7 +12,7 @@ type ViteManifest = Record<string, {
   imports?: string[]
 }>
 
-export async function build({ script = 'sync', mock = false } = {}) {
+export async function build(cliOptions: ViteSSGOptions = {}) {
   const mode = process.env.MODE || process.env.NODE_ENV || 'production'
   const config = await resolveConfig({}, 'build', mode)
 
@@ -21,6 +21,14 @@ export async function build({ script = 'sync', mock = false } = {}) {
   const ssgOut = join(root, '.vite-ssg-temp')
   const outDir = config.build.outDir || 'dist'
   const out = join(root, outDir)
+
+  const {
+    script = 'sync',
+    mock = 'false',
+    onBeforeRouteRender,
+    onRouterRendered,
+    onFinished,
+  } = Object.assign({}, config.ssgOptions || {}, cliOptions)
 
   if (fs.existsSync(ssgOut))
     await fs.remove(ssgOut)
@@ -48,8 +56,6 @@ export async function build({ script = 'sync', mock = false } = {}) {
 
   console.log(`\n${chalk.gray('[vite-ssg]')} ${chalk.yellow('Build for server...')}`)
 
-  process.env.VITE_SSR = 'true'
-  process.env.VITE_SSG = 'true'
   await viteBuild(ssrConfig)
 
   const manifest: ViteManifest = JSON.parse(await fs.readFile(join(out, 'manifest.json'), 'utf-8'))
@@ -83,6 +89,8 @@ export async function build({ script = 'sync', mock = false } = {}) {
       router.push(route)
       await router.isReady()
 
+      onBeforeRouteRender?.(route)
+
       const ctx: any = {}
       let appHTML = await renderToString(app, ctx)
 
@@ -103,12 +111,16 @@ export async function build({ script = 'sync', mock = false } = {}) {
       config.logger.info(
         `${chalk.dim(`${outDir}/`)}${chalk.cyan(filename)}\t${chalk.dim(getSize(html))}`,
       )
+
+      onRouterRendered?.(route)
     }),
   )
 
   await fs.remove(ssgOut)
 
   console.log(`\n${chalk.gray('[vite-ssg]')} ${chalk.green('Build finished.')}`)
+
+  onFinished?.()
 }
 
 function getSize(str: string) {
