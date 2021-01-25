@@ -2,7 +2,7 @@ import { join, dirname } from 'path'
 import chalk from 'chalk'
 import fs from 'fs-extra'
 import { build as viteBuild, resolveConfig, UserConfig } from 'vite'
-import { renderToString } from '@vue/server-renderer'
+import { renderToString, SSRContext } from '@vue/server-renderer'
 import { JSDOM } from 'jsdom'
 import { RollupOutput } from 'rollup'
 import { ViteSSGContext, ViteSSGOptions } from '../client'
@@ -29,8 +29,8 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
     mock = 'false',
     entry = 'src/main.ts',
     formatting = null,
-    onBeforeRouteRender,
-    onRouterRendered,
+    onBeforePageRender,
+    onPageRendered,
     onFinished,
   } = Object.assign({}, config.ssgOptions || {}, cliOptions)
 
@@ -79,9 +79,13 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
 
   const { routes } = createApp(false)
   // ignore dynamic routes
-  const routesPaths = routes.map(i => i.path).filter(i => !i.includes(':'))
+  const routesPaths = routes
+    .map(i => i.path)
+    .filter(i => !i.includes(':'))
 
   indexHTML = rewriteScripts(indexHTML, script)
+
+  console.log(`\n${chalk.gray('[vite-ssg]')} ${chalk.yellow('Rendering Pages...')} ${chalk.blue(`(${routesPaths.length})`)}`)
 
   if (mock) {
     const jsdom = new JSDOM()
@@ -90,8 +94,6 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
     Object.assign(global, jsdom.window)
   }
 
-  console.log(`\n${chalk.gray('[vite-ssg]')} ${chalk.yellow('Rendering Pages...')} ${chalk.blue(`(${routesPaths.length})`)}`)
-
   await Promise.all(
     routesPaths.map(async(route) => {
       const { app, router, head } = createApp(false)
@@ -99,32 +101,33 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
       router.push(route)
       await router.isReady()
 
-      onBeforeRouteRender?.(route)
+      const transformedIndexHTML = (await onBeforePageRender?.(route, indexHTML)) || indexHTML
 
-      const ctx: any = {}
+      const ctx: SSRContext = {}
       let appHTML = await renderToString(app, ctx)
 
       appHTML = rewriteAssets(appHTML, manifest)
 
-      const jsdom = new JSDOM(indexHTML)
+      // render head
+      const jsdom = new JSDOM(transformedIndexHTML)
       head.updateDOM(jsdom.window.document)
 
       // render current page's preloadLinks
       renderPreloadLinks(jsdom.window.document, ctx.modules, ssrManifest, clientResult, config.base)
 
-      const html = format(renderHTML(jsdom.serialize(), appHTML), formatting)
+      const html = renderHTML(jsdom.serialize(), appHTML)
+      const transformed = (await onPageRendered?.(route, html)) || html
+      const formatted = format(transformed, formatting)
 
       const relativeRoute = (route.endsWith('/') ? `${route}index` : route).slice(1)
       const filename = `${relativeRoute}.html`
 
       await fs.ensureDir(join(out, dirname(relativeRoute)))
-      await fs.writeFile(join(out, filename), html, 'utf-8')
+      await fs.writeFile(join(out, filename), formatted, 'utf-8')
 
       config.logger.info(
-        `${chalk.dim(`${outDir}/`)}${chalk.cyan(filename)}\t${chalk.dim(getSize(html))}`,
+        `${chalk.dim(`${outDir}/`)}${chalk.cyan(filename)}\t${chalk.dim(getSize(formatted))}`,
       )
-
-      onRouterRendered?.(route)
     }),
   )
 

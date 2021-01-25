@@ -31,8 +31,19 @@ export interface ViteSSGOptions {
    */
   formatting?: null | 'minify' | 'prettify'
 
-  onBeforeRouteRender?: (route: string) => void
-  onRouterRendered?: (route: string) => void
+  /**
+   * Callback to be called before every page render.
+   *
+   * Also give the change to transform the index html passed to the renderer.
+   */
+  onBeforePageRender?: (route: string, indexHTML: string) => Promise<string | null | undefined> | string | null | undefined
+
+  /**
+   * Callback to be called on every page rendered.
+   *
+   * Also give the change to transform the rendered html by returning a string.
+   */
+  onPageRendered?: (route: string, renderedHTML: string) => Promise<string | null | undefined> | string | null | undefined
 
   onFinished?: () => void
 }
