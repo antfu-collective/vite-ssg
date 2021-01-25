@@ -4,8 +4,10 @@ import fs from 'fs-extra'
 import { build as viteBuild, resolveConfig, UserConfig } from 'vite'
 import { renderToString } from '@vue/server-renderer'
 import { JSDOM } from 'jsdom'
+import { RollupOutput } from 'rollup'
 import { ViteSSGContext, ViteSSGOptions } from '../client'
 import { DEFAULT_ASSETS_RE } from './constants'
+import { renderPreloadLinks } from './perloadlink'
 
 type ViteManifest = Record<string, {
   file: string
@@ -40,30 +42,36 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
       minify: false,
       cssCodeSplit: false,
       rollupOptions: {
-        input: join(root, './src/main.ts'),
+        input: {
+          app: join(root, './src/main.ts'),
+        },
       },
     },
   }
 
   console.log(`${chalk.gray('[vite-ssg]')} ${chalk.yellow('Build for client...')}`)
 
-  await viteBuild({
+  const clientResult = await viteBuild({
     build: {
-      // TODO: ssrManifest: true,
+      ssrManifest: true,
       manifest: true,
+      rollupOptions: {
+        input: {
+          app: join(root, './index.html'),
+        },
+      },
     },
-  })
+  }) as RollupOutput
 
   console.log(`\n${chalk.gray('[vite-ssg]')} ${chalk.yellow('Build for server...')}`)
 
   await viteBuild(ssrConfig)
 
   const manifest: ViteManifest = JSON.parse(await fs.readFile(join(out, 'manifest.json'), 'utf-8'))
-  // TODO: render preloadLinks from ssrManifest
-  // const ssrManifest = JSON.parse(await fs.readFile(join(out, 'ssr-manifest.json'), 'utf-8'))
+  const ssrManifest = JSON.parse(await fs.readFile(join(out, 'ssr-manifest.json'), 'utf-8'))
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { createApp } = require(join(ssgOut, 'main.js')) as { createApp(client: boolean): ViteSSGContext }
+  const { createApp } = require(join(ssgOut, 'app.js')) as { createApp(client: boolean): ViteSSGContext }
 
   let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
 
@@ -94,12 +102,13 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
       const ctx: any = {}
       let appHTML = await renderToString(app, ctx)
 
-      // TODO: render preloadLinks from ssrManifest
-
       appHTML = rewriteAssets(appHTML, manifest)
 
       const jsdom = new JSDOM(indexHTML)
       head.updateDOM(jsdom.window.document)
+
+      // render current page's preloadLinks
+      renderPreloadLinks(jsdom.window.document, ctx.modules, ssrManifest, clientResult, config.base)
 
       const html = renderHTML(jsdom.serialize(), appHTML)
 
