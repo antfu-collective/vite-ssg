@@ -24,9 +24,9 @@ const knownAssetTypes = [
   'otf',
 
   // other
-  'wasm'
+  'wasm',
 ]
 
 export const DEFAULT_ASSETS_RE = new RegExp(
-  `\\.(` + knownAssetTypes.join('|') + `)(\\?.*)?$`
+  `\\.(${knownAssetTypes.join('|')})(\\?.*)?$`,
 )
