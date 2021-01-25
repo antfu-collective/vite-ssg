@@ -9,12 +9,27 @@ export interface ViteSSGOptions {
    * @default 'sync'
    */
   script?: 'sync' | 'async' | 'defer' | 'async defer'
+
+  /**
+   * The path of main entry, relative to the project root
+   *
+   * @default 'src/main.ts'
+   */
+  entry?: string
+
   /**
    * Mock browser global variables (window, document, etc.) for SSG
    *
    * @default false
    */
   mock?: boolean
+
+  /**
+   * Applying formatter to the generated index file.
+   *
+   * @default null
+   */
+  formatting?: null | 'minify' | 'prettify'
 
   onBeforeRouteRender?: (route: string) => void
   onRouterRendered?: (route: string) => void

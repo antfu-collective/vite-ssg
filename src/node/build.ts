@@ -27,6 +27,8 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
   const {
     script = 'sync',
     mock = 'false',
+    entry = 'src/main.ts',
+    formatting = null,
     onBeforeRouteRender,
     onRouterRendered,
     onFinished,
@@ -43,7 +45,7 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
       cssCodeSplit: false,
       rollupOptions: {
         input: {
-          app: join(root, './src/main.ts'),
+          app: join(root, entry),
         },
       },
     },
@@ -110,10 +112,11 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
       // render current page's preloadLinks
       renderPreloadLinks(jsdom.window.document, ctx.modules, ssrManifest, clientResult, config.base)
 
-      const html = renderHTML(jsdom.serialize(), appHTML)
+      const html = format(renderHTML(jsdom.serialize(), appHTML), formatting)
 
       const relativeRoute = (route.endsWith('/') ? `${route}index` : route).slice(1)
       const filename = `${relativeRoute}.html`
+
       await fs.ensureDir(join(out, dirname(relativeRoute)))
       await fs.writeFile(join(out, filename), html, 'utf-8')
 
@@ -154,4 +157,22 @@ function rewriteAssets(appHTML: string, manifest: ViteManifest) {
 function renderHTML(indexHTML: string, appHTML: string) {
   return indexHTML
     .replace('<div id="app">', `<div id="app" data-server-rendered="true">${appHTML}`)
+}
+
+function format(html: string, formatting: ViteSSGOptions['formatting']) {
+  if (formatting === 'minify') {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    return require('html-minifier').minify(html, {
+      collapseWhitespace: true,
+      caseSensitive: true,
+      collapseInlineTagWhitespace: true,
+      minifyJS: true,
+      minifyCSS: true,
+    })
+  }
+  else if (formatting === 'prettify') {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    return require('prettier').format(html, { semi: false, parser: 'html' })
+  }
+  return html
 }
