@@ -32,6 +32,13 @@ export interface ViteSSGOptions {
   formatting?: null | 'minify' | 'prettify'
 
   /**
+   * Prefetch all assets in current page.
+   *
+   * @default true
+   */
+  prefetchAssets?: boolean
+
+  /**
    * Callback to be called before every page render.
    *
    * Also give the change to transform the index html passed to the renderer.

@@ -6,13 +6,8 @@ import { renderToString, SSRContext } from '@vue/server-renderer'
 import { JSDOM } from 'jsdom'
 import { RollupOutput } from 'rollup'
 import { ViteSSGContext, ViteSSGOptions } from '../client'
-import { DEFAULT_ASSETS_RE } from './constants'
 import { renderPreloadLinks } from './perloadlink'
-
-type ViteManifest = Record<string, {
-  file: string
-  imports?: string[]
-}>
+import { buildLog, getSize } from './utils'
 
 export async function build(cliOptions: ViteSSGOptions = {}) {
   const mode = process.env.MODE || process.env.NODE_ENV || 'production'
@@ -29,6 +24,7 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
     mock = 'false',
     entry = 'src/main.ts',
     formatting = null,
+    prefetchAssets = true,
     onBeforePageRender,
     onPageRendered,
     onFinished,
@@ -51,12 +47,11 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
     },
   }
 
-  console.log(`${chalk.gray('[vite-ssg]')} ${chalk.yellow('Build for client...')}`)
+  buildLog('Build for client...')
 
-  const clientResult = await viteBuild({
+  await viteBuild({
     build: {
       ssrManifest: true,
-      manifest: true,
       rollupOptions: {
         input: {
           app: join(root, './index.html'),
@@ -65,11 +60,10 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
     },
   }) as RollupOutput
 
-  console.log(`\n${chalk.gray('[vite-ssg]')} ${chalk.yellow('Build for server...')}`)
+  buildLog('Build for server...')
 
   await viteBuild(ssrConfig)
 
-  const manifest: ViteManifest = JSON.parse(await fs.readFile(join(out, 'manifest.json'), 'utf-8'))
   const ssrManifest = JSON.parse(await fs.readFile(join(out, 'ssr-manifest.json'), 'utf-8'))
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -85,7 +79,7 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
 
   indexHTML = rewriteScripts(indexHTML, script)
 
-  console.log(`\n${chalk.gray('[vite-ssg]')} ${chalk.yellow('Rendering Pages...')} ${chalk.blue(`(${routesPaths.length})`)}`)
+  buildLog('Rendering Pages...', routesPaths.length)
 
   if (mock) {
     const jsdom = new JSDOM()
@@ -106,16 +100,19 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
       const ctx: SSRContext = {}
       let appHTML = await renderToString(app, ctx)
 
-      appHTML = rewriteAssets(appHTML, manifest)
+      // need to resolve assets so render content first
+      const renderedHTML = renderHTML(transformedIndexHTML, appHTML)
 
-      // render head
-      const jsdom = new JSDOM(transformedIndexHTML)
-      head.updateDOM(jsdom.window.document)
+      // create jsdom from renderedHTML
+      const jsdom = new JSDOM(renderedHTML)
 
       // render current page's preloadLinks
-      renderPreloadLinks(jsdom.window.document, ctx.modules, ssrManifest, clientResult, config.base)
+      renderPreloadLinks(jsdom.window.document, ctx.modules, ssrManifest, prefetchAssets)
 
-      const html = renderHTML(jsdom.serialize(), appHTML)
+      // render head
+      head.updateDOM(jsdom.window.document)
+
+      const html = jsdom.serialize()
       const transformed = (await onPageRendered?.(route, html)) || html
       const formatted = format(transformed, formatting)
 
@@ -138,23 +135,10 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
   onFinished?.()
 }
 
-function getSize(str: string) {
-  return `${(str.length / 1024).toFixed(2)}kb`
-}
-
 function rewriteScripts(indexHTML: string, mode?: string) {
   if (!mode || mode === 'sync')
     return indexHTML
   return indexHTML.replace(/<script type="module" /g, `<script type="module" ${mode} `)
-}
-
-function rewriteAssets(appHTML: string, manifest: ViteManifest) {
-  Object.keys(manifest)
-    .forEach((key) => {
-      if (DEFAULT_ASSETS_RE.test(key))
-        appHTML = appHTML.replace(key, manifest[key].file)
-    })
-  return appHTML
 }
 
 function renderHTML(indexHTML: string, appHTML: string) {

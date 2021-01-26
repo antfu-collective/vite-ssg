@@ -1,75 +1,69 @@
 import { RollupOutput, OutputChunk } from 'rollup'
+import { DEFAULT_ASSETS_RE } from './constants'
 
 interface Manifest {
   [key: string]: string[]
 }
 
-export function renderPreloadLinks(document: Document, modules: Set<string>, manifest: Manifest, clientResult: RollupOutput, base: string) {
+export function renderPreloadLinks(document: Document, modules: Set<string>, manifest: Manifest, prefetchAssets: boolean) {
   const seen = new Set()
-  const appChunk = clientResult.output.find(
-    chunk => chunk.type === 'chunk' && chunk.isEntry && chunk,
-  ) as OutputChunk
-  modules.forEach((id) => {
-    const pageChunk = clientResult.output.find(
-      chunk => chunk.type === 'chunk' && chunk.facadeModuleId === id,
-    ) as OutputChunk
 
-    const files = manifest[id]?.map((path) => {
-      return path.substring(1)
-    })
-
-    const preloadLinks: string[] = [
-      ...(pageChunk ? resolvePageImports(appChunk, pageChunk) : []),
-      ...files || [],
-    ]
-
-    if (preloadLinks) {
-      preloadLinks.forEach((file) => {
-        if (!seen.has(file)) {
-          seen.add(file)
-          renderPreloadLink(document, file, base)
-        }
-      })
-    }
+  let preloadLinks: string[] = []
+  
+  // preload assets
+  const srcDoms = document.body.querySelectorAll('[src]')
+  
+  srcDoms.forEach((dom: any) => {
+    const src = dom.src as string
+    if (src && DEFAULT_ASSETS_RE.test(src))
+      preloadLinks.push(src)
   })
+
+  // preload modules
+  Array.from(modules).forEach((id) => {
+    const files = manifest[id] || []
+    files.forEach((file) => {
+      if (!preloadLinks.includes(file))
+        preloadLinks.push(file)
+    })
+  })
+  
+  if (preloadLinks) {
+    preloadLinks.forEach((file) => {
+      if (!seen.has(file)) {
+        seen.add(file)
+        renderPreloadLink(document, file, prefetchAssets)
+      }
+    })
+  }
+}
+
+function renderPreloadLink(document: Document, file: string, prefetchAssets: boolean) {
+  if (file.endsWith('.js')) {
+    appendLink(document, 'modulepreload', file, true)
+  }
+  else if (file.endsWith('.css')) {
+    appendLink(document, 'stylesheet', file)
+  }
+  else if (prefetchAssets && DEFAULT_ASSETS_RE.test(file)) {
+    appendLink(document, 'prefetch', file)
+  }
+  else {
+    // TODO
+    return
+  }
 }
 
 const createLink = (document: Document) => document.createElement('link')
 
-function renderPreloadLink(document: Document, file: string, base: string) {
-  if (file.endsWith('.js')) {
-    const link = createLink(document)
-    link.rel = 'modulepreload'
+function appendLink(document: Document, rel: string, file: string, crossOrigin?: boolean) {
+  const link = createLink(document)
+  link.rel = rel
+  if (crossOrigin) {
     link.crossOrigin = ''
-    link.href = base + file
-    const exits = document.head.querySelector(`link[href='${base + file}']`)
-    if (!exits)
-      document.head.appendChild(link)
   }
-  else if (file.endsWith('.css')) {
-    const link = createLink(document)
-    link.rel = 'stylesheet'
-    link.href = base + file
-    const exits = document.head.querySelector(`link[href='${base + file}']`)
-    if (!exits)
-      document.head.appendChild(link)
-  }
-  else {
-    // TODO
-    return ''
-  }
-}
-
-function resolvePageImports(
-  appChunk: OutputChunk,
-  pageChunk?: OutputChunk,
-) {
-  return Array.from(
-    new Set([
-      ...appChunk.imports,
-      // ...appChunk.dynamicImports,
-      ...pageChunk?.imports || [],
-      ...pageChunk?.dynamicImports || [],
-    ]),
-  )
+  link.href = file
+  const exits = document.head.querySelector(`link[href='${file}']`)
+  if (!exits)
+    document.head.appendChild(link)
 }
