@@ -8,11 +8,11 @@ interface Manifest {
 export function renderPreloadLinks(document: Document, modules: Set<string>, manifest: Manifest, prefetchAssets: boolean) {
   const seen = new Set()
 
-  let preloadLinks: string[] = []
-  
+  const preloadLinks: string[] = []
+
   // preload assets
   const srcDoms = document.body.querySelectorAll('[src]')
-  
+
   srcDoms.forEach((dom: any) => {
     const src = dom.src as string
     if (src && DEFAULT_ASSETS_RE.test(src))
@@ -27,7 +27,7 @@ export function renderPreloadLinks(document: Document, modules: Set<string>, man
         preloadLinks.push(file)
     })
   })
-  
+
   if (preloadLinks) {
     preloadLinks.forEach((file) => {
       if (!seen.has(file)) {
@@ -48,10 +48,7 @@ function renderPreloadLink(document: Document, file: string, prefetchAssets: boo
   else if (prefetchAssets && DEFAULT_ASSETS_RE.test(file)) {
     appendLink(document, 'prefetch', file)
   }
-  else {
-    // TODO
-    return
-  }
+  else {}
 }
 
 const createLink = (document: Document) => document.createElement('link')
@@ -59,9 +56,9 @@ const createLink = (document: Document) => document.createElement('link')
 function appendLink(document: Document, rel: string, file: string, crossOrigin?: boolean) {
   const link = createLink(document)
   link.rel = rel
-  if (crossOrigin) {
+  if (crossOrigin)
     link.crossOrigin = ''
-  }
+
   link.href = file
   const exits = document.head.querySelector(`link[href='${file}']`)
   if (!exits)

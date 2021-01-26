@@ -98,7 +98,7 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
       const transformedIndexHTML = (await onBeforePageRender?.(route, indexHTML)) || indexHTML
 
       const ctx: SSRContext = {}
-      let appHTML = await renderToString(app, ctx)
+      const appHTML = await renderToString(app, ctx)
 
       // need to resolve assets so render content first
       const renderedHTML = renderHTML(transformedIndexHTML, appHTML)
