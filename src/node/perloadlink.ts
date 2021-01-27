@@ -1,23 +1,9 @@
-import { RollupOutput, OutputChunk } from 'rollup'
-import { DEFAULT_ASSETS_RE } from './constants'
+import { Manifest } from './build'
 
-interface Manifest {
-  [key: string]: string[]
-}
-
-export function renderPreloadLinks(document: Document, modules: Set<string>, manifest: Manifest, prefetchAssets: boolean) {
+export function renderPreloadLinks(document: Document, modules: Set<string>, manifest: Manifest) {
   const seen = new Set()
 
   const preloadLinks: string[] = []
-
-  // preload assets
-  const srcDoms = document.body.querySelectorAll('[src]')
-
-  srcDoms.forEach((dom: any) => {
-    const src = dom.src as string
-    if (src && DEFAULT_ASSETS_RE.test(src))
-      preloadLinks.push(src)
-  })
 
   // preload modules
   Array.from(modules).forEach((id) => {
@@ -32,35 +18,41 @@ export function renderPreloadLinks(document: Document, modules: Set<string>, man
     preloadLinks.forEach((file) => {
       if (!seen.has(file)) {
         seen.add(file)
-        renderPreloadLink(document, file, prefetchAssets)
+        renderPreloadLink(document, file)
       }
     })
   }
 }
 
-function renderPreloadLink(document: Document, file: string, prefetchAssets: boolean) {
+function renderPreloadLink(document: Document, file: string) {
   if (file.endsWith('.js')) {
-    appendLink(document, 'modulepreload', file, true)
+    appendLink(document, {
+      rel: 'modulepreload',
+      crossOrigin: '',
+      href: file,
+    })
   }
   else if (file.endsWith('.css')) {
-    appendLink(document, 'stylesheet', file)
-  }
-  else if (prefetchAssets && DEFAULT_ASSETS_RE.test(file)) {
-    appendLink(document, 'prefetch', file)
+    appendLink(document, {
+      rel: 'stylesheet',
+      href: file,
+    })
   }
   else {}
 }
 
 const createLink = (document: Document) => document.createElement('link')
 
-function appendLink(document: Document, rel: string, file: string, crossOrigin?: boolean) {
+function appendLink(document: Document, attrs: Record<string, any>) {
+  const exits = document.head.querySelector(`link[href='${attrs.file}']`)
+  if (exits) return
   const link = createLink(document)
-  link.rel = rel
-  if (crossOrigin)
-    link.crossOrigin = ''
+  setAttrs(link, attrs)
+  document.head.appendChild(link)
+}
 
-  link.href = file
-  const exits = document.head.querySelector(`link[href='${file}']`)
-  if (!exits)
-    document.head.appendChild(link)
+const setAttrs = (el: Element, attrs: Record<string, any>) => {
+  const keys = Object.keys(attrs)
+  for (const key of keys)
+    el.setAttribute(key, attrs[key])
 }

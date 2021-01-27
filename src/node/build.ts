@@ -9,6 +9,10 @@ import { ViteSSGContext, ViteSSGOptions } from '../client'
 import { renderPreloadLinks } from './perloadlink'
 import { buildLog, getSize } from './utils'
 
+export interface Manifest {
+  [key: string]: string[]
+}
+
 export async function build(cliOptions: ViteSSGOptions = {}) {
   const mode = process.env.MODE || process.env.NODE_ENV || 'production'
   const config = await resolveConfig({}, 'build', mode)
@@ -24,7 +28,6 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
     mock = 'false',
     entry = 'src/main.ts',
     formatting = null,
-    prefetchAssets = true,
     onBeforePageRender,
     onPageRendered,
     onFinished,
@@ -64,7 +67,7 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
 
   await viteBuild(ssrConfig)
 
-  const ssrManifest = JSON.parse(await fs.readFile(join(out, 'ssr-manifest.json'), 'utf-8'))
+  const ssrManifest: Manifest = JSON.parse(await fs.readFile(join(out, 'ssr-manifest.json'), 'utf-8'))
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { createApp } = require(join(ssgOut, 'app.js')) as { createApp(client: boolean): ViteSSGContext }
@@ -107,7 +110,7 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
       const jsdom = new JSDOM(renderedHTML)
 
       // render current page's preloadLinks
-      renderPreloadLinks(jsdom.window.document, ctx.modules, ssrManifest, prefetchAssets)
+      renderPreloadLinks(jsdom.window.document, ctx.modules, ssrManifest)
 
       // render head
       head.updateDOM(jsdom.window.document)
