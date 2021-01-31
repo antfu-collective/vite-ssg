@@ -45,7 +45,7 @@ export const createApp = ViteSSG(
 
 ### Single Page SSG
 
-If you are not using `vue-router`, simpily pass falsy value to the second parameter to do SSG for the index page only.
+If you are not using `vue-router`, simpily pass falsy value to the second parameter to have SSG for the index page only.
 
 ```ts
 export const createApp = ViteSSG(App, null)
