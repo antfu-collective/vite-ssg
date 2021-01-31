@@ -11,7 +11,7 @@ Server-side generation for Vite.
 > **This library requires Node.js version >= 14**
 
 <pre>
-<b>npm i -D vite-ssg</b> <em>vue-router @vue/server-renderer @vue/compiler-sfc</em>
+<b>npm i -D vite-ssg</b> <em>@vue/server-renderer @vue/compiler-sfc vue-router</em>
 </pre>
 
 ```diff
@@ -43,21 +43,29 @@ export const createApp = ViteSSG(
 )
 ```
 
-### Client Only
+### Single Page SSG
+
+If you are not using `vue-router`, simpily pass falsy value to the second parameter to do SSG for the index page only.
+
+```ts
+export const createApp = ViteSSG(App, null)
+```
+
+### `<ClientOnly/>`
+
+Component `ClientOnly` is registered globally along with the app creation.
 
 ```html
 <client-only>
-  <your-components>
+  <your-client-side-components />
 </client-only>
 ```
-
-Component `ClientOnly` is registered globally along with the app creation.
 
 ## Document head
 
 From `v0.4.0`, we ships [`@vueuse/head`](https://github.com/vueuse/head) to manage the document head out-of-box. You can directly use it in your pages/components, for example:
 
-```vue
+```html
 <template>
   <button @click="count++">Click</button>
 </template>

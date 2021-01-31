@@ -70,15 +70,17 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
   const ssrManifest: Manifest = JSON.parse(await fs.readFile(join(out, 'ssr-manifest.json'), 'utf-8'))
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { createApp } = require(join(ssgOut, 'app.js')) as { createApp(client: boolean): ViteSSGContext }
+  const { createApp } = require(join(ssgOut, 'app.js')) as { createApp(client: boolean): ViteSSGContext<true> | ViteSSGContext<false> }
 
   let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
 
   const { routes } = createApp(false)
   // ignore dynamic routes
   const routesPaths = routes
-    .map(i => i.path)
-    .filter(i => !i.includes(':'))
+    ? routes
+      .map(i => i.path)
+      .filter(i => !i.includes(':'))
+    : ['/']
 
   indexHTML = rewriteScripts(indexHTML, script)
 
@@ -95,8 +97,10 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
     routesPaths.map(async(route) => {
       const { app, router, head } = createApp(false)
 
-      router.push(route)
-      await router.isReady()
+      if (router) {
+        router.push(route)
+        await router.isReady()
+      }
 
       const transformedIndexHTML = (await onBeforePageRender?.(route, indexHTML)) || indexHTML
 
