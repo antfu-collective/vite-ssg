@@ -45,10 +45,12 @@ export const createApp = ViteSSG(
 
 ### Single Page SSG
 
-If you are not using `vue-router`, simpily pass falsy value to the second parameter to have SSG for the index page only.
+To have SSG for the index page only (without `vue-router`), import from `vite-ssg/single-page` instead.
 
 ```ts
-export const createApp = ViteSSG(App, null)
+import { ViteSSG } from 'vite-ssg/single-page'
+
+export const createApp = ViteSSG(App)
 ```
 
 ### `<ClientOnly/>`

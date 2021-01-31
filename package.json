@@ -5,6 +5,17 @@
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "exports": {
+    "./": "./",
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    },
+    "./single-page": {
+      "require": "./dist/client/single-page.js",
+      "import": "./dist/client/single-page.mjs"
+    }
+  },
   "license": "MIT",
   "funding": "https://github.com/sponsors/antfu",
   "author": "Anthony Fu <anthonyfu117@hotmail.com>",
@@ -19,7 +30,8 @@
   "bugs": "https://github.com/antfu/vite-ssg/issues",
   "files": [
     "dist",
-    "bin"
+    "bin",
+    "single-page.d.ts"
   ],
   "bin": {
     "vite-ssg": "bin/vite-ssg.js"
@@ -30,7 +42,7 @@
     "example:build": "cp README.md examples/multiple-pages/README.md && npm -C examples/multiple-pages run build",
     "example:single:dev": "npm -C examples/single-page run dev",
     "example:single:build": "npm -C examples/single-page run build",
-    "build": "tsup src/index.ts src/node/cli.ts --dts --format cjs,esm",
+    "build": "rimraf dist && tsup src/index.ts src/client/single-page.ts src/node/cli.ts --dts --format cjs,esm && cp dist/single-page.d.ts .",
     "prepublishOnly": "npm run build",
     "release": "npx bumpp --push --tag --commit && npm publish"
   },

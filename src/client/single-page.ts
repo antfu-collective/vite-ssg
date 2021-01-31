@@ -1,15 +1,13 @@
 import { createSSRApp, Component, createApp as createClientApp } from 'vue'
-import { createMemoryHistory, createRouter, createWebHistory } from 'vue-router'
 import { createHead } from '@vueuse/head'
-import { RouterOptions, ViteSSGContext, ViteSSGClientOptions } from '../types'
 import { ClientOnly } from './components/ClientOnly'
+import { ViteSSGClientOptions, ViteSSGContext } from '../types'
 
 export * from '../types'
 
 export function ViteSSG(
   App: Component,
-  routerOptions: RouterOptions,
-  fn?: (context: ViteSSGContext<true>) => void,
+  fn?: (context: ViteSSGContext<false>) => void,
   options: ViteSSGClientOptions = {},
 ) {
   const { registerComponents = true } = options
@@ -20,23 +18,13 @@ export function ViteSSG(
       ? createClientApp(App)
       : createSSRApp(App)
 
-    let context: ViteSSGContext<true>
+    let context: ViteSSGContext<false>
 
     const head = createHead()
 
     app.use(head)
 
-
-    const router = createRouter({
-      history: client ? createWebHistory() : createMemoryHistory(),
-      ...routerOptions,
-    })
-
-    const { routes } = routerOptions
-
-    app.use(router)
-
-    context = { app, head, isClient, router, routes }
+    context = { app, head, isClient, router: undefined, routes: undefined }
 
     if (registerComponents)
       app.component('ClientOnly', client ? ClientOnly : { render: () => null })
@@ -47,12 +35,8 @@ export function ViteSSG(
   }
 
   if (isClient) {
-    const { app, router } = createApp(true)
-
-    // wait until page component is fetched before mounting
-    router.isReady().then(() => {
-      app.mount('#app', true)
-    })
+    const { app } = createApp(true)
+    app.mount('#app', true)
   }
 
   return createApp

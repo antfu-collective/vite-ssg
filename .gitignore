@@ -3,3 +3,4 @@ node_modules
 dist
 examples/*/README.md
 .vite-ssg-temp
+*.d.ts
