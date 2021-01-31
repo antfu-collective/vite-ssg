@@ -1,5 +1,5 @@
 node_modules
 .DS_Store
 dist
-example/README.md
+examples/*/README.md
 .vite-ssg-temp

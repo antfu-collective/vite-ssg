@@ -26,8 +26,10 @@
   },
   "scripts": {
     "dev": "npm run build -- --watch",
-    "example:dev": "cp README.md example/README.md && npm -C example run dev",
-    "example:build": "cp README.md example/README.md && npm -C example run build",
+    "example:dev": "cp README.md examples/multiple-pages/README.md && npm -C examples/multiple-pages run dev",
+    "example:build": "cp README.md examples/multiple-pages/README.md && npm -C examples/multiple-pages run build",
+    "example:single:dev": "npm -C examples/single-page run dev",
+    "example:single:build": "npm -C examples/single-page run build",
     "build": "tsup src/index.ts src/node/cli.ts --dts --format cjs,esm",
     "prepublishOnly": "npm run build",
     "release": "npx bumpp --commit --tag && npm publish && git push"

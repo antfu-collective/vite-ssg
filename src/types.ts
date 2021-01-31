@@ -50,10 +50,10 @@ export interface ViteSSGOptions {
 
 type PartialKeys<T, Keys extends keyof T> = Omit<T, Keys> & Partial<Pick<T, Keys>>
 
-export interface ViteSSGContext {
+export interface ViteSSGContext<HasRouter extends boolean = true> {
   app: App<Element>
-  router: Router
-  routes: RouteRecordRaw[]
+  router: HasRouter extends true ? Router : undefined
+  routes: HasRouter extends true ? RouteRecordRaw[] : undefined
   head: Head
   isClient: boolean
 }

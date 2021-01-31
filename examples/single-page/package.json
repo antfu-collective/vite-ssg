@@ -1,0 +1,17 @@
+{
+  "private": true,
+  "scripts": {
+    "dev": "cross-env DEBUG=vite-ssg:* vite",
+    "build": "cross-env DEBUG=vite-ssg:* vite-ssg build"
+  },
+  "dependencies": {
+    "vue": "^3.0.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^1.1.2",
+    "cross-env": "^7.0.3",
+    "typescript": "^4.1.3",
+    "vite": "^2.0.0-beta.48",
+    "vite-ssg": "workspace:*"
+  }
+}
