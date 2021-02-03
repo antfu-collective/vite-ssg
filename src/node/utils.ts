@@ -9,7 +9,7 @@ export function getSize(str: string) {
 }
 
 export function collectRoutePaths(routes: any[]) {
-  const pathsFromRoute = (prefix: string) => (route: any): string[] => {
+  const pathsFromRoute = (prefix = '') => (route: any): string[] => {
     // include the prefix from the parent in this path
     const paths = [
       prefix ? `${prefix}/${route.path}` : route.path
@@ -25,6 +25,6 @@ export function collectRoutePaths(routes: any[]) {
 
 
   return routes
-    .flatMap(pathsFromRoute(''))
+    .flatMap(pathsFromRoute())
     .filter(i => !i.includes(':')) // ignore dynamic routes
 }
