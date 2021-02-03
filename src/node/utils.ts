@@ -1,4 +1,5 @@
 import chalk from 'chalk'
+import { RouteRecordRaw } from 'vue-router'
 
 export function buildLog(text: string, count?: number) {
   console.log(`\n${chalk.gray('[vite-ssg]')} ${chalk.yellow(text)}${count ? chalk.blue(` (${count})`) : ''}`)
@@ -8,8 +9,8 @@ export function getSize(str: string) {
   return `${(str.length / 1024).toFixed(2)}kb`
 }
 
-export function routesToPaths(routes: any[]) {
-  const pathsFromRoute = (prefix = '') => (route: any): string[] => {
+export function routesToPaths(routes: RouteRecordRaw[]) {
+  const pathsFromRoute = (prefix = '') => (route: RouteRecordRaw): string[] => {
     // include the prefix from the parent in this path
     const paths = [
       prefix ? `${prefix}/${route.path}` : route.path
