@@ -7,7 +7,7 @@ import { JSDOM } from 'jsdom'
 import { RollupOutput } from 'rollup'
 import { ViteSSGContext, ViteSSGOptions } from '../client'
 import { renderPreloadLinks } from './perloadlink'
-import { buildLog, getSize } from './utils'
+import { buildLog, collectRoutePaths, getSize } from './utils'
 
 export interface Manifest {
   [key: string]: string[]
@@ -76,24 +76,8 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
 
   const { routes } = createApp(false)
 
-  // this function recursively extracts all paths from a given route
-  const pathsFromRoute = (prefix: string) => (route: any) => {
-    const paths = [
-      prefix ? `${prefix}/${route.path}` : route.path
-    ]
-
-    if (Array.isArray(route.children)) {
-      paths.push(...route.children.flatMap(pathsFromRoute(route.path)))
-    }
-
-    return paths
-  }
-
-  // ignore dynamic routes when rendering
   const routesPaths = routes
-    ? routes
-      .flatMap(pathsFromRoute(''))
-      .filter(i => i && !i.includes(':'))
+    ? collectRoutePaths(routes)
     : ['/']
 
   indexHTML = rewriteScripts(indexHTML, script)
