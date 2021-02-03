@@ -75,10 +75,24 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
   let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
 
   const { routes } = createApp(false)
-  // ignore dynamic routes
+  
+  // this function recursively extracts all paths from a given route
+  const pathsFromRoute = (prefix:string) => (route:any) => {
+    const paths = [
+      prefix ? `${prefix}/${route.path}` : route.path
+    ]
+
+    if (Array.isArray(route.children)) {
+      paths.push(...route.children.flatMap(pathsFromRoute(route.path)))
+    }
+
+    return paths
+  }
+  
+  // ignore dynamic routes when rendering
   const routesPaths = routes
-    .map(i => i.path)
-    .filter(i => !i.includes(':'))
+    .flatMap(pathsFromRoute(''))
+    .filter(i => i && !i.includes(':'))
 
   indexHTML = rewriteScripts(indexHTML, script)
 
