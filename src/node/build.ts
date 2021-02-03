@@ -7,7 +7,7 @@ import { JSDOM } from 'jsdom'
 import { RollupOutput } from 'rollup'
 import { ViteSSGContext, ViteSSGOptions } from '../client'
 import { renderPreloadLinks } from './perloadlink'
-import { buildLog, collectRoutePaths, getSize } from './utils'
+import { buildLog, routesToPaths, getSize } from './utils'
 
 export interface Manifest {
   [key: string]: string[]
@@ -77,7 +77,7 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
   const { routes } = createApp(false)
 
   const routesPaths = routes
-    ? collectRoutePaths(routes)
+    ? routesToPaths(routes)
     : ['/']
 
   indexHTML = rewriteScripts(indexHTML, script)
