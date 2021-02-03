@@ -8,7 +8,7 @@ export function getSize(str: string) {
   return `${(str.length / 1024).toFixed(2)}kb`
 }
 
-export function collectRoutePaths(routes: any[]) {
+export function routesToPaths(routes: any[]) {
   const pathsFromRoute = (prefix = '') => (route: any): string[] => {
     // include the prefix from the parent in this path
     const paths = [
