@@ -7,7 +7,7 @@ import { JSDOM } from 'jsdom'
 import { RollupOutput } from 'rollup'
 import { ViteSSGContext, ViteSSGOptions } from '../client'
 import { renderPreloadLinks } from './perloadlink'
-import { buildLog, getSize } from './utils'
+import { buildLog, routesToPaths, getSize } from './utils'
 
 export interface Manifest {
   [key: string]: string[]
@@ -75,11 +75,9 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
   let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
 
   const { routes } = createApp(false)
-  // ignore dynamic routes
+
   const routesPaths = routes
-    ? routes
-      .map(i => i.path)
-      .filter(i => !i.includes(':'))
+    ? routesToPaths(routes)
     : ['/']
 
   indexHTML = rewriteScripts(indexHTML, script)
@@ -94,7 +92,7 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
   }
 
   await Promise.all(
-    routesPaths.map(async(route) => {
+    routesPaths.map(async (route) => {
       const { app, router, head } = createApp(false)
 
       if (router) {
