@@ -9,23 +9,21 @@ export function getSize(str: string) {
   return `${(str.length / 1024).toFixed(2)}kb`
 }
 
-export function routesToPaths(routes: RouteRecordRaw[]) {
-  const pathsFromRoute = (prefix = '') => (route: RouteRecordRaw): string[] => {
-    // include the prefix from the parent in this path
-    const paths = [
-      prefix ? `${prefix}/${route.path}` : route.path
-    ]
+export function routesToPaths(routes?: RouteRecordRaw[]) {
+  if (!routes)
+    return ['/']
 
-    // if the route has children, recursively traverse those as well
-    if (Array.isArray(route.children)) {
-      paths.push(...route.children.flatMap(pathsFromRoute(route.path)))
+  const paths: string[] = []
+
+  const getPaths = (routes: RouteRecordRaw[], prefix = '') => {
+    for (const route of routes) {
+      paths.push(prefix ? `${prefix}/${route.path}` : route.path)
+      if (Array.isArray(route.children))
+        getPaths(route.children, route.path)
     }
-
-    return paths
   }
 
+  getPaths(routes)
 
-  return routes
-    .flatMap(pathsFromRoute())
-    .filter(i => !i.includes(':')) // ignore dynamic routes
+  return paths
 }

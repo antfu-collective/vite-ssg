@@ -101,12 +101,30 @@ You can pass options to Vite SSG in the `ssgOptions` field of your `vite.config.
 export default {
   plugins: [ /*...*/ ],
   ssgOptions: {
-    script: 'async',
-  },
+    script: 'async'
+  }
 }
 ```
 
 See [src/types.ts] for more options avaliable.
+
+### Custom Routes to Render
+
+You can use the `includedRoutes` hook to exclude/include route paths to render, or even provide some complete custom ones.
+
+```js
+// vite.config.js
+
+export default {
+  plugins: [ /*...*/ ],
+  ssgOptions: {
+    includedRoutes(routes) {
+      // exclude all the route paths that contains 'foo'
+      return paths.filter(i => !i.includes('foo'))
+    }
+  }
+}
+```
 
 ## Comparsion
 

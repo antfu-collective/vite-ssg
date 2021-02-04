@@ -32,6 +32,14 @@ export interface ViteSSGOptions {
   formatting?: null | 'minify' | 'prettify'
 
   /**
+   * Custom functions to modified the routes to do the SSG.
+   *
+   * Default to a handler that filter out all the dynamic routes,
+   * when passing your custom handler, you should also take care the dynamic routes yourself.
+   */
+  includedRoutes?: (routes: string[]) => Promise<string[]> | string[]
+
+  /**
    * Callback to be called before every page render.
    *
    * Also give the change to transform the index html passed to the renderer.
@@ -58,14 +66,15 @@ export interface ViteSSGContext<HasRouter extends boolean = true> {
   isClient: boolean
 }
 
-declare module 'vite' {
-  interface UserConfig {
-    ssgOptions?: ViteSSGOptions
-  }
-}
-
 export interface ViteSSGClientOptions {
   registerComponents?: boolean
 }
 
 export type RouterOptions = PartialKeys<VueRouterOptions, 'history'>
+
+// extend vite.config.ts
+declare module 'vite' {
+  interface UserConfig {
+    ssgOptions?: ViteSSGOptions
+  }
+}
