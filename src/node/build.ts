@@ -116,7 +116,7 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
       const jsdom = new JSDOM(renderedHTML)
 
       // render current page's preloadLinks
-      renderPreloadLinks(jsdom.window.document, ctx.modules, ssrManifest)
+      renderPreloadLinks(jsdom.window.document, ctx.modules || new Set<string>(), ssrManifest)
 
       // render head
       head.updateDOM(jsdom.window.document)
