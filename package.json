@@ -42,8 +42,8 @@
     "example:build": "cp README.md examples/multiple-pages/README.md && npm -C examples/multiple-pages run build",
     "example:single:dev": "npm -C examples/single-page run dev",
     "example:single:build": "npm -C examples/single-page run build",
-    "build": "rimraf dist && tsup src/index.ts src/client/single-page.ts src/node/cli.ts --dts --format cjs,esm && cp dist/single-page.d.ts .",
-    "prepublishOnly": "npm run build",
+    "build": "rimraf dist && tsup src/index.ts src/client/single-page.ts src/node/cli.ts --dts --format cjs,esm",
+    "prepublishOnly": "npm run build && cp dist/single-page.d.ts .",
     "release": "npx bumpp --push --tag --commit && npm publish"
   },
   "dependencies": {
