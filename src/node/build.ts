@@ -44,15 +44,10 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
 
   const ssrConfig: UserConfig = {
     build: {
-      ssr: true,
+      ssr: join(root, entry),
       outDir: ssgOut,
       minify: false,
       cssCodeSplit: false,
-      rollupOptions: {
-        input: {
-          app: join(root, entry),
-        },
-      },
     },
   }
 
@@ -76,7 +71,7 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
   const ssrManifest: Manifest = JSON.parse(await fs.readFile(join(out, 'ssr-manifest.json'), 'utf-8'))
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { createApp } = require(join(ssgOut, 'app.js')) as { createApp(client: boolean): ViteSSGContext<true> | ViteSSGContext<false> }
+  const { createApp } = require(join(ssgOut, 'main.js')) as { createApp(client: boolean): ViteSSGContext<true> | ViteSSGContext<false> }
 
   let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
 
