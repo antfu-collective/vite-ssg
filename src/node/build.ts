@@ -18,7 +18,7 @@ function DefaultIncludedRoutes(paths: string[]) {
   return paths.filter(i => !i.includes(':') && !i.includes('*'))
 }
 
-export async function build(cliOptions: ViteSSGOptions = {}) {
+export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   const mode = process.env.MODE || process.env.NODE_ENV || 'production'
   const config = await resolveConfig({}, 'build', mode)
 
