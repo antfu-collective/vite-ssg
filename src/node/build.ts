@@ -30,14 +30,14 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
   const {
     script = 'sync',
-    mock = 'false',
+    mock = false,
     entry = 'src/main.ts',
     formatting = null,
     includedRoutes = DefaultIncludedRoutes,
     onBeforePageRender,
     onPageRendered,
     onFinished,
-  } = Object.assign({}, config.ssgOptions || {}, cliOptions)
+  }: ViteSSGOptions = Object.assign({}, config.ssgOptions || {}, cliOptions)
 
   if (fs.existsSync(ssgOut))
     await fs.remove(ssgOut)
