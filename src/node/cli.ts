@@ -11,7 +11,7 @@ yargs
     (args) => {
       return args
         .option('script', {
-          choices: ['defer', 'async', 'sync'] as const,
+          choices: ['sync', 'async', 'defer', 'async defer'] as const,
           describe: 'Rewrites script loading timing',
         })
         .option('mock', {
