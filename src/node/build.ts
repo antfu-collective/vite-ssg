@@ -18,7 +18,7 @@ function DefaultIncludedRoutes(paths: string[]) {
   return paths.filter(i => !i.includes(':') && !i.includes('*'))
 }
 
-export async function build(cliOptions: ViteSSGOptions = {}) {
+export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   const mode = process.env.MODE || process.env.NODE_ENV || 'production'
   const config = await resolveConfig({}, 'build', mode)
 
@@ -30,14 +30,14 @@ export async function build(cliOptions: ViteSSGOptions = {}) {
 
   const {
     script = 'sync',
-    mock = 'false',
+    mock = false,
     entry = 'src/main.ts',
     formatting = null,
     includedRoutes = DefaultIncludedRoutes,
     onBeforePageRender,
     onPageRendered,
     onFinished,
-  } = Object.assign({}, config.ssgOptions || {}, cliOptions)
+  }: ViteSSGOptions = Object.assign({}, config.ssgOptions || {}, cliOptions)
 
   if (fs.existsSync(ssgOut))
     await fs.remove(ssgOut)

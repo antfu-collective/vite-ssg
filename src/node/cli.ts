@@ -11,14 +11,11 @@ yargs
     (args) => {
       return args
         .option('script', {
-          type: 'string',
-          default: 'sync' as 'defer' | 'async' | 'sync',
-          choices: ['defer', 'async', 'sync'],
+          choices: ['sync', 'async', 'defer', 'async defer'] as const,
           describe: 'Rewrites script loading timing',
         })
         .option('mock', {
           type: 'boolean',
-          default: false,
           describe: 'Mock browser globals (window, document, etc.) for SSG',
         })
     },
