@@ -114,7 +114,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
       renderPreloadLinks(jsdom.window.document, ctx.modules || new Set<string>(), ssrManifest)
 
       // render head
-      head && head.updateDOM(jsdom.window.document)
+      head?.updateDOM(jsdom.window.document)
 
       const html = jsdom.serialize()
       const transformed = (await onPageRendered?.(route, html)) || html
