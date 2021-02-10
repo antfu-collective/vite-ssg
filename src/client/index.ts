@@ -1,6 +1,6 @@
 import { createSSRApp, Component, createApp as createClientApp } from 'vue'
 import { createMemoryHistory, createRouter, createWebHistory } from 'vue-router'
-import { createHead } from '@vueuse/head'
+import { createHead, Head } from '@vueuse/head'
 import { RouterOptions, ViteSSGContext, ViteSSGClientOptions } from '../types'
 import { ClientOnly } from './components/ClientOnly'
 
@@ -12,7 +12,10 @@ export function ViteSSG(
   fn?: (context: ViteSSGContext<true>) => void,
   options: ViteSSGClientOptions = {},
 ) {
-  const { registerComponents = true } = options
+  const {
+    registerComponents = true,
+    useHead = true,
+  } = options
   const isClient = typeof window !== 'undefined'
 
   function createApp(client = false) {
@@ -21,11 +24,12 @@ export function ViteSSG(
       : createSSRApp(App)
 
     let context: ViteSSGContext<true>
+    let head: Head | undefined
 
-    const head = createHead()
-
-    app.use(head)
-
+    if (useHead) {
+      head = createHead()
+      app.use(head)
+    }
 
     const router = createRouter({
       history: client ? createWebHistory() : createMemoryHistory(),
