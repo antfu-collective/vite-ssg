@@ -62,12 +62,13 @@ export interface ViteSSGContext<HasRouter extends boolean = true> {
   app: App<Element>
   router: HasRouter extends true ? Router : undefined
   routes: HasRouter extends true ? RouteRecordRaw[] : undefined
-  head: Head
+  head: Head | undefined
   isClient: boolean
 }
 
 export interface ViteSSGClientOptions {
   registerComponents?: boolean
+  useHead?: boolean
 }
 
 export type RouterOptions = PartialKeys<VueRouterOptions, 'history'>
