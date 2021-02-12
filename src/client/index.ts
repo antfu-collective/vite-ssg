@@ -23,7 +23,6 @@ export function ViteSSG(
       ? createClientApp(App)
       : createSSRApp(App)
 
-    let context: ViteSSGContext<true>
     let head: Head | undefined
 
     if (useHead) {
@@ -40,10 +39,10 @@ export function ViteSSG(
 
     app.use(router)
 
-    context = { app, head, isClient, router, routes }
-
     if (registerComponents)
       app.component('ClientOnly', client ? ClientOnly : { render: () => null })
+
+    const context: ViteSSGContext<true> = { app, head, isClient, router, routes }
 
     fn && fn(context)
 

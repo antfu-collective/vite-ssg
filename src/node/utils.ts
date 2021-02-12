@@ -16,8 +16,12 @@ export function routesToPaths(routes?: RouteRecordRaw[]) {
   const paths: string[] = []
 
   const getPaths = (routes: RouteRecordRaw[], prefix = '') => {
+    // remove tailing slash
+    prefix = prefix.replace(/\/$/g, '')
     for (const route of routes) {
-      paths.push(prefix ? `${prefix}/${route.path}` : route.path)
+      // remove leading slash
+      const path = route.path.replace(/^\//g, '')
+      paths.push(prefix ? `${prefix}/${path}` : path)
       if (Array.isArray(route.children))
         getPaths(route.children, route.path)
     }

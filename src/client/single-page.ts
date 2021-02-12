@@ -1,7 +1,7 @@
 import { createSSRApp, Component, createApp as createClientApp } from 'vue'
 import { createHead, Head } from '@vueuse/head'
-import { ClientOnly } from './components/ClientOnly'
 import { ViteSSGClientOptions, ViteSSGContext } from '../types'
+import { ClientOnly } from './components/ClientOnly'
 
 export * from '../types'
 
@@ -21,7 +21,6 @@ export function ViteSSG(
       ? createClientApp(App)
       : createSSRApp(App)
 
-    let context: ViteSSGContext<false>
     let head: Head | undefined
 
     if (useHead) {
@@ -29,7 +28,7 @@ export function ViteSSG(
       app.use(head)
     }
 
-    context = { app, head, isClient, router: undefined, routes: undefined }
+    const context = { app, head, isClient, router: undefined, routes: undefined }
 
     if (registerComponents)
       app.component('ClientOnly', client ? ClientOnly : { render: () => null })
