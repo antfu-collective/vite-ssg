@@ -120,7 +120,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
       const transformed = (await onPageRendered?.(route, html)) || html
       const formatted = format(transformed, formatting)
 
-      const relativeRoute = (route.endsWith('/') ? `${route}index` : route).slice(1)
+      const relativeRoute = (route.endsWith('/') ? `${route}index` : route).replace(/^\//g, '')
       const filename = `${relativeRoute}.html`
 
       await fs.ensureDir(join(out, dirname(relativeRoute)))
