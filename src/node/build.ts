@@ -66,6 +66,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
   buildLog('Build for server...')
 
+  process.env.VITE_SSG = 'true'
   await viteBuild(ssrConfig)
 
   const ssrManifest: Manifest = JSON.parse(await fs.readFile(join(out, 'ssr-manifest.json'), 'utf-8'))
