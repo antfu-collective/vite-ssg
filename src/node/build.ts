@@ -78,7 +78,9 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
   const { routes } = createApp(false)
 
-  const routesPaths = await includedRoutes(routesToPaths(routes))
+  let routesPaths = await includedRoutes(routesToPaths(routes))
+  // uniq
+  routesPaths = Array.from(new Set(routesPaths))
 
   indexHTML = rewriteScripts(indexHTML, script)
 
