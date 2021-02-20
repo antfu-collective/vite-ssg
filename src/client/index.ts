@@ -1,14 +1,18 @@
 import { createSSRApp, Component, createApp as createClientApp } from 'vue'
-import { createMemoryHistory, createRouter, createWebHistory } from 'vue-router'
+import { createMemoryHistory, createRouter, createWebHistory, createWebHashHistory } from 'vue-router'
 import { createHead, Head } from '@vueuse/head'
 import { RouterOptions, ViteSSGContext, ViteSSGClientOptions } from '../types'
 import { ClientOnly } from './components/ClientOnly'
 
 export * from '../types'
 
+type ExtRouterOptions = RouterOptions & {
+  isWebHashHistory: boolean
+}
+
 export function ViteSSG(
   App: Component,
-  routerOptions: RouterOptions,
+  routerOptions: ExtRouterOptions,
   fn?: (context: ViteSSGContext<true>) => void,
   options: ViteSSGClientOptions = {},
 ) {
@@ -30,8 +34,14 @@ export function ViteSSG(
       app.use(head)
     }
 
+    const { isWebHashHistory } = routerOptions
+
     const router = createRouter({
-      history: client ? createWebHistory() : createMemoryHistory(),
+      history: client
+        ? isWebHashHistory
+          ? createWebHashHistory()
+          : createWebHistory()
+        : createMemoryHistory(),
       ...routerOptions,
     })
 
