@@ -39,9 +39,9 @@ export function ViteSSG(
     const router = createRouter({
       history: client
         ? isWebHashHistory
-          ? createWebHashHistory()
-          : createWebHistory()
-        : createMemoryHistory(),
+          ? createWebHashHistory(routerOptions.base)
+          : createWebHistory(routerOptions.base)
+        : createMemoryHistory(routerOptions.base),
       ...routerOptions,
     })
 
