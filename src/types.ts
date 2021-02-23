@@ -71,7 +71,7 @@ export interface ViteSSGClientOptions {
   useHead?: boolean
 }
 
-export type RouterOptions = PartialKeys<VueRouterOptions, 'history'> & { base?: string }
+export type RouterOptions = PartialKeys<VueRouterOptions, 'history'> & { base?: string; mode?: string }
 
 // extend vite.config.ts
 declare module 'vite' {

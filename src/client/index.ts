@@ -6,13 +6,9 @@ import { ClientOnly } from './components/ClientOnly'
 
 export * from '../types'
 
-type ExtRouterOptions = RouterOptions & {
-  isWebHashHistory: boolean
-}
-
 export function ViteSSG(
   App: Component,
-  routerOptions: ExtRouterOptions,
+  routerOptions: RouterOptions,
   fn?: (context: ViteSSGContext<true>) => void,
   options: ViteSSGClientOptions = {},
 ) {
@@ -34,11 +30,9 @@ export function ViteSSG(
       app.use(head)
     }
 
-    const { isWebHashHistory } = routerOptions
-
     const router = createRouter({
       history: client
-        ? isWebHashHistory
+        ? routerOptions.mode === 'hash'
           ? createWebHashHistory(routerOptions.base)
           : createWebHistory(routerOptions.base)
         : createMemoryHistory(routerOptions.base),
