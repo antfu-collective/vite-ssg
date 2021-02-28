@@ -8,26 +8,17 @@ yargs
   .command(
     'build',
     'Build SSG',
-    (args) => {
-      return args
-        .option('script', {
-          choices: ['sync', 'async', 'defer', 'async defer'] as const,
-          describe: 'Rewrites script loading timing',
-        })
-        .option('mock', {
-          type: 'boolean',
-          describe: 'Mock browser globals (window, document, etc.) for SSG',
-        })
-    },
-    (args) => {
-      build(args)
-        .catch((err) => {
-          console.error(err)
-          process.exit(1)
-        })
-        .then(() => {
-          process.exit(0)
-        })
+    args => args
+      .option('script', {
+        choices: ['sync', 'async', 'defer', 'async defer'] as const,
+        describe: 'Rewrites script loading timing',
+      })
+      .option('mock', {
+        type: 'boolean',
+        describe: 'Mock browser globals (window, document, etc.) for SSG',
+      }),
+    async(args) => {
+      await build(args)
     },
   )
   .showHelpOnFail(false)
