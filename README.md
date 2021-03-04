@@ -11,7 +11,7 @@ Server-side generation for Vite.
 > **This library requires Node.js version >= 14**
 
 <pre>
-<b>npm i -D vite-ssg</b> <em>@vue/server-renderer @vue/compiler-sfc vue-router</em>
+<b>npm i -D vite-ssg</b> <em>@vue/server-renderer @vue/compiler-sfc vue-router@next @vueuse/head</em>
 </pre>
 
 ```diff
