@@ -43,6 +43,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
     await fs.remove(ssgOut)
 
   const ssrConfig: UserConfig = {
+    mode,
     build: {
       ssr: join(root, entry),
       outDir: ssgOut,
@@ -54,6 +55,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   buildLog('Build for client...')
 
   await viteBuild({
+    mode,
     build: {
       ssrManifest: true,
       rollupOptions: {
