@@ -56,7 +56,7 @@
     "chalk": "^4.1.0",
     "fs-extra": "^9.1.0",
     "html-minifier": "^4.0.0",
-    "jsdom": "^16.4.0",
+    "jsdom": "^16.5.1",
     "prettier": "^2.2.1",
     "yargs": "^16.2.0"
   },
@@ -69,21 +69,21 @@
     "vue-router": "^4.0.1"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^0.4.3",
-    "@types/fs-extra": "^9.0.7",
-    "@types/jsdom": "^16.2.6",
+    "@antfu/eslint-config": "^0.6.2",
+    "@types/fs-extra": "^9.0.8",
+    "@types/jsdom": "^16.2.7",
     "@types/yargs": "^16.0.0",
-    "@vueuse/head": "^0.3.1",
-    "@typescript-eslint/eslint-plugin": "^4.15.2",
-    "@vue/compiler-sfc": "^3.0.6",
-    "@vue/server-renderer": "^3.0.6",
-    "eslint": "^7.20.0",
-    "rollup": "^2.39.1",
+    "@typescript-eslint/eslint-plugin": "^4.18.0",
+    "@vue/compiler-sfc": "^3.0.7",
+    "@vue/server-renderer": "^3.0.7",
+    "@vueuse/head": "^0.5.1",
+    "eslint": "^7.22.0",
+    "rollup": "^2.41.3",
     "standard-version": "^9.1.1",
-    "tsup": "^4.3.1",
-    "typescript": "^4.2.2",
-    "vite": "^2.0.3",
-    "vue": "^3.0.6",
-    "vue-router": "^4.0.4"
+    "tsup": "^4.7.2",
+    "typescript": "^4.2.3",
+    "vite": "^2.1.0",
+    "vue": "^3.0.7",
+    "vue-router": "^4.0.5"
   }
 }

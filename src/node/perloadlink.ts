@@ -38,10 +38,15 @@ function renderPreloadLink(document: Document, file: string) {
       href: file,
     })
   }
-  else {}
 }
 
 const createLink = (document: Document) => document.createElement('link')
+
+const setAttrs = (el: Element, attrs: Record<string, any>) => {
+  const keys = Object.keys(attrs)
+  for (const key of keys)
+    el.setAttribute(key, attrs[key])
+}
 
 function appendLink(document: Document, attrs: Record<string, any>) {
   const exits = document.head.querySelector(`link[href='${attrs.file}']`)
@@ -49,10 +54,4 @@ function appendLink(document: Document, attrs: Record<string, any>) {
   const link = createLink(document)
   setAttrs(link, attrs)
   document.head.appendChild(link)
-}
-
-const setAttrs = (el: Element, attrs: Record<string, any>) => {
-  const keys = Object.keys(attrs)
-  for (const key of keys)
-    el.setAttribute(key, attrs[key])
 }

@@ -1,6 +1,6 @@
 import { App } from 'vue'
 import { Router, RouteRecordRaw, RouterOptions as VueRouterOptions } from 'vue-router'
-import { Head } from '@vueuse/head'
+import { HeadClient } from '@vueuse/head'
 
 export interface ViteSSGOptions {
   /**
@@ -62,7 +62,7 @@ export interface ViteSSGContext<HasRouter extends boolean = true> {
   app: App<Element>
   router: HasRouter extends true ? Router : undefined
   routes: HasRouter extends true ? RouteRecordRaw[] : undefined
-  head: Head | undefined
+  head: HeadClient | undefined
   isClient: boolean
 }
 
