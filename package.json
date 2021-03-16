@@ -61,10 +61,10 @@
     "yargs": "^16.2.0"
   },
   "peerDependencies": {
-    "@vueuse/head": "^0.3.1",
+    "@vueuse/head": "^0.5.1",
     "@vue/compiler-sfc": "^3.0.4",
     "@vue/server-renderer": "^3.0.4",
-    "vite": "^2.0.0-beta.3",
+    "vite": "^2.0.0",
     "vue": "^3.0.4",
     "vue-router": "^4.0.1"
   },
