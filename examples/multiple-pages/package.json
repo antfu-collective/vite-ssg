@@ -18,7 +18,6 @@
     "vite-plugin-md": "^0.6.1",
     "vite-plugin-pages": "^0.7.1",
     "vite-ssg": "workspace:*",
-    "voie-pages": "^0.4.0",
     "vue-router": "^4.0.5"
   }
 }
