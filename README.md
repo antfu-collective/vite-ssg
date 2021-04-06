@@ -120,7 +120,7 @@ export default {
   ssgOptions: {
     includedRoutes(routes) {
       // exclude all the route paths that contains 'foo'
-      return paths.filter(i => !i.includes('foo'))
+      return routes.filter(i => !i.includes('foo'))
     }
   }
 }
