@@ -69,6 +69,7 @@ export interface ViteSSGContext<HasRouter extends boolean = true> {
 export interface ViteSSGClientOptions {
   registerComponents?: boolean
   useHead?: boolean
+  rootContainer?: string | Element
 }
 
 export type RouterOptions = PartialKeys<VueRouterOptions, 'history'> & { base?: string }
