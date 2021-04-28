@@ -15,7 +15,7 @@ export function ViteSSG(
   const {
     registerComponents = true,
     useHead = true,
-    rootContainer = "#app",
+    rootContainer = '#app',
   } = options
   const isClient = typeof window !== 'undefined'
 
