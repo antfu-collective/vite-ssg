@@ -15,6 +15,7 @@ export function ViteSSG(
   const {
     registerComponents = true,
     useHead = true,
+    rootContainer = '#app',
   } = options
   const isClient = typeof window !== 'undefined'
 
@@ -56,7 +57,7 @@ export function ViteSSG(
 
     // wait until page component is fetched before mounting
     router.isReady().then(() => {
-      app.mount('#app', true)
+      app.mount(rootContainer, true)
     })
   }
 

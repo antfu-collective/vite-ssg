@@ -13,6 +13,7 @@ export function ViteSSG(
   const {
     registerComponents = true,
     useHead = true,
+    rootContainer = '#app',
   } = options
   const isClient = typeof window !== 'undefined'
 
@@ -40,7 +41,7 @@ export function ViteSSG(
 
   if (isClient) {
     const { app } = createApp(true)
-    app.mount('#app', true)
+    app.mount(rootContainer, true)
   }
 
   return createApp
