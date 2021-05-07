@@ -134,13 +134,14 @@ export default {
 - Single-purpose documentation site
 - Lightweight ([No double payload](https://twitter.com/youyuxi/status/1274834280091389955))
 
-### Use Vite SSG when you want:
+### Use Vite SSG when you want
 
 - More controls on the build process and tooling
 - The flexible plugin systems
 - Multi-purpose application with some SSG to improve SEO and loading speed
 
 Cons:
+
 - Double payload
 
 ## Example
