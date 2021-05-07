@@ -6,6 +6,7 @@
     "serve": "vite preview"
   },
   "dependencies": {
+    "pinia": "^2.0.0-alpha.16",
     "vue": "^3.0.11"
   },
   "devDependencies": {

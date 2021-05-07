@@ -446,6 +446,12 @@ packages:
       fastq: 1.11.0
     dev: true
 
+  /@nuxt/devalue/1.2.5:
+    resolution: {integrity: sha512-Tg86C7tqzvZtZli2BQVqgzZN136mZDTgauvJXagglKkP2xt5Kw3NUIiJyjX0Ww/IZy2xVmD0LN+CEPpij4dB2g==}
+    dependencies:
+      consola: 2.15.3
+    dev: true
+
   /@types/fs-extra/9.0.11:
     resolution: {integrity: sha512-mZsifGG4QeQ7hlkhO56u7zt/ycBgGxSVsFI/6lGTU34VtwkiqrrSDgw0+ygs8kFGWcXnFQWMrzF2h7TtDFNixA==}
     dependencies:
@@ -1207,6 +1213,10 @@ packages:
       inherits: 2.0.4
       readable-stream: 3.6.0
       typedarray: 0.0.6
+    dev: true
+
+  /consola/2.15.3:
+    resolution: {integrity: sha512-9vAdYbHj6x2fLKC4+oPH0kFzY/orMZyG2Aj+kNylHxKGJ/Ed4dpNyAQYwJOdqO4zdM7XpVHmyejQDcQHrnuXbw==}
     dev: true
 
   /consolidate/0.16.0:
@@ -3643,6 +3653,10 @@ packages:
     resolution: {integrity: sha1-5aSs0sEB/fPZpNB/DbxNtJ3SgXY=}
     engines: {node: '>=4'}
     dev: true
+
+  /pinia/2.0.0-alpha.16:
+    resolution: {integrity: sha512-E2ctjES/G5X3qdbRmoj1bddVPlXKXTH97VMnETqPo2IVps2uPt0J0XTKjNsm02ofBWQc/0arUq+OLrMUh8Yenw==}
+    dev: false
 
   /pinkie-promise/2.0.1:
     resolution: {integrity: sha1-ITXW36ejWMBprJsXh3YogihFD/o=}
