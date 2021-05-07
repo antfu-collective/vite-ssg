@@ -6,7 +6,7 @@ import { renderToString, SSRContext } from '@vue/server-renderer'
 import { JSDOM } from 'jsdom'
 import { RollupOutput } from 'rollup'
 import { ViteSSGContext, ViteSSGOptions } from '../client'
-import { renderPreloadLinks } from './perloadlink'
+import { renderPreloadLinks } from './preload-links'
 import { buildLog, routesToPaths, getSize } from './utils'
 
 export interface Manifest {
