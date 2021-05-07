@@ -10,7 +10,7 @@ export * from '../types'
 export function ViteSSG(
   App: Component,
   routerOptions: RouterOptions,
-  fn?: (context: ViteSSGContext<true>) => void,
+  fn?: (context: ViteSSGContext<true>) => Promise<void> | void,
   options: ViteSSGClientOptions = {},
 ) {
   const {
@@ -53,7 +53,7 @@ export function ViteSSG(
       // @ts-ignore
       context.initialState = transformState?.(window.__INITIAL_STATE__ || {}) || deserializeState(window.__INITIAL_STATE__)
 
-    fn?.(context)
+    await fn?.(context)
 
     let entryRoutePath: string | undefined
     let isFirstRoute = true
