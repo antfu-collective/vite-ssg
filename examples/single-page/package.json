@@ -2,7 +2,8 @@
   "private": true,
   "scripts": {
     "dev": "cross-env DEBUG=vite-ssg:* vite",
-    "build": "cross-env DEBUG=vite-ssg:* vite-ssg build"
+    "build": "cross-env DEBUG=vite-ssg:* vite-ssg build",
+    "serve": "vite preview"
   },
   "dependencies": {
     "vue": "^3.0.11"
