@@ -1,0 +1,25 @@
+{
+  "private": true,
+  "scripts": {
+    "dev": "cross-env DEBUG=vite-ssg:* vite",
+    "build": "cross-env DEBUG=vite-ssg:* vite-ssg build",
+    "serve": "vite preview"
+  },
+  "dependencies": {
+    "pinia": "^2.0.0-alpha.16",
+    "vue": "^3.0.11"
+  },
+  "devDependencies": {
+    "@nuxt/devalue": "1.2.5",
+    "@vitejs/plugin-vue": "^1.2.2",
+    "@vue/compiler-sfc": "^3.0.11",
+    "cross-env": "^7.0.3",
+    "typescript": "^4.2.4",
+    "vite": "^2.2.3",
+    "vite-plugin-components": "^0.8.4",
+    "vite-plugin-md": "^0.6.3",
+    "vite-plugin-pages": "^0.10.0",
+    "vite-ssg": "workspace:*",
+    "vue-router": "^4.0.6"
+  }
+}

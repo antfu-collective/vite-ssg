@@ -78,15 +78,48 @@ importers:
       vite-ssg: link:../..
       vue-router: 4.0.6_vue@3.0.11
 
+  examples/multiple-pages-with-store:
+    specifiers:
+      '@nuxt/devalue': 1.2.5
+      '@vitejs/plugin-vue': ^1.2.2
+      '@vue/compiler-sfc': ^3.0.11
+      cross-env: ^7.0.3
+      pinia: ^2.0.0-alpha.16
+      typescript: ^4.2.4
+      vite: ^2.2.3
+      vite-plugin-components: ^0.8.4
+      vite-plugin-md: ^0.6.3
+      vite-plugin-pages: ^0.10.0
+      vite-ssg: workspace:*
+      vue: ^3.0.11
+      vue-router: ^4.0.6
+    dependencies:
+      pinia: 2.0.0-alpha.16
+      vue: 3.0.11
+    devDependencies:
+      '@nuxt/devalue': 1.2.5
+      '@vitejs/plugin-vue': 1.2.2_@vue+compiler-sfc@3.0.11
+      '@vue/compiler-sfc': 3.0.11_vue@3.0.11
+      cross-env: 7.0.3
+      typescript: 4.2.4
+      vite: 2.2.3
+      vite-plugin-components: 0.8.4_vite@2.2.3
+      vite-plugin-md: 0.6.3_vite@2.2.3
+      vite-plugin-pages: 0.10.0_8cd74be53f81ed683d32be064bcfe770
+      vite-ssg: link:../..
+      vue-router: 4.0.6_vue@3.0.11
+
   examples/single-page:
     specifiers:
       '@vitejs/plugin-vue': ^1.2.2
       cross-env: ^7.0.3
+      pinia: ^2.0.0-alpha.16
       typescript: ^4.2.4
       vite: ^2.2.3
       vite-ssg: workspace:*
       vue: ^3.0.11
     dependencies:
+      pinia: 2.0.0-alpha.16
       vue: 3.0.11
     devDependencies:
       '@vitejs/plugin-vue': 1.2.2
