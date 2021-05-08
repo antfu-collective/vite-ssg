@@ -37,7 +37,7 @@ export const createApp = ViteSSG(
   // vue-router options
   { routes },
   // function to have custom setups
-  ({ app, router, isClient }) => {
+  ({ app, router, routes, isClient, initialState }) => {
     // install plugins etc.
   }
 )
@@ -91,7 +91,175 @@ That's all, no configuration needed. Vite SSG will handle the server-side render
 
 Refer to [`@vueuse/head`'s docs](https://github.com/vueuse/head) for more usage about `useHead`.
 
-## Configuration 
+## Initial State
+
+The initial state comprises data that is serialized to your server-side generated HTML that is hydrated in
+the browser when accessed. This data can be data fetched from a CDN, an API, etc, and is typically needed
+as soon as the application starts or is accessed for the first time.
+
+The main advantage of setting the application's initial state is that the statically generated pages do not
+need to fetch the data again as the data is fetched during build time and serialized into the page's HTML.
+
+The initial state is a plain JavaScript object that can be set during SSR, i.e., when statically generating
+the pages, like this:
+
+```ts
+// src/main.ts
+
+// ...
+
+export const createApp = ViteSSG(
+  App,
+  { routes },
+  ({ app, router, routes, isClient, initialState }) => {
+    // ...
+
+    if (import.meta.env.SSR) {
+      // Set initial state during server side
+      initialState.data = { cats: 2, dogs: 3 }
+    } else {
+      // Restore or read the initial state on the client side in the browser
+      console.log(initialState.data) // => { cats: 2, dogs: 3 }
+    }
+
+    // ...
+  }
+)
+```
+
+Typically, you will use this with an application store, such as
+[VueX](https://vuex.vuejs.org/) or [Pinia](https://pinia.esm.dev/).
+For examples, see below:
+
+<details><summary>When using Pinia</summary>
+<p>
+Following [Pinia's guide](https://pinia.esm.dev/ssr), you will to adapt your `main.{ts,js}` file to look
+like this:
+
+```ts
+// main.ts
+import { ViteSSG } from 'vite-ssg'
+import { createPinia } from 'pinia'
+import routes from 'virtual:generated-pages'
+// use any store you configured that you need data from on start-up
+import { useRootStore } from './store/root'
+import App from './App.vue'
+
+export const createApp = ViteSSG(
+  App,
+  { routes },
+  ({ app, router, initialState }) => {
+    const pinia = createPinia()
+    app.use(pinia)
+
+    if (import.meta.env.SSR) {
+      initialState.pinia = pinia.state.value
+    } else {
+      pinia.state.value = initialState.pinia || {}
+    }
+
+    router.beforeEach((to, from, next) => {
+      const store = useRootStore(pinia)
+      if (!store.ready)
+        // perform the (user-implemented) store action to fill the store's state
+        store.initialize()
+      next()
+    })
+  },
+)
+```
+</p></details>
+
+<details><summary>When using VueX</summary>
+<p>
+
+```ts
+// main.ts
+import { ViteSSG } from 'vite-ssg'
+import routes from 'virtual:generated-pages'
+import { createStore } from 'vuex'
+import App from './App.vue'
+
+// Normally, you should definitely put this in a separate file
+// in order to be able to use it everywhere
+const store = createStore({
+  // ...
+})
+
+export const createApp = ViteSSG(
+  App,
+  { routes },
+  ({ app, router, initialState }) => {
+    app.use(store)
+
+    if (import.meta.env.SSR) {
+      initialState.store = store.state
+    } else {
+      store.replaceState(initialState.store)
+    }
+
+    router.beforeEach((to, from, next) => {
+      // perform the (user-implemented) store action to fill the store's state
+      if (!store.getters.ready)
+        store.dispatch('initialize')
+
+      next()
+    })
+  },
+)
+```
+</p></details>
+
+For an example how to use a store with an initial state in a single page app,
+see [the single page example](./examples/single-page/src/main.ts).
+
+### State Serialization
+
+Per default, the state is deserialized and serialized by using `JSON.stringify` and `JSON.parse`.
+If this approach works for you, you should definitely stick to it as it yields a far better
+performance.
+You may use the option `transformState` in the `ViteSSGClientOptions` as displayed below.
+A valid approach besides `JSON.stringify` and `JSON.parse` is
+[`@nuxt/devalue`](https://github.com/nuxt-contrib/devalue) (which is used by Nuxt.js):
+
+```ts
+import devalue from '@nuxt/devalue'
+import { ViteSSG } from 'vite-ssg'
+// ...
+import App from './App.vue'
+
+export const createApp = ViteSSG(
+  App,
+  { routes },
+  ({ app, router, initialState }) => {
+    // ...
+  },
+  {
+    transformState(state) {
+      return import.meta.env.SSR ? devalue(state) : state
+    },
+  },
+)
+```
+
+**A minor remark when using `@nuxt/devalue`:** In case, you are getting an error because of a `require`
+within the package `@nuxt/devalue`, you have to add the following piece of config to your Vite config:
+
+```ts
+// vite.config.ts
+//...
+
+export default defineConfig({
+  resolve: {
+    alias: {
+      '@nuxt/devalue': '@nuxt/devalue/dist/devalue.js',
+    },
+  },
+  // ...
+})
+```
+
+## Configuration
 
 You can pass options to Vite SSG in the `ssgOptions` field of your `vite.config.js`
 
