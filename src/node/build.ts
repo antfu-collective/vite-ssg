@@ -31,7 +31,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   const {
     script = 'sync',
     mock = false,
-    entry = 'src/main.ts',
+    entry = await detectEntry(root),
     formatting = null,
     includedRoutes = DefaultIncludedRoutes,
     onBeforePageRender,
@@ -169,4 +169,17 @@ function format(html: string, formatting: ViteSSGOptions['formatting']) {
     return require('prettier').format(html, { semi: false, parser: 'html' })
   }
   return html
+}
+
+async function detectEntry(root: string) {
+  // pick the first script tag of type module as the entry
+  const scriptSrcReg = /<script(?:.*?)src=["'](.+?)["'](?!<)(?:.*)\>(?:[\n\r\s]*?)(?:<\/script>)/img
+  const html = await fs.readFile(join(root, 'index.html'), 'utf-8')
+  const scripts = [...html.matchAll(scriptSrcReg)] || []
+  const [, entry] = scripts.find((matchResult) => {
+    const [script] = matchResult
+    const [, scriptType] = script.match(/.*\stype=(?:'|")?([^>'"\s]+)/i) || []
+    return scriptType === 'module'
+  }) || []
+  return entry || 'src/main.ts'
 }
