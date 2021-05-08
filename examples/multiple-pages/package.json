@@ -13,10 +13,10 @@
     "@vue/compiler-sfc": "^3.0.11",
     "cross-env": "^7.0.3",
     "typescript": "^4.2.4",
-    "vite": "^2.2.3",
-    "vite-plugin-components": "^0.8.4",
-    "vite-plugin-md": "^0.6.3",
-    "vite-plugin-pages": "^0.10.0",
+    "vite": "^2.2.4",
+    "vite-plugin-components": "^0.9.0",
+    "vite-plugin-md": "^0.6.4",
+    "vite-plugin-pages": "^0.11.1",
     "vite-ssg": "workspace:*",
     "vue-router": "^4.0.6"
   }
