@@ -57,7 +57,7 @@
     "fs-extra": "^10.0.0",
     "html-minifier": "^4.0.0",
     "jsdom": "^16.5.3",
-    "prettier": "^2.2.1",
+    "prettier": "^2.3.0",
     "yargs": "^17.0.1"
   },
   "peerDependencies": {
@@ -69,21 +69,21 @@
     "vue-router": "^4.0.1"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^0.6.4",
+    "@antfu/eslint-config": "^0.6.5",
     "@types/fs-extra": "^9.0.11",
     "@types/jsdom": "^16.2.10",
     "@types/yargs": "^16.0.1",
-    "@typescript-eslint/eslint-plugin": "^4.22.1",
+    "@typescript-eslint/eslint-plugin": "^4.24.0",
     "@vue/compiler-sfc": "^3.0.11",
     "@vue/server-renderer": "^3.0.11",
     "@vueuse/head": "^0.5.1",
     "eslint": "^7.26.0",
-    "rollup": "^2.47.0",
+    "rollup": "^2.48.0",
     "standard-version": "^9.3.0",
-    "tsup": "^4.10.1",
+    "tsup": "^4.11.0",
     "typescript": "^4.2.4",
-    "vite": "^2.2.4",
+    "vite": "^2.3.3",
     "vue": "^3.0.11",
-    "vue-router": "^4.0.6"
+    "vue-router": "^4.0.8"
   }
 }
