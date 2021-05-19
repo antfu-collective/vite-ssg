@@ -16,7 +16,7 @@
     "vite": "^2.3.3",
     "vite-plugin-components": "^0.9.1",
     "vite-plugin-md": "^0.6.7",
-    "vite-plugin-pages": "^0.11.4",
+    "vite-plugin-pages": "^0.12.1",
     "vite-ssg": "workspace:*",
     "vue-router": "^4.0.8"
   }

@@ -7,7 +7,7 @@ importers:
       '@antfu/eslint-config': ^0.6.5
       '@types/fs-extra': ^9.0.11
       '@types/jsdom': ^16.2.10
-      '@types/yargs': ^16.0.1
+      '@types/yargs': ^16.0.2
       '@typescript-eslint/eslint-plugin': ^4.24.0
       '@vue/compiler-sfc': ^3.0.11
       '@vue/server-renderer': ^3.0.11
@@ -37,7 +37,7 @@ importers:
       '@antfu/eslint-config': 0.6.5_eslint@7.26.0+typescript@4.2.4
       '@types/fs-extra': 9.0.11
       '@types/jsdom': 16.2.10
-      '@types/yargs': 16.0.1
+      '@types/yargs': 16.0.2
       '@typescript-eslint/eslint-plugin': 4.24.0_eslint@7.26.0+typescript@4.2.4
       '@vue/compiler-sfc': 3.0.11_vue@3.0.11
       '@vue/server-renderer': 3.0.11_vue@3.0.11
@@ -60,7 +60,7 @@ importers:
       vite: ^2.3.3
       vite-plugin-components: ^0.9.1
       vite-plugin-md: ^0.6.7
-      vite-plugin-pages: ^0.11.4
+      vite-plugin-pages: ^0.12.1
       vite-ssg: workspace:*
       vue: ^3.0.11
       vue-router: ^4.0.8
@@ -74,7 +74,7 @@ importers:
       vite: 2.3.3
       vite-plugin-components: 0.9.1_vite@2.3.3
       vite-plugin-md: 0.6.7_vite@2.3.3
-      vite-plugin-pages: 0.11.4_vite@2.3.3+vue@3.0.11
+      vite-plugin-pages: 0.12.1_vite@2.3.3+vue@3.0.11
       vite-ssg: link:../..
       vue-router: 4.0.8_vue@3.0.11
 
@@ -84,17 +84,17 @@ importers:
       '@vitejs/plugin-vue': ^1.2.2
       '@vue/compiler-sfc': ^3.0.11
       cross-env: ^7.0.3
-      pinia: ^2.0.0-alpha.16
+      pinia: ^2.0.0-alpha.18
       typescript: ^4.2.4
-      vite: ^2.2.3
-      vite-plugin-components: ^0.8.4
-      vite-plugin-md: ^0.6.3
-      vite-plugin-pages: ^0.10.0
+      vite: ^2.3.3
+      vite-plugin-components: ^0.9.1
+      vite-plugin-md: ^0.6.7
+      vite-plugin-pages: ^0.12.1
       vite-ssg: workspace:*
       vue: ^3.0.11
-      vue-router: ^4.0.6
+      vue-router: ^4.0.8
     dependencies:
-      pinia: 2.0.0-alpha.16
+      pinia: 2.0.0-alpha.18
       vue: 3.0.11
     devDependencies:
       '@nuxt/devalue': 1.2.5
@@ -102,24 +102,24 @@ importers:
       '@vue/compiler-sfc': 3.0.11_vue@3.0.11
       cross-env: 7.0.3
       typescript: 4.2.4
-      vite: 2.2.3
-      vite-plugin-components: 0.8.4_vite@2.2.3
-      vite-plugin-md: 0.6.3_vite@2.2.3
-      vite-plugin-pages: 0.10.0_8cd74be53f81ed683d32be064bcfe770
+      vite: 2.3.3
+      vite-plugin-components: 0.9.1_vite@2.3.3
+      vite-plugin-md: 0.6.7_vite@2.3.3
+      vite-plugin-pages: 0.12.1_vite@2.3.3+vue@3.0.11
       vite-ssg: link:../..
-      vue-router: 4.0.6_vue@3.0.11
+      vue-router: 4.0.8_vue@3.0.11
 
   examples/single-page:
     specifiers:
       '@vitejs/plugin-vue': ^1.2.2
       cross-env: ^7.0.3
-      pinia: ^2.0.0-alpha.16
+      pinia: ^2.0.0-alpha.18
       typescript: ^4.2.4
       vite: ^2.3.3
       vite-ssg: workspace:*
       vue: ^3.0.11
     dependencies:
-      pinia: 2.0.0-alpha.16
+      pinia: 2.0.0-alpha.18
       vue: 3.0.11
     devDependencies:
       '@vitejs/plugin-vue': 1.2.2
@@ -501,8 +501,8 @@ packages:
     resolution: {integrity: sha512-37RSHht+gzzgYeobbG+KWryeAW8J33Nhr69cjTqSYymXVZEN9NbRYWoYlRtDhHKPVT1FyNKwaTPC1NynKZpzRA==}
     dev: true
 
-  /@types/yargs/16.0.1:
-    resolution: {integrity: sha512-x4HABGLyzr5hKUzBC9dvjciOTm11WVH1NWonNjGgxapnTHu5SWUqyqn0zQ6Re0yQU0lsQ6ztLCoMAKDGZflyxA==}
+  /@types/yargs/16.0.2:
+    resolution: {integrity: sha512-EkZDJvHXblOE2/iFZb3Ty5c8RHPssmFvrXqj3V/ZLXtOt0f7xJh9Fd7p1pl2ITrNHM7Rl3Db3JJVBT7q/C0wUg==}
     dependencies:
       '@types/yargs-parser': 20.2.0
     dev: true
@@ -702,7 +702,6 @@ packages:
 
   /@vue/devtools-api/6.0.0-beta.10:
     resolution: {integrity: sha512-nktQYRnIFrh4DdXiCBjHnsHOMZXDIVcP9qlm/DMfxmjJMtpMGrSZCOKP8j7kDhObNHyqlicwoGLd+a4hf4x9ww==}
-    dev: true
 
   /@vue/reactivity/3.0.11:
     resolution: {integrity: sha512-SKM3YKxtXHBPMf7yufXeBhCZ4XZDKP9/iXeQSC8bBO3ivBuzAi4aZi0bNoeE2IF2iGfP/AHEt1OU4ARj4ao/Xw==}
@@ -3611,8 +3610,10 @@ packages:
     engines: {node: '>=4'}
     dev: true
 
-  /pinia/2.0.0-alpha.16:
-    resolution: {integrity: sha512-E2ctjES/G5X3qdbRmoj1bddVPlXKXTH97VMnETqPo2IVps2uPt0J0XTKjNsm02ofBWQc/0arUq+OLrMUh8Yenw==}
+  /pinia/2.0.0-alpha.18:
+    resolution: {integrity: sha512-KbgU5mvGcRjnOEleTL943nDIJcI97CmOQskGiOJUntZ5VuNYxm3CgzQztO4VE1SUYgHYbLhcauV9Athz9R1kWw==}
+    dependencies:
+      '@vue/devtools-api': 6.0.0-beta.10
     dev: false
 
   /pinkie-promise/2.0.1:
@@ -4683,8 +4684,8 @@ packages:
       vite: 2.3.3
     dev: true
 
-  /vite-plugin-pages/0.11.4_vite@2.3.3+vue@3.0.11:
-    resolution: {integrity: sha512-E/n+HaPeYzCqVEYFC2iNTKCJrQ6aoBhOrawVcVY4jPojfwDDpghV2uak9lGVjT+QhlC12shfgOtHTVSD7SHRCA==}
+  /vite-plugin-pages/0.12.1_vite@2.3.3+vue@3.0.11:
+    resolution: {integrity: sha512-JG7RURsLqVX7F1HPMD9kOXnY9Xn3bA5D6lXIRdFd2eYMHU8S4oRcrQFjQXAbonyOJB5qD3UxBb93uNQpKu6cUQ==}
     peerDependencies:
       vite: ^2.0.0
       vue: ^3.0.0

@@ -77,7 +77,7 @@
     "@antfu/eslint-config": "^0.6.5",
     "@types/fs-extra": "^9.0.11",
     "@types/jsdom": "^16.2.10",
-    "@types/yargs": "^16.0.1",
+    "@types/yargs": "^16.0.2",
     "@typescript-eslint/eslint-plugin": "^4.24.0",
     "@vue/compiler-sfc": "^3.0.11",
     "@vue/server-renderer": "^3.0.11",
