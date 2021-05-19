@@ -22,8 +22,8 @@ export function routesToPaths(routes?: RouteRecordRaw[]) {
       // remove leading slash
       if (route.path) {
         paths.push(
-          prefix
-            ? `${prefix}/${route.path.replace(/^\//g, '')}`
+          prefix && !route.path.startsWith('/')
+            ? `${prefix}/${route.path}`
             : route.path,
         )
       }
