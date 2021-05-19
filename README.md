@@ -128,7 +128,7 @@ export const createApp = ViteSSG(
 ```
 
 Typically, you will use this with an application store, such as
-[VueX](https://vuex.vuejs.org/) or [Pinia](https://pinia.esm.dev/).
+[Vuex](https://vuex.vuejs.org/) or [Pinia](https://pinia.esm.dev/).
 For examples, see below:
 
 <details><summary>When using Pinia</summary>
@@ -170,7 +170,7 @@ export const createApp = ViteSSG(
 ```
 </p></details>
 
-<details><summary>When using VueX</summary>
+<details><summary>When using Vuex</summary>
 <p>
 
 ```ts
@@ -210,14 +210,15 @@ export const createApp = ViteSSG(
 ```
 </p></details>
 
-For an example how to use a store with an initial state in a single page app,
+For the example of how to use a store with an initial state in a single page app,
 see [the single page example](./examples/single-page/src/main.ts).
 
 ### State Serialization
 
 Per default, the state is deserialized and serialized by using `JSON.stringify` and `JSON.parse`.
-If this approach works for you, you should definitely stick to it as it yields a far better
+If this approach works for you, you should definitely stick to it as it yields far better
 performance.
+
 You may use the option `transformState` in the `ViteSSGClientOptions` as displayed below.
 A valid approach besides `JSON.stringify` and `JSON.parse` is
 [`@nuxt/devalue`](https://github.com/nuxt-contrib/devalue) (which is used by Nuxt.js):
@@ -274,7 +275,7 @@ export default {
 }
 ```
 
-See [src/types.ts] for more options avaliable.
+See [src/types.ts] for more options available.
 
 ### Custom Routes to Render
 
