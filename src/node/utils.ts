@@ -13,7 +13,7 @@ export function routesToPaths(routes?: RouteRecordRaw[]) {
   if (!routes)
     return ['/']
 
-  const paths: string[] = []
+  const paths: Set<string> = new Set()
 
   const getPaths = (routes: RouteRecordRaw[], prefix = '') => {
     // remove trailing slash
@@ -21,7 +21,7 @@ export function routesToPaths(routes?: RouteRecordRaw[]) {
     for (const route of routes) {
       // check for leading slash
       if (route.path) {
-        paths.push(
+        paths.add(
           prefix && !route.path.startsWith('/')
             ? `${prefix}/${route.path}`
             : route.path,
@@ -33,6 +33,5 @@ export function routesToPaths(routes?: RouteRecordRaw[]) {
   }
 
   getPaths(routes)
-
-  return paths
+  return [...paths]
 }
