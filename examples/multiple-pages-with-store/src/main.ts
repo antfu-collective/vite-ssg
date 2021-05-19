@@ -1,11 +1,14 @@
+import devalue from '@nuxt/devalue'
+import { ViteSSG } from 'vite-ssg'
 import { createPinia } from 'pinia'
-import { ViteSSG } from 'vite-ssg/single-page'
+import routes from 'virtual:generated-pages'
 import { useRootStore } from './store/root'
 import App from './App.vue'
 
 export const createApp = ViteSSG(
   App,
-  ({ app, initialState }) => {
+  { routes },
+  ({ app, router, initialState }) => {
     const pinia = createPinia()
     app.use(pinia)
 
@@ -17,7 +20,16 @@ export const createApp = ViteSSG(
       pinia.state.value = initialState.pinia || {}
     }
 
-    const store = useRootStore(pinia)
-    store.initialize()
+    router.beforeEach((to, from, next) => {
+      const store = useRootStore(pinia)
+
+      store.initialize()
+      next()
+    })
+  },
+  {
+    transformState(state) {
+      return import.meta.env.SSR ? devalue(state) : state
+    },
   },
 )

@@ -1,23 +1,25 @@
 import { createSSRApp, Component, createApp as createClientApp } from 'vue'
 import { createHead, HeadClient } from '@vueuse/head'
 import { ViteSSGClientOptions, ViteSSGContext } from '../types'
+import { deserializeState, serializeState } from '../utils/state'
 import { ClientOnly } from './components/ClientOnly'
 
 export * from '../types'
 
 export function ViteSSG(
   App: Component,
-  fn?: (context: ViteSSGContext<false>) => void,
+  fn?: (context: ViteSSGContext<false>) => Promise<void> | void,
   options: ViteSSGClientOptions = {},
 ) {
   const {
+    transformState,
     registerComponents = true,
     useHead = true,
     rootContainer = '#app',
   } = options
   const isClient = typeof window !== 'undefined'
 
-  function createApp(client = false) {
+  async function createApp(client = false) {
     const app = client
       ? createClientApp(App)
       : createSSRApp(App)
@@ -29,19 +31,31 @@ export function ViteSSG(
       app.use(head)
     }
 
-    const context = { app, head, isClient, router: undefined, routes: undefined }
+    const context = { app, head, isClient, router: undefined, routes: undefined, initialState: {} }
 
     if (registerComponents)
       app.component('ClientOnly', client ? ClientOnly : { render: () => null })
 
-    fn && fn(context)
+    if (client)
+      // @ts-ignore
+      context.initialState = transformState?.(window.__INITIAL_STATE__ || {}) || deserializeState(window.__INITIAL_STATE__)
 
-    return context
+    await fn?.(context)
+
+    // serialize initial state for SSR app for it to be interpolated to output HTML
+    const initialState = transformState?.(context.initialState) || serializeState(context.initialState)
+
+    return {
+      ...context,
+      initialState,
+    } as ViteSSGContext<false>
   }
 
   if (isClient) {
-    const { app } = createApp(true)
-    app.mount(rootContainer, true)
+    (async() => {
+      const { app } = await createApp(true)
+      app.mount(rootContainer, true)
+    })()
   }
 
   return createApp

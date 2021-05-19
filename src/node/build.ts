@@ -6,7 +6,7 @@ import { renderToString, SSRContext } from '@vue/server-renderer'
 import { JSDOM } from 'jsdom'
 import { RollupOutput } from 'rollup'
 import { ViteSSGContext, ViteSSGOptions } from '../client'
-import { renderPreloadLinks } from './perloadlink'
+import { renderPreloadLinks } from './preload-links'
 import { buildLog, routesToPaths, getSize } from './utils'
 
 export interface Manifest {
@@ -72,11 +72,11 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   const ssrManifest: Manifest = JSON.parse(await fs.readFile(join(out, 'ssr-manifest.json'), 'utf-8'))
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { createApp } = require(join(ssgOut, 'main.js')) as { createApp(client: boolean): ViteSSGContext<true> | ViteSSGContext<false> }
+  const { createApp } = require(join(ssgOut, 'main.js')) as { createApp(client: boolean): Promise<ViteSSGContext<true> | ViteSSGContext<false>> }
 
   let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
 
-  const { routes } = createApp(false)
+  const { app, router, routes, head, initialState } = await createApp(false)
 
   let routesPaths = await includedRoutes(routesToPaths(routes))
   // uniq
@@ -95,8 +95,6 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
   await Promise.all(
     routesPaths.map(async(route) => {
-      const { app, router, head } = createApp(false)
-
       if (router) {
         router.push(route)
         await router.isReady()
@@ -108,7 +106,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
       const appHTML = await renderToString(app, ctx)
 
       // need to resolve assets so render content first
-      const renderedHTML = renderHTML(transformedIndexHTML, appHTML)
+      const renderedHTML = renderHTML({ indexHTML: transformedIndexHTML, appHTML, initialState })
 
       // create jsdom from renderedHTML
       const jsdom = new JSDOM(renderedHTML)
@@ -148,9 +146,12 @@ function rewriteScripts(indexHTML: string, mode?: string) {
   return indexHTML.replace(/<script type="module" /g, `<script type="module" ${mode} `)
 }
 
-function renderHTML(indexHTML: string, appHTML: string) {
+function renderHTML({ indexHTML, appHTML, initialState }: { indexHTML: string; appHTML: string; initialState: any }) {
   return indexHTML
-    .replace('<div id="app">', `<div id="app" data-server-rendered="true">${appHTML}`)
+    .replace(
+      '<div id="app"></div>',
+      `<div id="app" data-server-rendered="true">${appHTML}</div>\n\n<script>window.__INITIAL_STATE__=${initialState}</script>`,
+    )
 }
 
 function format(html: string, formatting: ViteSSGOptions['formatting']) {

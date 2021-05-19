@@ -78,15 +78,48 @@ importers:
       vite-ssg: link:../..
       vue-router: 4.0.8_vue@3.0.11
 
+  examples/multiple-pages-with-store:
+    specifiers:
+      '@nuxt/devalue': 1.2.5
+      '@vitejs/plugin-vue': ^1.2.2
+      '@vue/compiler-sfc': ^3.0.11
+      cross-env: ^7.0.3
+      pinia: ^2.0.0-alpha.16
+      typescript: ^4.2.4
+      vite: ^2.2.3
+      vite-plugin-components: ^0.8.4
+      vite-plugin-md: ^0.6.3
+      vite-plugin-pages: ^0.10.0
+      vite-ssg: workspace:*
+      vue: ^3.0.11
+      vue-router: ^4.0.6
+    dependencies:
+      pinia: 2.0.0-alpha.16
+      vue: 3.0.11
+    devDependencies:
+      '@nuxt/devalue': 1.2.5
+      '@vitejs/plugin-vue': 1.2.2_@vue+compiler-sfc@3.0.11
+      '@vue/compiler-sfc': 3.0.11_vue@3.0.11
+      cross-env: 7.0.3
+      typescript: 4.2.4
+      vite: 2.2.3
+      vite-plugin-components: 0.8.4_vite@2.2.3
+      vite-plugin-md: 0.6.3_vite@2.2.3
+      vite-plugin-pages: 0.10.0_8cd74be53f81ed683d32be064bcfe770
+      vite-ssg: link:../..
+      vue-router: 4.0.6_vue@3.0.11
+
   examples/single-page:
     specifiers:
       '@vitejs/plugin-vue': ^1.2.2
       cross-env: ^7.0.3
+      pinia: ^2.0.0-alpha.16
       typescript: ^4.2.4
       vite: ^2.3.3
       vite-ssg: workspace:*
       vue: ^3.0.11
     dependencies:
+      pinia: 2.0.0-alpha.16
       vue: 3.0.11
     devDependencies:
       '@vitejs/plugin-vue': 1.2.2
@@ -410,6 +443,12 @@ packages:
     dependencies:
       '@nodelib/fs.scandir': 2.1.4
       fastq: 1.11.0
+    dev: true
+
+  /@nuxt/devalue/1.2.5:
+    resolution: {integrity: sha512-Tg86C7tqzvZtZli2BQVqgzZN136mZDTgauvJXagglKkP2xt5Kw3NUIiJyjX0Ww/IZy2xVmD0LN+CEPpij4dB2g==}
+    dependencies:
+      consola: 2.15.3
     dev: true
 
   /@types/fs-extra/9.0.11:
@@ -1130,6 +1169,10 @@ packages:
       inherits: 2.0.4
       readable-stream: 3.6.0
       typedarray: 0.0.6
+    dev: true
+
+  /consola/2.15.3:
+    resolution: {integrity: sha512-9vAdYbHj6x2fLKC4+oPH0kFzY/orMZyG2Aj+kNylHxKGJ/Ed4dpNyAQYwJOdqO4zdM7XpVHmyejQDcQHrnuXbw==}
     dev: true
 
   /consolidate/0.16.0:
@@ -3567,6 +3610,10 @@ packages:
     resolution: {integrity: sha1-5aSs0sEB/fPZpNB/DbxNtJ3SgXY=}
     engines: {node: '>=4'}
     dev: true
+
+  /pinia/2.0.0-alpha.16:
+    resolution: {integrity: sha512-E2ctjES/G5X3qdbRmoj1bddVPlXKXTH97VMnETqPo2IVps2uPt0J0XTKjNsm02ofBWQc/0arUq+OLrMUh8Yenw==}
+    dev: false
 
   /pinkie-promise/2.0.1:
     resolution: {integrity: sha1-ITXW36ejWMBprJsXh3YogihFD/o=}

@@ -46,8 +46,13 @@
     "dev": "npm run build -- --watch",
     "example:dev": "cp README.md examples/multiple-pages/README.md && npm -C examples/multiple-pages run dev",
     "example:build": "cp README.md examples/multiple-pages/README.md && npm -C examples/multiple-pages run build",
+    "example:serve": "cp README.md examples/multiple-pages/README.md && npm -C examples/multiple-pages run serve",
+    "example:store:dev": "cp README.md examples/multiple-pages-with-store/README.md && npm -C examples/multiple-pages-with-store run dev",
+    "example:store:build": "cp README.md examples/multiple-pages-with-store/README.md && npm -C examples/multiple-pages-with-store run build",
+    "example:store:serve": "cp README.md examples/multiple-pages-with-store/README.md && npm -C examples/multiple-pages-with-store run serve",
     "example:single:dev": "npm -C examples/single-page run dev",
     "example:single:build": "npm -C examples/single-page run build",
+    "example:single:serve": "npm -C examples/single-page run serve",
     "build": "rimraf dist && tsup src/index.ts src/client/single-page.ts src/node/cli.ts --dts --format cjs,esm && cp dist/single-page.d.ts .",
     "prepublishOnly": "npm run build",
     "release": "npx git-ensure -a && npx bumpp --push --tag --commit"
