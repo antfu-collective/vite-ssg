@@ -20,7 +20,7 @@ export function serializeState(state: any) {
     )
   }
   catch (error) {
-    console.error('[SSR] On state serialization -', error, state)
+    console.error('[SSG] On state serialization -', error, state)
     return '{}'
   }
 }
@@ -30,7 +30,7 @@ export function deserializeState(state: string) {
     return JSON.parse(state || '{}')
   }
   catch (error) {
-    console.error('[SSR] On state deserialization -', error, state)
+    console.error('[SSG] On state deserialization -', error, state)
     return {}
   }
 }
