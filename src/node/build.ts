@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { join, dirname } from 'path'
 import chalk from 'chalk'
 import fs from 'fs-extra'
@@ -76,7 +77,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
   let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
 
-  const { app, router, routes, head, initialState } = await createApp(false)
+  const { routes, initialState } = await createApp(false)
 
   let routesPaths = await includedRoutes(routesToPaths(routes))
   // uniq
@@ -95,8 +96,10 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
   await Promise.all(
     routesPaths.map(async(route) => {
+      const { app, router, head } = await createApp(false)
+
       if (router) {
-        router.push(route)
+        await router.push(route)
         await router.isReady()
       }
 
