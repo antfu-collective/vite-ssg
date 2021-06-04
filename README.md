@@ -275,7 +275,7 @@ export default {
 }
 ```
 
-See [src/types.ts] for more options available.
+See [src/types.ts](./src/types.ts). for more options available.
 
 ### Custom Routes to Render
 
