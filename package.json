@@ -53,6 +53,12 @@
     "example:single:dev": "npm -C examples/single-page run dev",
     "example:single:build": "npm -C examples/single-page run build",
     "example:single:serve": "npm -C examples/single-page run serve",
+    "win:example:dev": "xcopy /Y README.md examples/multiple-pages/README.md && npm -C examples/multiple-pages run dev",
+    "win:example:build": "xcopy /Y README.md examples/multiple-pages/README.md && npm -C examples/multiple-pages run build",
+    "win:example:serve": "xcopy /Y README.md examples/multiple-pages/README.md && npm -C examples/multiple-pages run serve",
+    "win:example:store:dev": "xcopy /Y README.md examples/multiple-pages-with-store/README.md && npm -C examples/multiple-pages-with-store run dev",
+    "win:example:store:build": "xcopy /Y README.md examples/multiple-pages-with-store/README.md && npm -C examples/multiple-pages-with-store run build",
+    "win:example:store:serve": "xcopy /Y README.md examples/multiple-pages-with-store/README.md && npm -C examples/multiple-pages-with-store run serve",
     "build": "rimraf dist && tsup src/index.ts src/client/single-page.ts src/node/cli.ts --dts --format cjs,esm && cp dist/single-page.d.ts .",
     "prepublishOnly": "npm run build",
     "release": "npx git-ensure -a && npx bumpp --push --tag --commit"
