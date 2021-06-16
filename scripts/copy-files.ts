@@ -1,4 +1,4 @@
-import fs from 'fs'
+import { copyFileSync } from 'fs'
 
 const destinations = [
   'multiple-pages',
@@ -6,5 +6,5 @@ const destinations = [
 ]
 
 destinations.map(ex => `examples/${ex}/README.md`).forEach((ex) => {
-  fs.copyFileSync('README.md', ex)
+  copyFileSync('README.md', ex)
 })
