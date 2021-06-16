@@ -4,7 +4,6 @@ const fs = require('fs')
 const destinations = [
   'multiple-pages',
   'multiple-pages-with-store',
-  'single-page',
 ]
 
 destinations.map(ex => `examples/${ex}/README.md`).forEach((ex) => {
