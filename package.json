@@ -44,12 +44,13 @@
   ],
   "scripts": {
     "dev": "npm run build -- --watch",
-    "example:dev": "cp README.md examples/multiple-pages/README.md && npm -C examples/multiple-pages run dev",
-    "example:build": "cp README.md examples/multiple-pages/README.md && npm -C examples/multiple-pages run build",
-    "example:serve": "cp README.md examples/multiple-pages/README.md && npm -C examples/multiple-pages run serve",
-    "example:store:dev": "cp README.md examples/multiple-pages-with-store/README.md && npm -C examples/multiple-pages-with-store run dev",
-    "example:store:build": "cp README.md examples/multiple-pages-with-store/README.md && npm -C examples/multiple-pages-with-store run build",
-    "example:store:serve": "cp README.md examples/multiple-pages-with-store/README.md && npm -C examples/multiple-pages-with-store run serve",
+    "copy-files": "esno scripts/copy-files.ts",
+    "example:dev": "npm run copy-files && npm -C examples/multiple-pages run dev",
+    "example:build": "npm run copy-files && npm -C examples/multiple-pages run build",
+    "example:serve": "npm run copy-files && npm -C examples/multiple-pages run serve",
+    "example:store:dev": "npm run copy-files && npm -C examples/multiple-pages-with-store run dev",
+    "example:store:build": "npm run copy-files && npm -C examples/multiple-pages-with-store run build",
+    "example:store:serve": "npm run copy-files && npm -C examples/multiple-pages-with-store run serve",
     "example:single:dev": "npm -C examples/single-page run dev",
     "example:single:build": "npm -C examples/single-page run build",
     "example:single:serve": "npm -C examples/single-page run serve",
@@ -66,9 +67,9 @@
     "yargs": "^17.0.1"
   },
   "peerDependencies": {
-    "@vueuse/head": "^0.5.1",
     "@vue/compiler-sfc": "^3.0.4",
     "@vue/server-renderer": "^3.0.4",
+    "@vueuse/head": "^0.5.1",
     "vite": "^2.0.0",
     "vue": "^3.0.4",
     "vue-router": "^4.0.1"
@@ -83,6 +84,7 @@
     "@vue/server-renderer": "^3.0.11",
     "@vueuse/head": "^0.5.1",
     "eslint": "^7.26.0",
+    "esno": "^0.7.3",
     "rollup": "^2.48.0",
     "standard-version": "^9.3.0",
     "tsup": "^4.11.0",
