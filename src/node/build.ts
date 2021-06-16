@@ -4,7 +4,7 @@ import chalk from 'chalk'
 import fs from 'fs-extra'
 import { build as viteBuild, resolveConfig, UserConfig } from 'vite'
 import { renderToString, SSRContext } from '@vue/server-renderer'
-import { JSDOM } from 'jsdom'
+import { JSDOM, VirtualConsole } from 'jsdom'
 import { RollupOutput } from 'rollup'
 import { ViteSSGContext, ViteSSGOptions } from '../client'
 import { renderPreloadLinks } from './preload-links'
@@ -88,7 +88,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   buildLog('Rendering Pages...', routesPaths.length)
 
   if (mock) {
-    const virtualConsole = new JSDOM.VirtualConsole();
+    const virtualConsole = new VirtualConsole()
     const jsdom = new JSDOM('', { url: 'http://localhost', virtualConsole })
     // @ts-ignore
     global.window = jsdom.window
