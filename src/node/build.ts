@@ -88,7 +88,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   buildLog('Rendering Pages...', routesPaths.length)
 
   if (mock) {
-    const jsdom = new JSDOM()
+    const jsdom = new JSDOM('', { url: 'http://localhost' })
     // @ts-ignore
     global.window = jsdom.window
     Object.assign(global, jsdom.window)
