@@ -2,8 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "types": [
-      "vite/client",
-      "vite-plugin-pages/client"
+      "vite/client"
     ]
   }
 }
