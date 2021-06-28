@@ -97,7 +97,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
   await Promise.all(
     routesPaths.map(async(route) => {
-      const { app, router, head } = await createApp(false)
+      const { app, router, head } = await createApp(false, route)
 
       if (router) {
         await router.push(route)
