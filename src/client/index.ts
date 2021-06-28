@@ -21,7 +21,7 @@ export function ViteSSG(
   } = options
   const isClient = typeof window !== 'undefined'
 
-  async function createApp(client = false) {
+  async function createApp(client = false, routePath) {
     const app = client
       ? createClientApp(App)
       : createSSRApp(App)
@@ -53,7 +53,7 @@ export function ViteSSG(
       // @ts-ignore
       context.initialState = transformState?.(window.__INITIAL_STATE__ || {}) || deserializeState(window.__INITIAL_STATE__)
 
-    await fn?.(context)
+    await fn?.(context, routePath)
 
     let entryRoutePath: string | undefined
     let isFirstRoute = true
