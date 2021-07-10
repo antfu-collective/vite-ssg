@@ -85,6 +85,8 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
   indexHTML = rewriteScripts(indexHTML, script)
 
+  const initialStatePath = await createInitialState({ initialState, out })
+
   buildLog('Rendering Pages...', routesPaths.length)
 
   if (mock) {
@@ -110,13 +112,18 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
       const appHTML = await renderToString(app, ctx)
 
       // need to resolve assets so render content first
-      const renderedHTML = renderHTML({ indexHTML: transformedIndexHTML, appHTML, initialState })
+      const renderedHTML = renderHTML({ indexHTML: transformedIndexHTML, appHTML })
 
       // create jsdom from renderedHTML
       const jsdom = new JSDOM(renderedHTML)
 
       // render current page's preloadLinks
       renderPreloadLinks(jsdom.window.document, ctx.modules || new Set<string>(), ssrManifest)
+
+      const relativeRoute = (route.endsWith('/') ? `${route}index` : route).replace(/^\//g, '')
+
+      // add initial state as an asset
+      await addInitialState({ jsdom, initialStatePath })
 
       // render head
       head?.updateDOM(jsdom.window.document)
@@ -125,7 +132,6 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
       const transformed = (await onPageRendered?.(route, html)) || html
       const formatted = format(transformed, formatting)
 
-      const relativeRoute = (route.endsWith('/') ? `${route}index` : route).replace(/^\//g, '')
       const filename = `${relativeRoute}.html`
 
       await fs.ensureDir(join(out, dirname(relativeRoute)))
@@ -150,12 +156,25 @@ function rewriteScripts(indexHTML: string, mode?: string) {
   return indexHTML.replace(/<script type="module" /g, `<script type="module" ${mode} `)
 }
 
-function renderHTML({ indexHTML, appHTML, initialState }: { indexHTML: string; appHTML: string; initialState: any }) {
+function renderHTML({ indexHTML, appHTML }: { indexHTML: string; appHTML: string }) {
   return indexHTML
     .replace(
       '<div id="app"></div>',
-      `<div id="app" data-server-rendered="true">${appHTML}</div>\n\n<script>window.__INITIAL_STATE__=${initialState}</script>`,
+      `<div id="app" data-server-rendered="true">${appHTML}</div>`,
     )
+}
+
+async function createInitialState({ initialState, out }: { initialState: any; out: string }) {
+  const initialStatePath = join('assets', 'initial-state.js')
+  await fs.writeFile(join(out, initialStatePath), `window.__INITIAL_STATE__ = ${initialState}`, 'utf-8')
+  return initialStatePath
+}
+
+async function addInitialState({ jsdom, initialStatePath }: { jsdom: JSDOM; initialStatePath: string }) {
+  const initialStateScriptTag = jsdom.window.document.createElement('script')
+  initialStateScriptTag.defer = true
+  initialStateScriptTag.src = initialStatePath
+  jsdom.window.document.head.prepend(initialStateScriptTag)
 }
 
 function format(html: string, formatting: ViteSSGOptions['formatting']) {
