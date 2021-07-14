@@ -32,6 +32,15 @@ export interface ViteSSGOptions {
   formatting?: null | 'minify' | 'prettify'
 
   /**
+   * Uses .cjs file extension for temporary build file.
+   * This should be set to true for es-module environments
+   * with type: "module" set in package.json.
+   *
+   * @default false
+   */
+  buildCjs?: boolean
+
+  /**
    * Custom functions to modified the routes to do the SSG.
    *
    * Default to a handler that filter out all the dynamic routes,
