@@ -34,6 +34,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
     mock = false,
     entry = await detectEntry(root),
     formatting = null,
+    buildCjs = false,
     includedRoutes = DefaultIncludedRoutes,
     onBeforePageRender,
     onPageRendered,
@@ -70,10 +71,18 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   process.env.VITE_SSG = 'true'
   await viteBuild(ssrConfig)
 
+  let outputFile = join(ssgOut, 'main.js')
+  // rename to cjs extension
+  if (buildCjs === true) {
+    let pos = outputFile.lastIndexOf('.');
+    outputFile = outputFile.substr(0, pos < 0 ? outputFile.length : pos) + '.cjs';
+    await fs.rename(join(ssgOut, 'main.js'), outputFile);
+  }
+
   const ssrManifest: Manifest = JSON.parse(await fs.readFile(join(out, 'ssr-manifest.json'), 'utf-8'))
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { createApp } = require(join(ssgOut, 'main.js')) as { createApp(client: boolean): Promise<ViteSSGContext<true> | ViteSSGContext<false>> }
+  const { createApp } = require(outputFile) as { createApp(client: boolean): Promise<ViteSSGContext<true> | ViteSSGContext<false>> }
 
   let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
 
