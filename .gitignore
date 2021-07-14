@@ -1,6 +1,6 @@
 node_modules
 .DS_Store
-dist
+# dist
 examples/*/README.md
 .vite-ssg-temp
 *.d.ts
