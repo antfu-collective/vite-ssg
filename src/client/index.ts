@@ -2,8 +2,8 @@ import { createSSRApp, Component, createApp as createClientApp } from 'vue'
 import { createMemoryHistory, createRouter, createWebHistory } from 'vue-router'
 import { createHead, HeadClient } from '@vueuse/head'
 import { deserializeState, serializeState } from '../utils/state'
-import { ClientOnly } from './components/ClientOnly'
 import type { RouterOptions, ViteSSGContext, ViteSSGClientOptions } from '../types'
+import { ClientOnly } from './components/ClientOnly'
 
 export * from '../types'
 

@@ -153,10 +153,13 @@ function rewriteScripts(indexHTML: string, mode?: string) {
 }
 
 function renderHTML({ indexHTML, appHTML, initialState }: { indexHTML: string; appHTML: string; initialState: any }) {
+  const stateScript = initialState
+    ? `\n<script>window.__INITIAL_STATE__=${initialState}</script>`
+    : ''
   return indexHTML
     .replace(
       '<div id="app"></div>',
-      `<div id="app" data-server-rendered="true">${appHTML}</div>\n\n<script>window.__INITIAL_STATE__=${initialState}</script>`,
+      `<div id="app" data-server-rendered="true">${appHTML}</div>${stateScript}`,
     )
 }
 

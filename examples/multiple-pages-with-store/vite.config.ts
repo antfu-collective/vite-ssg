@@ -6,11 +6,6 @@ import Components from 'vite-plugin-components'
 import Vue from '@vitejs/plugin-vue'
 
 const config: UserConfig = {
-  resolve: {
-    alias: {
-      '@nuxt/devalue': '@nuxt/devalue/dist/devalue.js',
-    },
-  },
   plugins: [
     Vue({
       include: [/\.vue$/, /\.md$/],
