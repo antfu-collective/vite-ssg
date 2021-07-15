@@ -14,6 +14,8 @@ export interface Manifest {
   [key: string]: string[]
 }
 
+export type CreateAppFactory = (client: boolean, routePath?: string) => Promise<ViteSSGContext<true> | ViteSSGContext<false>>
+
 function DefaultIncludedRoutes(paths: string[]) {
   // ignore dynamic routes
   return paths.filter(i => !i.includes(':') && !i.includes('*'))
@@ -75,7 +77,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   const ssrManifest: Manifest = JSON.parse(await fs.readFile(join(out, 'ssr-manifest.json'), 'utf-8'))
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { createApp } = require(join(ssgOut, 'main.js')) as { createApp(client: boolean): Promise<ViteSSGContext<true> | ViteSSGContext<false>> }
+  const { createApp } = require(join(ssgOut, 'main.js')) as { createApp: CreateAppFactory }
 
   let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
 
@@ -99,7 +101,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
   await Promise.all(
     routesPaths.map(async(route) => {
-      const { app, router, head } = await createApp(false)
+      const { app, router, head } = await createApp(false, route)
 
       if (router) {
         await router.push(route)
