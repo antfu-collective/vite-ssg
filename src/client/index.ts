@@ -1,9 +1,9 @@
 import { createSSRApp, Component, createApp as createClientApp } from 'vue'
 import { createMemoryHistory, createRouter, createWebHistory } from 'vue-router'
 import { createHead, HeadClient } from '@vueuse/head'
-import type { RouterOptions, ViteSSGContext, ViteSSGClientOptions } from '../types'
 import { deserializeState, serializeState } from '../utils/state'
 import { ClientOnly } from './components/ClientOnly'
+import type { RouterOptions, ViteSSGContext, ViteSSGClientOptions } from '../types'
 
 export * from '../types'
 
@@ -21,7 +21,7 @@ export function ViteSSG(
   } = options
   const isClient = typeof window !== 'undefined'
 
-  async function createApp(client = false, routePath) {
+  async function createApp(client = false, routePath?: string) {
     const app = client
       ? createClientApp(App)
       : createSSRApp(App)
@@ -47,13 +47,21 @@ export function ViteSSG(
     if (registerComponents)
       app.component('ClientOnly', client ? ClientOnly : { render: () => null })
 
-    const context: ViteSSGContext<true> = { app, head, isClient, router, routes, initialState: {} }
+    const context: ViteSSGContext<true> = {
+      app,
+      head,
+      isClient,
+      router,
+      routes,
+      initialState: {},
+      currentPath: routePath,
+    }
 
     if (client)
       // @ts-ignore
       context.initialState = transformState?.(window.__INITIAL_STATE__ || {}) || deserializeState(window.__INITIAL_STATE__)
 
-    await fn?.(context, routePath)
+    await fn?.(context)
 
     let entryRoutePath: string | undefined
     let isFirstRoute = true
