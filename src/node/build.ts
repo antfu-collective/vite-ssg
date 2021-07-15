@@ -45,18 +45,8 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   if (fs.existsSync(ssgOut))
     await fs.remove(ssgOut)
 
-  const ssrConfig: UserConfig = {
-    build: {
-      ssr: await resolveAlias(config, entry),
-      outDir: ssgOut,
-      minify: false,
-      cssCodeSplit: false,
-    },
-    mode: config.mode,
-  }
-
+  // client
   buildLog('Build for client...')
-
   await viteBuild({
     build: {
       ssrManifest: true,
@@ -69,10 +59,18 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
     mode: config.mode,
   }) as RollupOutput
 
+  // server
   buildLog('Build for server...')
-
   process.env.VITE_SSG = 'true'
-  await viteBuild(ssrConfig)
+  await viteBuild({
+    build: {
+      ssr: await resolveAlias(config, entry),
+      outDir: ssgOut,
+      minify: false,
+      cssCodeSplit: false,
+    },
+    mode: config.mode,
+  })
 
   const ssrManifest: Manifest = JSON.parse(await fs.readFile(join(out, 'ssr-manifest.json'), 'utf-8'))
 
@@ -193,8 +191,8 @@ async function detectEntry(root: string) {
   return entry || 'src/main.ts'
 }
 
-async function resolveAlias(config: ResolvedConfig, path: string) {
+async function resolveAlias(config: ResolvedConfig, entry: string) {
   const resolver = config.createResolver()
-  const result = await resolver(path, config.root)
-  return result
+  const result = await resolver(entry, config.root)
+  return result || join(config.root, entry)
 }
