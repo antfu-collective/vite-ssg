@@ -20,7 +20,7 @@ function DefaultIncludedRoutes(paths: string[]) {
 }
 
 export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
-  const mode = process.env.MODE || process.env.NODE_ENV || 'production'
+  const mode = process.env.MODE || process.env.NODE_ENV || cliOptions.mode || 'production'
   const config = await resolveConfig({}, 'build', mode)
 
   const cwd = process.cwd()
@@ -50,6 +50,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
       minify: false,
       cssCodeSplit: false,
     },
+    mode: config.mode
   }
 
   buildLog('Build for client...')
@@ -63,6 +64,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
         },
       },
     },
+    mode: config.mode
   }) as RollupOutput
 
   buildLog('Build for server...')

@@ -32,6 +32,11 @@ export interface ViteSSGOptions {
   formatting?: null | 'minify' | 'prettify'
 
   /**
+   * Vite enviroument mode
+   */
+  mode?: string
+
+  /**
    * Custom functions to modified the routes to do the SSG.
    *
    * Default to a handler that filter out all the dynamic routes,
