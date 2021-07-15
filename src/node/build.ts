@@ -2,7 +2,7 @@
 import { join, dirname } from 'path'
 import chalk from 'chalk'
 import fs from 'fs-extra'
-import { build as viteBuild, resolveConfig, UserConfig } from 'vite'
+import { build as viteBuild, resolveConfig, UserConfig, ResolvedConfig } from 'vite'
 import { renderToString, SSRContext } from '@vue/server-renderer'
 import { JSDOM, VirtualConsole } from 'jsdom'
 import { RollupOutput } from 'rollup'
@@ -45,7 +45,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
   const ssrConfig: UserConfig = {
     build: {
-      ssr: join(root, entry),
+      ssr: await resolveAlias(config, entry),
       outDir: ssgOut,
       minify: false,
       cssCodeSplit: false,
@@ -189,4 +189,10 @@ async function detectEntry(root: string) {
     return scriptType === 'module'
   }) || []
   return entry || 'src/main.ts'
+}
+
+async function resolveAlias(config: ResolvedConfig, path: string) {
+  const resolver = config.createResolver()
+  const result = await resolver(path, config.root)
+  return result
 }
