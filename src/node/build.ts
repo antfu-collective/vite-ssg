@@ -50,7 +50,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
       minify: false,
       cssCodeSplit: false,
     },
-    mode: config.mode
+    mode: config.mode,
   }
 
   buildLog('Build for client...')
@@ -64,7 +64,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
         },
       },
     },
-    mode: config.mode
+    mode: config.mode,
   }) as RollupOutput
 
   buildLog('Build for server...')
