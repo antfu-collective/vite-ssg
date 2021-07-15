@@ -54,7 +54,7 @@ export function ViteSSG(
       router,
       routes,
       initialState: {},
-      currentPath: routePath,
+      routePath,
     }
 
     if (client)

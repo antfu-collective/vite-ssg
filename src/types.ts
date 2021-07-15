@@ -68,7 +68,7 @@ export interface ViteSSGContext<HasRouter extends boolean = true> {
   /**
    * Current router path on SSG, `undefined` on client side.
    */
-  currentPath?: string
+  routePath?: string
 }
 
 export interface ViteSSGClientOptions {
