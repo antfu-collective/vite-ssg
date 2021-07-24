@@ -32,6 +32,11 @@ export interface ViteSSGOptions {
   formatting?: null | 'minify' | 'prettify'
 
   /**
+   * Vite enviroument mode
+   */
+  mode?: string
+
+  /**
    * Uses .cjs file extension for temporary build file.
    * This should be set to true for es-module environments
    * with type: "module" set in package.json.
@@ -74,6 +79,10 @@ export interface ViteSSGContext<HasRouter extends boolean = true> {
   initialState: Record<string, any>
   head: HeadClient | undefined
   isClient: boolean
+  /**
+   * Current router path on SSG, `undefined` on client side.
+   */
+  routePath?: string
 }
 
 export interface ViteSSGClientOptions {

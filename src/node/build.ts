@@ -2,7 +2,7 @@
 import { join, dirname } from 'path'
 import chalk from 'chalk'
 import fs from 'fs-extra'
-import { build as viteBuild, resolveConfig, UserConfig } from 'vite'
+import { build as viteBuild, resolveConfig, UserConfig, ResolvedConfig } from 'vite'
 import { renderToString, SSRContext } from '@vue/server-renderer'
 import { JSDOM, VirtualConsole } from 'jsdom'
 import { RollupOutput } from 'rollup'
@@ -14,13 +14,15 @@ export interface Manifest {
   [key: string]: string[]
 }
 
+export type CreateAppFactory = (client: boolean, routePath?: string) => Promise<ViteSSGContext<true> | ViteSSGContext<false>>
+
 function DefaultIncludedRoutes(paths: string[]) {
   // ignore dynamic routes
   return paths.filter(i => !i.includes(':') && !i.includes('*'))
 }
 
 export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
-  const mode = process.env.MODE || process.env.NODE_ENV || 'production'
+  const mode = process.env.MODE || process.env.NODE_ENV || cliOptions.mode || 'production'
   const config = await resolveConfig({}, 'build', mode)
 
   const cwd = process.cwd()
@@ -44,17 +46,8 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   if (fs.existsSync(ssgOut))
     await fs.remove(ssgOut)
 
-  const ssrConfig: UserConfig = {
-    build: {
-      ssr: join(root, entry),
-      outDir: ssgOut,
-      minify: false,
-      cssCodeSplit: false,
-    },
-  }
-
+  // client
   buildLog('Build for client...')
-
   await viteBuild({
     build: {
       ssrManifest: true,
@@ -64,12 +57,21 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
         },
       },
     },
+    mode: config.mode,
   }) as RollupOutput
 
+  // server
   buildLog('Build for server...')
-
   process.env.VITE_SSG = 'true'
-  await viteBuild(ssrConfig)
+  await viteBuild({
+    build: {
+      ssr: await resolveAlias(config, entry),
+      outDir: ssgOut,
+      minify: false,
+      cssCodeSplit: false,
+    },
+    mode: config.mode,
+  })
 
   let outputFile = join(ssgOut, 'main.js')
   // rename to cjs extension
@@ -82,7 +84,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   const ssrManifest: Manifest = JSON.parse(await fs.readFile(join(out, 'ssr-manifest.json'), 'utf-8'))
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { createApp } = require(outputFile) as { createApp(client: boolean): Promise<ViteSSGContext<true> | ViteSSGContext<false>> }
+  const { createApp } = require(outputFile) as { createApp: CreateAppFactory }
 
   let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
 
@@ -106,7 +108,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
   await Promise.all(
     routesPaths.map(async(route) => {
-      const { app, router, head } = await createApp(false)
+      const { app, router, head } = await createApp(false, route)
 
       if (router) {
         await router.push(route)
@@ -160,10 +162,13 @@ function rewriteScripts(indexHTML: string, mode?: string) {
 }
 
 function renderHTML({ indexHTML, appHTML, initialState }: { indexHTML: string; appHTML: string; initialState: any }) {
+  const stateScript = initialState
+    ? `\n<script>window.__INITIAL_STATE__=${initialState}</script>`
+    : ''
   return indexHTML
     .replace(
       '<div id="app"></div>',
-      `<div id="app" data-server-rendered="true">${appHTML}</div>\n\n<script>window.__INITIAL_STATE__=${initialState}</script>`,
+      `<div id="app" data-server-rendered="true">${appHTML}</div>${stateScript}`,
     )
 }
 
@@ -196,4 +201,10 @@ async function detectEntry(root: string) {
     return scriptType === 'module'
   }) || []
   return entry || 'src/main.ts'
+}
+
+async function resolveAlias(config: ResolvedConfig, entry: string) {
+  const resolver = config.createResolver()
+  const result = await resolver(entry, config.root)
+  return result || join(config.root, entry)
 }
