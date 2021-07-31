@@ -38,6 +38,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
     mock = false,
     entry = await detectEntry(root),
     formatting = null,
+    crittersOptions = {},
     includedRoutes = DefaultIncludedRoutes,
     onBeforePageRender,
     onPageRendered,
@@ -85,7 +86,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
   buildLog('Rendering Pages...', routesPaths.length)
 
-  const critters = getCritters(outDir)
+  const critters = getCritters(outDir, crittersOptions)
   if (critters)
     console.log(`${chalk.gray('[vite-ssg]')} ${chalk.blue('Critical CSS generation enabled via `critters`')}`)
 

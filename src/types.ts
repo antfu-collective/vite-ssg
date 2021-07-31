@@ -1,6 +1,7 @@
-import { App } from 'vue'
-import { Router, RouteRecordRaw, RouterOptions as VueRouterOptions } from 'vue-router'
-import { HeadClient } from '@vueuse/head'
+import type { App } from 'vue'
+import type { Router, RouteRecordRaw, RouterOptions as VueRouterOptions } from 'vue-router'
+import type { HeadClient } from '@vueuse/head'
+import type { Options as CrittersOptions } from 'critters'
 
 export interface ViteSSGOptions {
   /**
@@ -35,6 +36,13 @@ export interface ViteSSGOptions {
    * Vite enviroument mode
    */
   mode?: string
+
+  /**
+   * Options for critters
+   *
+   * @see https://github.com/GoogleChromeLabs/critters
+   */
+  crittersOptions?: CrittersOptions
 
   /**
    * Custom functions to modified the routes to do the SSG.
