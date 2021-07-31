@@ -1,9 +1,10 @@
+import type Critters from 'critters'
 
-export function getCritters(outDir: string) {
+export function getCritters(outDir: string): Critters | undefined {
   try {
     // eslint-disable-next-line no-eval
-    const Critters = eval('require')('critters') as typeof import('critters').default
-    return new Critters({
+    const CrittersClass = eval('require')('critters')
+    return new CrittersClass({
       external: false,
       path: outDir,
       inlineThreshold: Infinity,

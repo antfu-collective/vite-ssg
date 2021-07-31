@@ -213,16 +213,3 @@ async function resolveAlias(config: ResolvedConfig, entry: string) {
   const result = await resolver(entry, config.root)
   return result || join(config.root, entry)
 }
-
-function hasPackage(name: string) {
-  try {
-    // eslint-disable-next-line no-eval
-    const r = eval('require')
-    r.resolve(name)
-    return true
-  }
-  catch (e) {
-    console.log(e)
-    return false
-  }
-}
