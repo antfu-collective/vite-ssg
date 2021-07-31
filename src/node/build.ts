@@ -46,9 +46,6 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   if (fs.existsSync(ssgOut))
     await fs.remove(ssgOut)
 
-  if (config.build.emptyOutDir !== false)
-    await fs.remove(outDir)
-
   // client
   buildLog('Build for client...')
   await viteBuild({
@@ -143,24 +140,10 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
   await fs.remove(ssgOut)
 
+  // when `vite-plugin-pwa` is presented, use it to regenerate SW after rendering
   const pwaPlugin: VitePluginPWAAPI = config.plugins.find(i => i.name === 'vite-plugin-pwa')?.api
   if (pwaPlugin?.generateSW) {
     buildLog('Regenerate PWA...')
-    const bundle = pwaPlugin.generateBundle()
-    if (bundle) {
-      await Promise.all(
-        Object.entries(bundle)
-          .map(async([key, value]: any) => {
-            if (!value.source)
-              return
-
-            await fs.writeFile(join(outDir, key), value.source, 'utf-8')
-            config.logger.info(
-              `${chalk.dim(`${outDir}/`)}${chalk.cyan(key)}\t${chalk.dim(getSize(value.source))}`,
-            )
-          }),
-      )
-    }
     await pwaPlugin.generateSW()
   }
 
