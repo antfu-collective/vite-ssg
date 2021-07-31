@@ -28,9 +28,9 @@ export interface ViteSSGOptions {
   /**
    * Applying formatter to the generated index file.
    *
-   * @default null
+   * @default 'none'
    */
-  formatting?: null | 'minify' | 'prettify'
+  formatting?: 'minify' | 'prettify' | 'none'
 
   /**
    * Vite enviroument mode

@@ -37,7 +37,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
     script = 'sync',
     mock = false,
     entry = await detectEntry(root),
-    formatting = null,
+    formatting = 'none',
     crittersOptions = {},
     includedRoutes = DefaultIncludedRoutes,
     onBeforePageRender,
@@ -184,7 +184,7 @@ function format(html: string, formatting: ViteSSGOptions['formatting']) {
     return require('html-minifier').minify(html, {
       collapseWhitespace: true,
       caseSensitive: true,
-      collapseInlineTagWhitespace: true,
+      collapseInlineTagWhitespace: false,
       minifyJS: true,
       minifyCSS: true,
     })
