@@ -58,7 +58,7 @@
     "build:module": "tsup src/index.ts src/client/single-page.ts src/node/cli.ts --dts --format cjs,esm",
     "build": "rimraf dist && npm run build:module && npm run copy-single-page-dts",
     "prepublishOnly": "npm run build",
-    "release": "npx git-ensure -a && npx bumpp --push --tag --commit"
+    "release": "npx bumpp --push --tag --commit"
   },
   "dependencies": {
     "chalk": "^4.1.2",
