@@ -6,11 +6,11 @@ export function getCritters(outDir: string, options: Options = {}): Critters | u
     // eslint-disable-next-line no-eval
     const CrittersClass = eval('require')('critters') as typeof import('critters').default
     return new CrittersClass({
+      path: outDir,
+      logLevel: 'warn',
       external: true,
       inlineFonts: true,
-      path: outDir,
-      inlineThreshold: Infinity,
-      logLevel: 'warn',
+      preloadFonts: true,
       ...options,
     })
   }
