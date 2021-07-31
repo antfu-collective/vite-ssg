@@ -10,6 +10,7 @@ import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
 import { ViteSSGContext, ViteSSGOptions } from '../client'
 import { renderPreloadLinks } from './preload-links'
 import { buildLog, routesToPaths, getSize } from './utils'
+import { getCritters } from './critical'
 
 export interface Manifest {
   [key: string]: string[]
@@ -84,6 +85,10 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
   buildLog('Rendering Pages...', routesPaths.length)
 
+  const critters = getCritters(outDir)
+  if (critters)
+    console.log(`${chalk.gray('[vite-ssg]')} ${chalk.blue('Critical CSS generation enabled via `critters`')}`)
+
   if (mock) {
     const virtualConsole = new VirtualConsole()
     const jsdom = new JSDOM('', { url: 'http://localhost', virtualConsole })
@@ -123,7 +128,10 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
       head?.updateDOM(jsdom.window.document)
 
       const html = jsdom.serialize()
-      const transformed = (await onPageRendered?.(route, html)) || html
+      let transformed = (await onPageRendered?.(route, html)) || html
+      if (critters)
+        transformed = await critters.process(transformed)
+
       const formatted = format(transformed, formatting)
 
       const relativeRoute = (route.endsWith('/') ? `${route}index` : route).replace(/^\//g, '')
@@ -204,4 +212,17 @@ async function resolveAlias(config: ResolvedConfig, entry: string) {
   const resolver = config.createResolver()
   const result = await resolver(entry, config.root)
   return result || join(config.root, entry)
+}
+
+function hasPackage(name: string) {
+  try {
+    // eslint-disable-next-line no-eval
+    const r = eval('require')
+    r.resolve(name)
+    return true
+  }
+  catch (e) {
+    console.log(e)
+    return false
+  }
 }

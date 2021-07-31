@@ -13,6 +13,7 @@ importers:
       '@vue/server-renderer': ^3.1.5
       '@vueuse/head': ^0.6.0
       chalk: ^4.1.2
+      critters: ^0.0.10
       eslint: ^7.32.0
       esno: ^0.8.0
       fs-extra: ^10.0.0
@@ -44,6 +45,7 @@ importers:
       '@vue/compiler-sfc': 3.1.5_vue@3.1.5
       '@vue/server-renderer': 3.1.5_vue@3.1.5
       '@vueuse/head': 0.6.0_vue@3.1.5
+      critters: 0.0.10
       eslint: 7.32.0
       esno: 0.8.0
       rollup: 2.55.1
@@ -117,7 +119,7 @@ importers:
       '@vitejs/plugin-vue': ^1.3.0
       '@vue/compiler-sfc': ^3.1.5
       cross-env: ^7.0.3
-      pinia: ^2.0.0-rc.1
+      pinia: 2.0.0-alpha.18
       typescript: ^4.3.5
       vite: ^2.4.4
       vite-plugin-components: ^0.13.2
@@ -127,7 +129,7 @@ importers:
       vue: ^3.1.5
       vue-router: ^4.0.10
     dependencies:
-      pinia: 2.0.0-rc.1_typescript@4.3.5+vue@3.1.5
+      pinia: 2.0.0-alpha.18
       vue: 3.1.5
     devDependencies:
       '@nuxt/devalue': 2.0.0
@@ -2255,6 +2257,12 @@ packages:
     engines: {node: '>= 4.0.0'}
     dev: true
 
+  /atob/2.1.2:
+    resolution: {integrity: sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==}
+    engines: {node: '>= 4.5.0'}
+    hasBin: true
+    dev: true
+
   /available-typed-arrays/1.0.4:
     resolution: {integrity: sha512-SA5mXJWrId1TaQjfxUYghbqQ/hYioKmLJvPJyDuYRtXXenFNMjj4hSSt1Cf1xsuXSXrtxrVC5Ot4eU6cOtBDdA==}
     engines: {node: '>= 0.4'}
@@ -2754,6 +2762,16 @@ packages:
       yaml: 1.10.2
     dev: true
 
+  /critters/0.0.10:
+    resolution: {integrity: sha512-p5VKhP1803+f+0Jq5P03w1SbiHtpAKm+1EpJHkiPxQPq0Vu9QLZHviJ02GRrWi0dlcJqrmzMWInbwp4d22RsGw==}
+    dependencies:
+      chalk: 4.1.2
+      css: 3.0.0
+      parse5: 6.0.1
+      parse5-htmlparser2-tree-adapter: 6.0.1
+      pretty-bytes: 5.6.0
+    dev: true
+
   /cross-env/7.0.3:
     resolution: {integrity: sha512-+/HKd6EgcQCJGh2PSjZuUitQBQynKor4wrFbRg4DtAgS1aWO+gU52xpH7M9ScGgXSYmAVS9bIJ8EzuaGw0oNAw==}
     engines: {node: '>=10.14', npm: '>=6', yarn: '>=1'}
@@ -2774,6 +2792,14 @@ packages:
   /crypto-random-string/2.0.0:
     resolution: {integrity: sha512-v1plID3y9r/lPhviJ1wrXpLeyUIGAZ2SHNYTEapm7/8A9nLPoyvVp3RK/EPFqn5kEznyWgYZNsRtYYIWbuG8KA==}
     engines: {node: '>=8'}
+    dev: true
+
+  /css/3.0.0:
+    resolution: {integrity: sha512-DG9pFfwOrzc+hawpmqX/dHYHJG+Bsdb0klhyi1sDneOgGOXy9wQIC8hzyVp1e4NRYDBdxcylvywPkkXCHAzTyQ==}
+    dependencies:
+      inherits: 2.0.4
+      source-map: 0.6.1
+      source-map-resolve: 0.6.0
     dev: true
 
   /cssesc/3.0.0:
@@ -2877,6 +2903,11 @@ packages:
   /decimal.js/10.2.1:
     resolution: {integrity: sha512-KaL7+6Fw6i5A2XSnsbhm/6B+NuEA7TZ4vqxnd5tXz9sbKtrN9Srj8ab4vKVdK8YAqZO9P1kg45Y6YLoduPf+kw==}
     dev: false
+
+  /decode-uri-component/0.2.0:
+    resolution: {integrity: sha1-6zkTMzRYd1y4TNGh+uBiEGu4dUU=}
+    engines: {node: '>=0.10'}
+    dev: true
 
   /deep-equal/2.0.5:
     resolution: {integrity: sha512-nPiRgmbAtm1a3JsnLCf6/SLfXcjyN5v8L1TXzdCmHrXJ4hx+gW/w1YCcn7z8gJtSiDArZCgYtbao3QqLm/N1Sw==}
@@ -5024,9 +5055,14 @@ packages:
       lines-and-columns: 1.1.6
     dev: true
 
+  /parse5-htmlparser2-tree-adapter/6.0.1:
+    resolution: {integrity: sha512-qPuWvbLgvDGilKc5BoicRovlT4MtYT6JfJyBOMDsKoiT+GiuP5qyrPCnR9HcPECIJJmZh5jRndyNThnhhb/vlA==}
+    dependencies:
+      parse5: 6.0.1
+    dev: true
+
   /parse5/6.0.1:
     resolution: {integrity: sha512-Ofn/CTFzRGTTxwpNEs9PP93gXShHcTq255nzRYSKe8AkVpZY7e1fpmTfOyoIvjP5HG7Z2ZM7VS9PPhQGW2pOpw==}
-    dev: false
 
   /path-exists/2.1.0:
     resolution: {integrity: sha1-D+tsZPD8UY2adU3V77YscCJ2H0s=}
@@ -5103,6 +5139,12 @@ packages:
     resolution: {integrity: sha1-5aSs0sEB/fPZpNB/DbxNtJ3SgXY=}
     engines: {node: '>=4'}
     dev: true
+
+  /pinia/2.0.0-alpha.18:
+    resolution: {integrity: sha512-KbgU5mvGcRjnOEleTL943nDIJcI97CmOQskGiOJUntZ5VuNYxm3CgzQztO4VE1SUYgHYbLhcauV9Athz9R1kWw==}
+    dependencies:
+      '@vue/devtools-api': 6.0.0-beta.15
+    dev: false
 
   /pinia/2.0.0-rc.1_typescript@4.3.5+vue@3.1.5:
     resolution: {integrity: sha512-kxmCzjev0c2q+FkcQZg7Rx8AhB6uAcuM0p7mV/SSJiKcZpgzWlIW+Ig+XZGsKEJuQK+R1hGBqVj7xV6yEdiDrw==}
@@ -5688,6 +5730,13 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
+  /source-map-resolve/0.6.0:
+    resolution: {integrity: sha512-KXBr9d/fO/bWo97NXsPIAW1bFSBOuCnjbNTBMO7N59hsv5i9yzRDfcYwwt0l04+VqnKC+EwzvJZIP/qkuMgR/w==}
+    dependencies:
+      atob: 2.1.2
+      decode-uri-component: 0.2.0
+    dev: true
+
   /source-map-support/0.5.19:
     resolution: {integrity: sha512-Wonm7zOCIJzBGQdB+thsPar0kYuCIzYvxZwlBa87yi/Mdjv7Tip2cyVbLj5o0cFPN4EVkuTwb3GDDyUx2DGnGw==}
     dependencies:
@@ -5728,7 +5777,7 @@ packages:
     resolution: {integrity: sha512-cOYcUWwhCuHCXi49RhFRCyJEK3iPj1Ziz9DpViV3tbZOwXD49QzIN3MpOLJNxh2qwq2lJJZaKMVw9qNi4jTC0w==}
     dependencies:
       spdx-expression-parse: 3.0.1
-      spdx-license-ids: 3.0.8
+      spdx-license-ids: 3.0.9
     dev: true
 
   /spdx-exceptions/2.3.0:
@@ -5739,11 +5788,11 @@ packages:
     resolution: {integrity: sha512-cbqHunsQWnJNE6KhVSMsMeH5H/L9EpymbzqTQ3uLwNCLZ1Q481oWaofqH7nO6V07xlXwY6PhQdQ2IedWx/ZK4Q==}
     dependencies:
       spdx-exceptions: 2.3.0
-      spdx-license-ids: 3.0.8
+      spdx-license-ids: 3.0.9
     dev: true
 
-  /spdx-license-ids/3.0.8:
-    resolution: {integrity: sha512-NDgA96EnaLSvtbM7trJj+t1LUR3pirkDCcz9nOUlPb5DMBGsH7oES6C3hs3j7R9oHEa1EMvReS/BUAIT5Tcr0g==}
+  /spdx-license-ids/3.0.9:
+    resolution: {integrity: sha512-Ki212dKK4ogX+xDo4CtOZBVIwhsKBEfsEEcwmJfLQzirgc2jIWdzg40Unxz/HzEUqM1WFzVlQSMF9kZZ2HboLQ==}
     dev: true
 
   /split/1.0.1:
