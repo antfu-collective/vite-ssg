@@ -42,7 +42,7 @@ export interface ViteSSGOptions {
    *
    * @see https://github.com/GoogleChromeLabs/critters
    */
-  crittersOptions?: CrittersOptions
+  crittersOptions?: CrittersOptions | false
 
   /**
    * Custom functions to modified the routes to do the SSG.

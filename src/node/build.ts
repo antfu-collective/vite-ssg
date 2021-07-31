@@ -86,7 +86,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
   buildLog('Rendering Pages...', routesPaths.length)
 
-  const critters = getCritters(outDir, crittersOptions)
+  const critters = crittersOptions !== false ? getCritters(outDir, crittersOptions) : undefined
   if (critters)
     console.log(`${chalk.gray('[vite-ssg]')} ${chalk.blue('Critical CSS generation enabled via `critters`')}`)
 
