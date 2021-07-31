@@ -6,19 +6,19 @@
     "serve": "vite preview"
   },
   "dependencies": {
-    "pinia": "^2.0.0-beta.5",
-    "vue": "^3.1.4"
+    "pinia": "^2.0.0-rc.1",
+    "vue": "^3.1.5"
   },
   "devDependencies": {
     "@nuxt/devalue": "^2.0.0",
-    "@vitejs/plugin-vue": "^1.2.5",
-    "@vue/compiler-sfc": "^3.1.4",
+    "@vitejs/plugin-vue": "^1.3.0",
+    "@vue/compiler-sfc": "^3.1.5",
     "cross-env": "^7.0.3",
     "typescript": "^4.3.5",
-    "vite": "^2.4.2",
-    "vite-plugin-components": "^0.12.2",
-    "vite-plugin-md": "^0.8.0",
-    "vite-plugin-pages": "^0.15.0",
+    "vite": "^2.4.4",
+    "vite-plugin-components": "^0.13.2",
+    "vite-plugin-md": "^0.10.0",
+    "vite-plugin-pages": "^0.15.1",
     "vite-ssg": "workspace:*",
     "vue-router": "^4.0.10"
   }

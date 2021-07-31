@@ -6,6 +6,7 @@ import { build as viteBuild, resolveConfig, UserConfig, ResolvedConfig } from 'v
 import { renderToString, SSRContext } from '@vue/server-renderer'
 import { JSDOM, VirtualConsole } from 'jsdom'
 import { RollupOutput } from 'rollup'
+import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
 import { ViteSSGContext, ViteSSGOptions } from '../client'
 import { renderPreloadLinks } from './preload-links'
 import { buildLog, routesToPaths, getSize } from './utils'
@@ -45,6 +46,9 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   if (fs.existsSync(ssgOut))
     await fs.remove(ssgOut)
 
+  if (config.build.emptyOutDir !== false)
+    await fs.remove(outDir)
+
   // client
   buildLog('Build for client...')
   await viteBuild({
@@ -72,20 +76,14 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
     mode: config.mode,
   })
 
-  const ssrManifest: Manifest = JSON.parse(await fs.readFile(join(out, 'ssr-manifest.json'), 'utf-8'))
-
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { createApp } = require(join(ssgOut, 'main.js')) as { createApp: CreateAppFactory }
-
-  let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
 
   const { routes, initialState } = await createApp(false)
 
   let routesPaths = await includedRoutes(routesToPaths(routes))
   // uniq
   routesPaths = Array.from(new Set(routesPaths))
-
-  indexHTML = rewriteScripts(indexHTML, script)
 
   buildLog('Rendering Pages...', routesPaths.length)
 
@@ -96,6 +94,10 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
     global.window = jsdom.window
     Object.assign(global, jsdom.window)
   }
+
+  const ssrManifest: Manifest = JSON.parse(await fs.readFile(join(out, 'ssr-manifest.json'), 'utf-8'))
+  let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
+  indexHTML = rewriteScripts(indexHTML, script)
 
   await Promise.all(
     routesPaths.map(async(route) => {
@@ -140,6 +142,27 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   )
 
   await fs.remove(ssgOut)
+
+  const pwaPlugin: VitePluginPWAAPI = config.plugins.find(i => i.name === 'vite-plugin-pwa')?.api
+  if (pwaPlugin?.generateSW) {
+    buildLog('Regenerate PWA...')
+    const bundle = pwaPlugin.generateBundle()
+    if (bundle) {
+      await Promise.all(
+        Object.entries(bundle)
+          .map(async([key, value]: any) => {
+            if (!value.source)
+              return
+
+            await fs.writeFile(join(outDir, key), value.source, 'utf-8')
+            config.logger.info(
+              `${chalk.dim(`${outDir}/`)}${chalk.cyan(key)}\t${chalk.dim(getSize(value.source))}`,
+            )
+          }),
+      )
+    }
+    await pwaPlugin.generateSW()
+  }
 
   console.log(`\n${chalk.gray('[vite-ssg]')} ${chalk.green('Build finished.')}`)
 
