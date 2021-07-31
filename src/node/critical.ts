@@ -5,7 +5,7 @@ export function getCritters(outDir: string): Critters | undefined {
     // eslint-disable-next-line no-eval
     const CrittersClass = eval('require')('critters')
     return new CrittersClass({
-      external: false,
+      external: true,
       path: outDir,
       inlineThreshold: Infinity,
       logLevel: 'warn',
