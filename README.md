@@ -1,6 +1,6 @@
 # Vite SSG
 
-Server-side generation for Vite.
+Server-side generation for Vue 3 on Vite.
 
 [![NPM version](https://img.shields.io/npm/v/vite-ssg?color=a1b858)](https://www.npmjs.com/package/vite-ssg)
 
