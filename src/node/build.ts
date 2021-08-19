@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { join, dirname } from 'path'
+import { join, dirname, isAbsolute } from 'path'
 import chalk from 'chalk'
 import fs from 'fs-extra'
 import { build as viteBuild, resolveConfig, UserConfig, ResolvedConfig } from 'vite'
@@ -31,7 +31,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   const root = config.root || cwd
   const ssgOut = join(root, '.vite-ssg-temp')
   const outDir = config.build.outDir || 'dist'
-  const out = join(root, outDir)
+  const out = isAbsolute(outDir) ? outDir : join(root, outDir)
 
   const {
     script = 'sync',
