@@ -7,6 +7,7 @@ import { renderToString, SSRContext } from '@vue/server-renderer'
 import { JSDOM, VirtualConsole } from 'jsdom'
 import { RollupOutput } from 'rollup'
 import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
+import readPkgUp from 'read-pkg-up'
 import { ViteSSGContext, ViteSSGOptions } from '../client'
 import { renderPreloadLinks } from './preload-links'
 import { buildLog, routesToPaths, getSize } from './utils'
@@ -32,6 +33,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   const ssgOut = join(root, '.vite-ssg-temp')
   const outDir = config.build.outDir || 'dist'
   const out = isAbsolute(outDir) ? outDir : join(root, outDir)
+  const isTypeModule = (await readPkgUp ({ cwd: root }))?.packageJson.type === 'module'
 
   const {
     script = 'sync',
@@ -71,12 +73,17 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
       outDir: ssgOut,
       minify: false,
       cssCodeSplit: false,
+      rollupOptions: {
+        output: {
+          entryFileNames: `[name].${isTypeModule ? 'cjs' : 'js'}`,
+        },
+      },
     },
     mode: config.mode,
   })
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { createApp } = require(join(ssgOut, 'main.js')) as { createApp: CreateAppFactory }
+  const { createApp } = require(join(ssgOut, `main.${isTypeModule ? 'cjs' : 'js'}`)) as { createApp: CreateAppFactory }
 
   const { routes, initialState } = await createApp(false)
 
