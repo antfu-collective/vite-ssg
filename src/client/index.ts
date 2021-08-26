@@ -77,7 +77,8 @@ export function ViteSSG(
     })
 
     if (!client) {
-      router.push(routerOptions.base || '/')
+      const route = context.routePath ?? routerOptions.base ?? '/'
+      router.push(route)
 
       await router.isReady()
       context.initialState = router.currentRoute.value.meta.state as Record<string, any> || {}
