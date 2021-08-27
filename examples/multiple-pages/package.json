@@ -6,18 +6,18 @@
     "serve": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.1.5"
+    "vue": "^3.2.6"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^1.3.0",
-    "@vue/compiler-sfc": "^3.1.5",
+    "@vitejs/plugin-vue": "^1.6.0",
+    "@vue/compiler-sfc": "^3.2.6",
     "cross-env": "^7.0.3",
-    "typescript": "^4.3.5",
-    "vite": "^2.4.4",
+    "typescript": "^4.4.2",
+    "vite": "^2.5.1",
     "vite-plugin-components": "^0.13.2",
-    "vite-plugin-md": "^0.10.0",
-    "vite-plugin-pages": "^0.15.1",
+    "vite-plugin-md": "^0.11.0",
+    "vite-plugin-pages": "^0.17.5",
     "vite-ssg": "workspace:*",
-    "vue-router": "^4.0.10"
+    "vue-router": "^4.0.11"
   }
 }
