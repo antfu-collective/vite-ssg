@@ -149,7 +149,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
       await fs.writeFile(join(out, filename), formatted, 'utf-8')
 
       config.logger.info(
-        `${chalk.dim(`${outDir}/`)}${chalk.cyan(filename)}\t${chalk.dim(getSize(formatted))}`,
+        `${chalk.dim(`${outDir}/`)}${chalk.cyan(filename.padEnd(15, ' '))}  ${chalk.dim(getSize(formatted))}`,
       )
     }),
   )

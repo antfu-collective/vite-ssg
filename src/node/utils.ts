@@ -7,7 +7,7 @@ export function buildLog(text: string, count?: number) {
 }
 
 export function getSize(str: string) {
-  return `${(str.length / 1024).toFixed(2)}kb`
+  return `${(str.length / 1024).toFixed(2)} KiB`
 }
 
 export function routesToPaths(routes?: RouteRecordRaw[]) {
@@ -24,9 +24,9 @@ export function routesToPaths(routes?: RouteRecordRaw[]) {
       // check for leading slash
       if (route.path) {
         path = prefix && !route.path.startsWith('/')
-            ? `${prefix}/${route.path}`
-            : route.path
-        
+          ? `${prefix}/${route.path}`
+          : route.path
+
         paths.add(path)
       }
       if (Array.isArray(route.children))
