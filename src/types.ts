@@ -38,6 +38,11 @@ export interface ViteSSGOptions {
   mode?: string
 
   /**
+   * sub page generate sub directory
+   */
+  subDirectory?: boolean
+
+  /**
    * Options for critters
    *
    * @see https://github.com/GoogleChromeLabs/critters

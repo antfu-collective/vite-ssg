@@ -40,6 +40,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
     mock = false,
     entry = await detectEntry(root),
     formatting = 'none',
+    subDirectory = false,
     crittersOptions = {},
     includedRoutes = DefaultIncludedRoutes,
     onBeforePageRender,
@@ -143,7 +144,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
       const formatted = format(transformed, formatting)
 
       const relativeRoute = (route.endsWith('/') ? `${route}index` : route).replace(/^\//g, '')
-      const filename = `${relativeRoute}.html`
+      const filename = subDirectory ? `${relativeRoute}/index.html` : `${relativeRoute}.html`
 
       await fs.ensureDir(join(out, dirname(relativeRoute)))
       await fs.writeFile(join(out, filename), formatted, 'utf-8')
