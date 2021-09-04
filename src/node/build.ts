@@ -3,6 +3,7 @@ import { join, dirname, isAbsolute } from 'path'
 import chalk from 'chalk'
 import fs from 'fs-extra'
 import { build as viteBuild, resolveConfig, UserConfig, ResolvedConfig } from 'vite'
+import hash_sum from 'hash-sum';
 import { renderToString, SSRContext } from '@vue/server-renderer'
 import { JSDOM, VirtualConsole } from 'jsdom'
 import { RollupOutput } from 'rollup'
@@ -91,10 +92,6 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   // uniq
   routesPaths = Array.from(new Set(routesPaths))
 
-  indexHTML = rewriteScripts(indexHTML, script)
-
-  const initialStatePath = await createInitialState({ initialState, out })
-
   buildLog('Rendering Pages...', routesPaths.length)
 
   const critters = crittersOptions !== false ? getCritters(outDir, crittersOptions) : undefined
@@ -139,6 +136,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
       const relativeRoute = (route.endsWith('/') ? `${route}index` : route).replace(/^\//g, '')
 
       // add initial state as an asset
+      const initialStatePath = await createInitialState({ initialState, out, route: relativeRoute })
       await addInitialState({ jsdom, initialStatePath })
 
       // render head
@@ -190,9 +188,11 @@ function renderHTML({ indexHTML, appHTML }: { indexHTML: string; appHTML: string
     )
 }
 
-async function createInitialState({ initialState, out }: { initialState: any; out: string }) {
-  const initialStatePath = join('assets', 'initial-state.js')
-  await fs.writeFile(join(out, initialStatePath), `window.__INITIAL_STATE__ = ${initialState}`, 'utf-8')
+async function createInitialState({ initialState, out, route }: { initialState: any; out: string, route: string }) {
+  const initialStateScript = `window.__INITIAL_STATE__ = ${initialState}`
+  const initialStatePath = join('assets', route, `initial-state.${hash_sum(initialStateScript)}.js`)
+  await fs.ensureDir(join(out, dirname(initialStatePath)))
+  await fs.writeFile(join(out, initialStatePath), initialStateScript, 'utf-8')
   return initialStatePath
 }
 
