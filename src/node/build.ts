@@ -136,8 +136,10 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
       const relativeRoute = (route.endsWith('/') ? `${route}index` : route).replace(/^\//g, '')
 
       // add initial state as an asset
-      const initialStatePath = await createInitialState({ initialState, out, route: relativeRoute })
-      await addInitialState({ jsdom, initialStatePath })
+      if (initialState && Object.keys(initialState).length !== 0) {
+        const initialStatePath = await createInitialState({ initialState, out, route: relativeRoute })
+        await addInitialState({ jsdom, initialStatePath })
+      }
 
       // render head
       head?.updateDOM(jsdom.window.document)
