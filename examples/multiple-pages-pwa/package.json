@@ -6,11 +6,9 @@
     "serve": "vite preview"
   },
   "dependencies": {
-    "pinia": "2.0.0-rc.6",
     "vue": "^3.2.6"
   },
   "devDependencies": {
-    "@nuxt/devalue": "^2.0.0",
     "@vitejs/plugin-vue": "^1.6.0",
     "@vue/compiler-sfc": "^3.2.6",
     "cross-env": "^7.0.3",
@@ -19,6 +17,7 @@
     "vite-plugin-components": "^0.13.2",
     "vite-plugin-md": "^0.11.0",
     "vite-plugin-pages": "^0.17.5",
+    "vite-plugin-pwa": "^0.11.2",
     "vite-ssg": "workspace:*",
     "vue-router": "^4.0.11"
   }

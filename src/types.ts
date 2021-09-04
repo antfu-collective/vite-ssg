@@ -1,6 +1,7 @@
-import { App } from 'vue'
-import { Router, RouteRecordRaw, RouterOptions as VueRouterOptions } from 'vue-router'
-import { HeadClient } from '@vueuse/head'
+import type { App } from 'vue'
+import type { Router, RouteRecordRaw, RouterOptions as VueRouterOptions } from 'vue-router'
+import type { HeadClient } from '@vueuse/head'
+import type { Options as CrittersOptions } from 'critters'
 
 export interface ViteSSGOptions {
   /**
@@ -27,9 +28,21 @@ export interface ViteSSGOptions {
   /**
    * Applying formatter to the generated index file.
    *
-   * @default null
+   * @default 'none'
    */
-  formatting?: null | 'minify' | 'prettify'
+  formatting?: 'minify' | 'prettify' | 'none'
+
+  /**
+   * Vite enviroument mode
+   */
+  mode?: string
+
+  /**
+   * Options for critters
+   *
+   * @see https://github.com/GoogleChromeLabs/critters
+   */
+  crittersOptions?: CrittersOptions | false
 
   /**
    * Custom functions to modified the routes to do the SSG.
@@ -65,6 +78,10 @@ export interface ViteSSGContext<HasRouter extends boolean = true> {
   initialState: Record<string, any>
   head: HeadClient | undefined
   isClient: boolean
+  /**
+   * Current router path on SSG, `undefined` on client side.
+   */
+  routePath?: string
 }
 
 export interface ViteSSGClientOptions {

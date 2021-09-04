@@ -1,13 +1,13 @@
 import { Manifest } from './build'
 
-export function renderPreloadLinks(document: Document, modules: Set<string>, manifest: Manifest) {
+export function renderPreloadLinks(document: Document, modules: Set<string>, ssrManifest: Manifest) {
   const seen = new Set()
 
   const preloadLinks: string[] = []
 
   // preload modules
   Array.from(modules).forEach((id) => {
-    const files = manifest[id] || []
+    const files = ssrManifest[id] || []
     files.forEach((file) => {
       if (!preloadLinks.includes(file))
         preloadLinks.push(file)

@@ -1,8 +1,6 @@
 import { UserConfig } from 'vite'
-import {} from 'vite-ssg'
-import Markdown from 'vite-plugin-md'
 import Pages from 'vite-plugin-pages'
-import Components from 'vite-plugin-components'
+import { VitePWA } from 'vite-plugin-pwa'
 import Vue from '@vitejs/plugin-vue'
 
 const config: UserConfig = {
@@ -13,11 +11,9 @@ const config: UserConfig = {
     Pages({
       extensions: ['vue', 'md'],
     }),
-    Markdown({
-      headEnabled: true,
-    }),
-    Components({
-      customLoaderMatcher: path => path.endsWith('.md'),
+    VitePWA({
+      minify: false,
+      mode: 'development',
     }),
   ],
   ssgOptions: {

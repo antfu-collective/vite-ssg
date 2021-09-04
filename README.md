@@ -1,6 +1,6 @@
 # Vite SSG
 
-Server-side generation for Vite.
+Server-side generation for Vue 3 on Vite.
 
 [![NPM version](https://img.shields.io/npm/v/vite-ssg?color=a1b858)](https://www.npmjs.com/package/vite-ssg)
 
@@ -87,9 +87,19 @@ useHead({
 </script>
 ```
 
-That's all, no configuration needed. Vite SSG will handle the server-side rendering and merging automatically.
+That's all, no configuration is needed. Vite SSG will handle the server-side rendering and merging automatically.
 
 Refer to [`@vueuse/head`'s docs](https://github.com/vueuse/head) for more usage about `useHead`.
+
+## Critical CSS
+
+Vite SSG has built-in support for generating [Critical CSS](https://web.dev/extract-critical-css/) inlined in the HTML via the [`critters`](https://github.com/GoogleChromeLabs/critters) package. Install it via:
+
+```bash
+npm i -D critters
+```
+
+Critical CSS generation will be enabled automatically for you.
 
 ## Initial State
 
