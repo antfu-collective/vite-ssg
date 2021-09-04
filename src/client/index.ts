@@ -4,7 +4,6 @@ import { createHead, HeadClient } from '@vueuse/head'
 import { deserializeState, serializeState } from '../utils/state'
 import type { RouterOptions, ViteSSGContext, ViteSSGClientOptions } from '../types'
 import { ClientOnly } from './components/ClientOnly'
-import type { RouterOptions, ViteSSGContext, ViteSSGClientOptions } from '../types'
 
 export * from '../types'
 
