@@ -45,6 +45,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
     onBeforePageRender,
     onPageRendered,
     onFinished,
+    useIndexMode = false,
   }: ViteSSGOptions = Object.assign({}, config.ssgOptions || {}, cliOptions)
 
   if (fs.existsSync(ssgOut))
@@ -87,7 +88,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
   const { routes, initialState } = await createApp(false)
 
-  let routesPaths = await includedRoutes(routesToPaths(routes))
+  let routesPaths = useIndexMode ? routesToPaths(routes) : await includedRoutes(routesToPaths(routes))
   // uniq
   routesPaths = Array.from(new Set(routesPaths))
 
@@ -143,10 +144,10 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
       const formatted = format(transformed, formatting)
 
       const relativeRoute = (route.endsWith('/') ? `${route}index` : route).replace(/^\//g, '')
-      const filename = `${relativeRoute}.html`
+      const filename = useIndexMode ? "index.html" : `${relativeRoute}.html`
 
-      await fs.ensureDir(join(out, dirname(relativeRoute)))
-      await fs.writeFile(join(out, filename), formatted, 'utf-8')
+      await fs.ensureDir(join(out, useIndexMode ? route :  dirname(relativeRoute)))
+      await fs.writeFile(join(out + (useIndexMode ? route : ""), filename), formatted, 'utf-8')
 
       config.logger.info(
         `${chalk.dim(`${outDir}/`)}${chalk.cyan(filename.padEnd(15, ' '))}  ${chalk.dim(getSize(formatted))}`,

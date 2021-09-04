@@ -66,7 +66,47 @@ export interface ViteSSGOptions {
    */
   onPageRendered?: (route: string, renderedHTML: string) => Promise<string | null | undefined> | string | null | undefined
 
-  onFinished?: () => void
+  onFinished?: () => void,
+
+
+  /**
+   * vue-route use index.html to build files
+   * 
+   * e.g  routes =   [
+   *      {
+   *         name: 'index',
+   *         path: '/',
+   *         component: [Function: component],
+   *         props: true
+   *      },
+   *      {
+   *         name: 'list-card',
+   *         path: '/list/card',
+   *         component: [Function: component],
+   *         props: true
+   *      },
+   *      {
+   *         name: 'user',
+   *         path: '/user',
+   *         component: [Function: component],
+   *         props: true
+   *      },
+   *      {
+   *         name: 'user-id',
+   *         path: '/user/:id',
+   *         component: [Function: component],
+   *         props: true
+   *      }
+   *  ]
+   * 
+   * file paths :  [
+   *     ~dist/index.html,
+   *     ~dist/list/card/index.html,
+   *     ~dist/user/index.html
+   *     ~dist/user/:id/index.html
+   * ]
+   */
+  useIndexMode?: boolean
 }
 
 type PartialKeys<T, Keys extends keyof T> = Omit<T, Keys> & Partial<Pick<T, Keys>>
