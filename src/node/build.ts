@@ -1,13 +1,13 @@
 /* eslint-disable no-console */
-import { join, dirname, isAbsolute } from 'path'
+import { join, dirname, isAbsolute, parse } from 'path'
 import chalk from 'chalk'
 import fs from 'fs-extra'
-import { build as viteBuild, resolveConfig, UserConfig, ResolvedConfig } from 'vite'
+import { build as viteBuild, resolveConfig, ResolvedConfig } from 'vite'
 import { renderToString, SSRContext } from '@vue/server-renderer'
 import { JSDOM, VirtualConsole } from 'jsdom'
 import { RollupOutput } from 'rollup'
-import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
 import readPkgUp from 'read-pkg-up'
+import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
 import { ViteSSGContext, ViteSSGOptions } from '../client'
 import { renderPreloadLinks } from './preload-links'
 import { buildLog, routesToPaths, getSize } from './utils'
@@ -69,9 +69,10 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   // server
   buildLog('Build for server...')
   process.env.VITE_SSG = 'true'
+  const ssrEntry = await resolveAlias(config, entry)
   await viteBuild({
     build: {
-      ssr: await resolveAlias(config, entry),
+      ssr: ssrEntry,
       outDir: ssgOut,
       minify: false,
       cssCodeSplit: false,
@@ -85,7 +86,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   })
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { createApp } = require(join(ssgOut, `main.${isTypeModule ? 'cjs' : 'js'}`)) as { createApp: CreateAppFactory }
+  const { createApp } = require(join(ssgOut, `${parse(ssrEntry).name}.${isTypeModule ? 'cjs' : 'js'}`)) as { createApp: CreateAppFactory }
 
   const { routes, initialState } = await createApp(false)
 
