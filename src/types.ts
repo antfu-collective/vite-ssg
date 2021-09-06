@@ -33,9 +33,28 @@ export interface ViteSSGOptions {
   formatting?: 'minify' | 'prettify' | 'none'
 
   /**
-   * Vite enviroument mode
+   * Vite environment mode
    */
   mode?: string
+
+  /**
+   * Directory style of the output directory.
+   *
+   * flat: `/foo` -> `/foo.html`
+   * nested: `/foo` -> `/foo/index.html`
+   *
+   * @default flat
+   */
+  dirStyle?: 'flat' | 'nested'
+
+  /**
+    * Generate for all routes, including dynamic routes.
+    * If enabled, you will need to configure your server
+    * manually to handle dynamic routes properly.
+    *
+    * @default false
+    */
+  includeAllRoutes?: boolean
 
   /**
    * Options for critters
@@ -46,6 +65,8 @@ export interface ViteSSGOptions {
 
   /**
    * Custom functions to modified the routes to do the SSG.
+   *
+   * Works only when `includeAllRoutes` is set to false.
    *
    * Default to a handler that filter out all the dynamic routes,
    * when passing your custom handler, you should also take care the dynamic routes yourself.
@@ -66,47 +87,7 @@ export interface ViteSSGOptions {
    */
   onPageRendered?: (route: string, renderedHTML: string) => Promise<string | null | undefined> | string | null | undefined
 
-  onFinished?: () => void,
-
-
-  /**
-   * vue-route use index.html to build files
-   * 
-   * e.g  routes =   [
-   *      {
-   *         name: 'index',
-   *         path: '/',
-   *         component: [Function: component],
-   *         props: true
-   *      },
-   *      {
-   *         name: 'list-card',
-   *         path: '/list/card',
-   *         component: [Function: component],
-   *         props: true
-   *      },
-   *      {
-   *         name: 'user',
-   *         path: '/user',
-   *         component: [Function: component],
-   *         props: true
-   *      },
-   *      {
-   *         name: 'user-id',
-   *         path: '/user/:id',
-   *         component: [Function: component],
-   *         props: true
-   *      }
-   *  ]
-   * 
-   * file paths :  [
-   *     ~dist/index.html,
-   *     ~dist/list/card/index.html,
-   *     ~dist/user/index.html
-   *     ~dist/user/:id/index.html
-   * ]
-   */
-  useIndexMode?: boolean
+  onFinished?: () => void
 }
 
 type PartialKeys<T, Keys extends keyof T> = Omit<T, Keys> & Partial<Pick<T, Keys>>
