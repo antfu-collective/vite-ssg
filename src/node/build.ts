@@ -45,6 +45,8 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
     onBeforePageRender,
     onPageRendered,
     onFinished,
+    dirStyle = 'flat',
+    includeAllRoutes = false,
   }: ViteSSGOptions = Object.assign({}, config.ssgOptions || {}, cliOptions)
 
   if (fs.existsSync(ssgOut))
@@ -87,7 +89,10 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
   const { routes, initialState } = await createApp(false)
 
-  let routesPaths = await includedRoutes(routesToPaths(routes))
+  let routesPaths = includeAllRoutes
+    ? routesToPaths(routes)
+    : await includedRoutes(routesToPaths(routes))
+
   // uniq
   routesPaths = Array.from(new Set(routesPaths))
 
@@ -143,9 +148,11 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
       const formatted = format(transformed, formatting)
 
       const relativeRoute = (route.endsWith('/') ? `${route}index` : route).replace(/^\//g, '')
-      const filename = `${relativeRoute}.html`
+      const filename = dirStyle === 'nested'
+        ? join(relativeRoute, 'index.html')
+        : `${relativeRoute}.html`
 
-      await fs.ensureDir(join(out, dirname(relativeRoute)))
+      await fs.ensureDir(join(out, dirname(filename)))
       await fs.writeFile(join(out, filename), formatted, 'utf-8')
 
       config.logger.info(
