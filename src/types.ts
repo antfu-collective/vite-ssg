@@ -33,9 +33,28 @@ export interface ViteSSGOptions {
   formatting?: 'minify' | 'prettify' | 'none'
 
   /**
-   * Vite enviroument mode
+   * Vite environment mode
    */
   mode?: string
+
+  /**
+   * Directory style of the output directory.
+   *
+   * flat: `/foo` -> `/foo.html`
+   * nested: `/foo` -> `/foo/index.html`
+   *
+   * @default flat
+   */
+  dirStyle?: 'flat' | 'nested'
+
+  /**
+    * Generate for all routes, including dynamic routes.
+    * If enabled, you will need to configure your server
+    * manually to handle dynamic routes properly.
+    *
+    * @default false
+    */
+  includeAllRoutes?: boolean
 
   /**
    * Options for critters
@@ -46,6 +65,8 @@ export interface ViteSSGOptions {
 
   /**
    * Custom functions to modified the routes to do the SSG.
+   *
+   * Works only when `includeAllRoutes` is set to false.
    *
    * Default to a handler that filter out all the dynamic routes,
    * when passing your custom handler, you should also take care the dynamic routes yourself.
