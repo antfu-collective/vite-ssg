@@ -245,23 +245,6 @@ export const createApp = ViteSSG(
 )
 ```
 
-**A minor remark when using `@nuxt/devalue`:** In case, you are getting an error because of a `require`
-within the package `@nuxt/devalue`, you have to add the following piece of config to your Vite config:
-
-```ts
-// vite.config.ts
-//...
-
-export default defineConfig({
-  resolve: {
-    alias: {
-      '@nuxt/devalue': '@nuxt/devalue/dist/devalue.js',
-    },
-  },
-  // ...
-})
-```
-
 ## Configuration
 
 You can pass options to Vite SSG in the `ssgOptions` field of your `vite.config.js`
