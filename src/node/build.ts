@@ -143,7 +143,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
       // add initial state as an asset
       if (initialState && Object.keys(initialState).length !== 0) {
-        const initialStatePath = await createInitialState({ initialState, out, route: relativeRoute })
+        const initialStatePath = await createInitialState({ initialState, out })
         await addInitialState({ jsdom, initialStatePath })
       }
 
@@ -198,10 +198,9 @@ function renderHTML({ indexHTML, appHTML }: { indexHTML: string; appHTML: string
     )
 }
 
-async function createInitialState({ initialState, out, route }: { initialState: any; out: string; route: string }) {
+async function createInitialState({ initialState, out }: { initialState: any; out: string }) {
   const initialStateScript = `window.__INITIAL_STATE__ = ${initialState}`
-  const initialStatePath = join('assets', route, `initial-state.${hash_sum(initialStateScript)}.js`)
-  await fs.ensureDir(join(out, dirname(initialStatePath)))
+  const initialStatePath = join('assets', `initial-state.${hash_sum(initialStateScript)}.js`)
   await fs.writeFile(join(out, initialStatePath), initialStateScript, 'utf-8')
   return initialStatePath
 }
