@@ -42,8 +42,6 @@ export function ViteSSG(
 
     const { routes } = routerOptions
 
-    app.use(router)
-
     if (registerComponents)
       app.component('ClientOnly', client ? ClientOnly : { render: () => null })
 
@@ -62,6 +60,8 @@ export function ViteSSG(
       context.initialState = transformState?.(window.__INITIAL_STATE__ || {}) || deserializeState(window.__INITIAL_STATE__)
 
     await fn?.(context)
+
+    app.use(router)
 
     let entryRoutePath: string | undefined
     let isFirstRoute = true
