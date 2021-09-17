@@ -65,7 +65,7 @@ Component `ClientOnly` is registered globally along with the app creation.
 
 ## Document head
 
-From `v0.4.0`, we ships [`@vueuse/head`](https://github.com/vueuse/head) to manage the document head out-of-box. You can directly use it in your pages/components, for example:
+From `v0.4.0`, we ship [`@vueuse/head`](https://github.com/vueuse/head) to manage the document head out-of-box. You can directly use it in your pages/components, for example:
 
 ```html
 <template>
