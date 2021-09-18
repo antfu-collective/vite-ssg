@@ -6,6 +6,7 @@ importers:
     specifiers:
       '@antfu/eslint-config': ^0.7.0
       '@types/fs-extra': ^9.0.12
+      '@types/hash-sum': ^1.0.0
       '@types/jsdom': ^16.2.13
       '@types/yargs': ^17.0.2
       '@typescript-eslint/eslint-plugin': ^4.30.0
@@ -17,6 +18,7 @@ importers:
       eslint: ^7.32.0
       esno: ^0.9.1
       fs-extra: ^10.0.0
+      hash-sum: ^2.0.0
       html-minifier: ^4.0.0
       jsdom: ^16.7.0
       prettier: ^2.3.2
@@ -41,6 +43,7 @@ importers:
     devDependencies:
       '@antfu/eslint-config': 0.7.0_eslint@7.32.0+typescript@4.4.2
       '@types/fs-extra': 9.0.12
+      '@types/hash-sum': 1.0.0
       '@types/jsdom': 16.2.13
       '@types/yargs': 17.0.2
       '@typescript-eslint/eslint-plugin': 4.30.0_eslint@7.32.0+typescript@4.4.2
@@ -50,6 +53,7 @@ importers:
       critters: 0.0.10
       eslint: 7.32.0
       esno: 0.9.1
+      hash-sum: 2.0.0
       rollup: 2.56.3
       standard-version: 9.3.1
       tsup: 4.14.0_typescript@4.4.2
@@ -1715,6 +1719,10 @@ packages:
     resolution: {integrity: sha512-I+bsBr67CurCGnSenZZ7v94gd3tc3+Aj2taxMT4yu4ABLuOgOjeFxX3dokG24ztSRg5tnT00sL8BszO7gSMoIw==}
     dependencies:
       '@types/node': 15.3.0
+    dev: true
+
+  /@types/hash-sum/1.0.0:
+    resolution: {integrity: sha512-FdLBT93h3kcZ586Aee66HPCVJ6qvxVjBlDWNmxSGSbCZe9hTsjRKdSsl4y1T+3zfujxo9auykQMnFsfyHWD7wg==}
     dev: true
 
   /@types/jsdom/16.2.13:

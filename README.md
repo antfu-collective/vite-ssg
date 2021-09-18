@@ -105,7 +105,7 @@ Critical CSS generation will be enabled automatically for you.
 
 The initial state comprises data that is serialized to your server-side generated HTML that is hydrated in
 the browser when accessed. This data can be data fetched from a CDN, an API, etc, and is typically needed
-as soon as the application starts or is accessed for the first time.
+as soon as the application **starts** or is accessed for the **first time**.
 
 The main advantage of setting the application's initial state is that the statically generated pages do not
 need to fetch the data again as the data is fetched during build time and serialized into the page's HTML.
@@ -168,13 +168,9 @@ export const createApp = ViteSSG(
       pinia.state.value = initialState.pinia || {}
     }
 
-    router.beforeEach((to, from, next) => {
-      const store = useRootStore(pinia)
-      if (!store.ready)
-        // perform the (user-implemented) store action to fill the store's state
-        store.initialize()
-      next()
-    })
+    if (!store.ready)
+      // perform the (user-implemented) store action to fill the store's state
+      store.initialize()
   },
 )
 ```
@@ -208,13 +204,9 @@ export const createApp = ViteSSG(
       store.replaceState(initialState.store)
     }
 
-    router.beforeEach((to, from, next) => {
-      // perform the (user-implemented) store action to fill the store's state
-      if (!store.getters.ready)
-        store.dispatch('initialize')
-
-      next()
-    })
+    // perform the (user-implemented) store action to fill the store's state
+    if (!store.getters.ready)
+      store.dispatch('initialize')
   },
 )
 ```
@@ -251,23 +243,6 @@ export const createApp = ViteSSG(
     },
   },
 )
-```
-
-**A minor remark when using `@nuxt/devalue`:** In case, you are getting an error because of a `require`
-within the package `@nuxt/devalue`, you have to add the following piece of config to your Vite config:
-
-```ts
-// vite.config.ts
-//...
-
-export default defineConfig({
-  resolve: {
-    alias: {
-      '@nuxt/devalue': '@nuxt/devalue/dist/devalue.js',
-    },
-  },
-  // ...
-})
 ```
 
 ## Configuration
