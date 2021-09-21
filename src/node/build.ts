@@ -88,7 +88,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { createApp } = require(join(ssgOut, `${parse(ssrEntry).name}.${isTypeModule ? 'cjs' : 'js'}`)) as { createApp: CreateAppFactory }
 
-  const { routes, initialState } = await createApp(false)
+  const { routes } = await createApp(false)
 
   let routesPaths = includeAllRoutes
     ? routesToPaths(routes)
@@ -117,7 +117,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
   await Promise.all(
     routesPaths.map(async(route) => {
-      const { app, router, head } = await createApp(false, route)
+      const { app, router, head, initialState } = await createApp(false, route)
 
       if (router) {
         await router.push(route)
