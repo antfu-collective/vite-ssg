@@ -173,7 +173,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
   console.log(`\n${chalk.gray('[vite-ssg]')} ${chalk.green('Build finished.')}`)
 
-  onFinished?.()
+  await onFinished?.()
 }
 
 function rewriteScripts(indexHTML: string, mode?: string) {

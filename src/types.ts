@@ -87,7 +87,7 @@ export interface ViteSSGOptions {
    */
   onPageRendered?: (route: string, renderedHTML: string) => Promise<string | null | undefined> | string | null | undefined
 
-  onFinished?: () => void
+  onFinished?: () => Promise<void> | void
 }
 
 type PartialKeys<T, Keys extends keyof T> = Omit<T, Keys> & Partial<Pick<T, Keys>>
