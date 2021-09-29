@@ -148,10 +148,10 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
       const formatted = format(transformed, formatting)
 
-      const relativeRoute = (route.endsWith('/') ? `${route}index` : route).replace(/^\//g, '')
+      const relativeRouteFile = `${(route.endsWith('/') ? `${route}index` : route).replace(/^\//g, '')}.html`
       const filename = dirStyle === 'nested'
-        ? join(relativeRoute, 'index.html')
-        : `${relativeRoute}.html`
+        ? join(route.replace(/^\//g, ''), 'index.html')
+        : relativeRouteFile
 
       await fs.ensureDir(join(out, dirname(filename)))
       await fs.writeFile(join(out, filename), formatted, 'utf-8')
