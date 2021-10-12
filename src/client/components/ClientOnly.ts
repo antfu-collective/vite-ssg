@@ -1,7 +1,15 @@
-import { defineComponent } from 'vue'
+import { defineComponent, onMounted, ref } from "vue";
 
 export const ClientOnly = defineComponent({
-  render() {
-    return this.$slots.default && this.$slots.default({})
+  setup() {
+    const mounted = ref(false);
+    onMounted(() => (mounted.value = true));
+
+    return {
+      mounted,
+    };
   },
-})
+  render() {
+    return this.mounted && this.$slots.default && this.$slots.default({});
+  },
+});
