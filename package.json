@@ -83,24 +83,24 @@
     }
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^0.9.0",
+    "@antfu/eslint-config": "^0.10.0",
     "@types/fs-extra": "^9.0.13",
     "@types/jsdom": "^16.2.13",
-    "@types/yargs": "^17.0.3",
-    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@types/yargs": "^17.0.4",
+    "@typescript-eslint/eslint-plugin": "^5.1.0",
     "@vue/compiler-sfc": "^3.2.20",
     "@vue/server-renderer": "^3.2.20",
     "@vueuse/head": "^0.6.0",
-    "critters": "^0.0.10",
-    "eslint": "^8.0.0",
+    "critters": "^0.0.12",
+    "eslint": "^8.0.1",
     "esno": "^0.10.1",
     "rollup": "^2.58.0",
-    "standard-version": "^9.3.1",
-    "tsup": "^5.4.0",
+    "standard-version": "^9.3.2",
+    "tsup": "^5.4.2",
     "typescript": "^4.4.4",
-    "vite": "^2.6.7",
+    "vite": "^2.6.10",
     "vite-plugin-pwa": "^0.11.3",
     "vue": "^3.2.20",
-    "vue-router": "^4.0.11"
+    "vue-router": "^4.0.12"
   }
 }
