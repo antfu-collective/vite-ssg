@@ -1,12 +1,11 @@
 /* eslint-disable no-console */
-import { join, dirname, isAbsolute, parse } from 'path'
+import { join, dirname, isAbsolute, parse, resolve } from 'path'
 import chalk from 'chalk'
 import fs from 'fs-extra'
 import { build as viteBuild, resolveConfig, ResolvedConfig } from 'vite'
 import { renderToString, SSRContext } from '@vue/server-renderer'
 import { JSDOM, VirtualConsole } from 'jsdom'
 import { RollupOutput } from 'rollup'
-import readPkgUp from 'read-pkg-up'
 import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
 import { ViteSSGContext, ViteSSGOptions } from '../client'
 import { renderPreloadLinks } from './preload-links'
@@ -24,6 +23,10 @@ function DefaultIncludedRoutes(paths: string[]) {
   return paths.filter(i => !i.includes(':') && !i.includes('*'))
 }
 
+function readJson(path: string) {
+  return JSON.parse(fs.readFileSync(path, 'utf8'))
+}
+
 export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   const mode = process.env.MODE || process.env.NODE_ENV || cliOptions.mode || 'production'
   const config = await resolveConfig({}, 'build', mode)
@@ -33,7 +36,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   const ssgOut = join(root, '.vite-ssg-temp')
   const outDir = config.build.outDir || 'dist'
   const out = isAbsolute(outDir) ? outDir : join(root, outDir)
-  const isTypeModule = (await readPkgUp ({ cwd: root }))?.packageJson.type === 'module'
+  const isTypeModule = readJson(resolve(cwd, 'package.json')).type === 'module'
 
   const {
     script = 'sync',
