@@ -91,6 +91,7 @@
     "@vue/compiler-sfc": "^3.2.20",
     "@vue/server-renderer": "^3.2.20",
     "@vueuse/head": "^0.6.0",
+    "bumpp": "^7.1.1",
     "critters": "^0.0.12",
     "eslint": "^8.0.1",
     "esno": "^0.10.1",
