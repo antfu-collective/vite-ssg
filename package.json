@@ -66,7 +66,6 @@
     "html-minifier": "^4.0.0",
     "jsdom": "^17.0.0",
     "prettier": "^2.4.1",
-    "read-pkg-up": "^7.0.1",
     "yargs": "^17.2.1"
   },
   "peerDependencies": {
