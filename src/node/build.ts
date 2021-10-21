@@ -117,48 +117,52 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
   await Promise.all(
     routesPaths.map(async(route) => {
-      const { app, router, head, initialState } = await createApp(false, route)
+      try {
+        const { app, router, head, initialState } = await createApp(false, route)
 
-      if (router) {
-        await router.push(route)
-        await router.isReady()
+        if (router) {
+          await router.push(route)
+          await router.isReady()
+        }
+
+        const transformedIndexHTML = (await onBeforePageRender?.(route, indexHTML)) || indexHTML
+
+        const ctx: SSRContext = {}
+        const appHTML = await renderToString(app, ctx)
+
+        // need to resolve assets so render content first
+        const renderedHTML = renderHTML({ indexHTML: transformedIndexHTML, appHTML, initialState })
+
+        // create jsdom from renderedHTML
+        const jsdom = new JSDOM(renderedHTML)
+
+        // render current page's preloadLinks
+        renderPreloadLinks(jsdom.window.document, ctx.modules || new Set<string>(), ssrManifest)
+
+        // render head
+        head?.updateDOM(jsdom.window.document)
+
+        const html = jsdom.serialize()
+        let transformed = (await onPageRendered?.(route, html)) || html
+        if (critters)
+          transformed = await critters.process(transformed)
+
+        const formatted = format(transformed, formatting)
+
+        const relativeRouteFile = `${(route.endsWith('/') ? `${route}index` : route).replace(/^\//g, '')}.html`
+        const filename = dirStyle === 'nested'
+          ? join(route.replace(/^\//g, ''), 'index.html')
+          : relativeRouteFile
+
+        await fs.ensureDir(join(out, dirname(filename)))
+        await fs.writeFile(join(out, filename), formatted, 'utf-8')
+        config.logger.info(
+          `${chalk.dim(`${outDir}/`)}${chalk.cyan(filename.padEnd(15, ' '))}  ${chalk.dim(getSize(formatted))}`,
+        )
       }
-
-      const transformedIndexHTML = (await onBeforePageRender?.(route, indexHTML)) || indexHTML
-
-      const ctx: SSRContext = {}
-      const appHTML = await renderToString(app, ctx)
-
-      // need to resolve assets so render content first
-      const renderedHTML = renderHTML({ indexHTML: transformedIndexHTML, appHTML, initialState })
-
-      // create jsdom from renderedHTML
-      const jsdom = new JSDOM(renderedHTML)
-
-      // render current page's preloadLinks
-      renderPreloadLinks(jsdom.window.document, ctx.modules || new Set<string>(), ssrManifest)
-
-      // render head
-      head?.updateDOM(jsdom.window.document)
-
-      const html = jsdom.serialize()
-      let transformed = (await onPageRendered?.(route, html)) || html
-      if (critters)
-        transformed = await critters.process(transformed)
-
-      const formatted = format(transformed, formatting)
-
-      const relativeRouteFile = `${(route.endsWith('/') ? `${route}index` : route).replace(/^\//g, '')}.html`
-      const filename = dirStyle === 'nested'
-        ? join(route.replace(/^\//g, ''), 'index.html')
-        : relativeRouteFile
-
-      await fs.ensureDir(join(out, dirname(filename)))
-      await fs.writeFile(join(out, filename), formatted, 'utf-8')
-
-      config.logger.info(
-        `${chalk.dim(`${outDir}/`)}${chalk.cyan(filename.padEnd(15, ' '))}  ${chalk.dim(getSize(formatted))}`,
-      )
+      catch (err: any) {
+        throw new Error(`${chalk.gray('[vite-ssg]')} ${chalk.red(`Error on page: ${chalk.cyan(route)}`)}\n${err.stack}`)
+      }
     }),
   )
 
