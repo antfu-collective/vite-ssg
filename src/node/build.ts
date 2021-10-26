@@ -181,6 +181,14 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   console.log(`\n${chalk.gray('[vite-ssg]')} ${chalk.green('Build finished.')}`)
 
   await onFinished?.()
+
+  // ensure build process always exits
+  const waitInSeconds = 15
+  const timeout = setTimeout(() => {
+    console.log(`${chalk.gray('[vite-ssg]')} ${chalk.yellow(`Build process still running after ${waitInSeconds}s. Force exit.`)}`)
+    process.exit(0)
+  }, waitInSeconds * 1000)
+  timeout.unref() // don't wait for timeout
 }
 
 function rewriteScripts(indexHTML: string, mode?: string) {
