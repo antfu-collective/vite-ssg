@@ -121,14 +121,15 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   await Promise.all(
     routesPaths.map(async(route) => {
       try {
-        const { app, router, head, initialState } = await createApp(false, route)
+        const appCtx = await createApp(false, route)
+        const { app, router, head, initialState } = appCtx
 
         if (router) {
           await router.push(route)
           await router.isReady()
         }
 
-        const transformedIndexHTML = (await onBeforePageRender?.(route, indexHTML)) || indexHTML
+        const transformedIndexHTML = (await onBeforePageRender?.(route, indexHTML, appCtx as ViteSSGContext<true>)) || indexHTML
 
         const ctx: SSRContext = {}
         const appHTML = await renderToString(app, ctx)
@@ -146,7 +147,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
         head?.updateDOM(jsdom.window.document)
 
         const html = jsdom.serialize()
-        let transformed = (await onPageRendered?.(route, html)) || html
+        let transformed = (await onPageRendered?.(route, html, appCtx)) || html
         if (critters)
           transformed = await critters.process(transformed)
 

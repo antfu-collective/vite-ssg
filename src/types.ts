@@ -78,14 +78,14 @@ export interface ViteSSGOptions {
    *
    * Also give the change to transform the index html passed to the renderer.
    */
-  onBeforePageRender?: (route: string, indexHTML: string) => Promise<string | null | undefined> | string | null | undefined
+  onBeforePageRender?: (route: string, indexHTML: string, appCtx: ViteSSGContext<true>) => Promise<string | null | undefined> | string | null | undefined
 
   /**
    * Callback to be called on every page rendered.
    *
    * Also give the change to transform the rendered html by returning a string.
    */
-  onPageRendered?: (route: string, renderedHTML: string) => Promise<string | null | undefined> | string | null | undefined
+  onPageRendered?: (route: string, renderedHTML: string, appCtx: ViteSSGContext<true>) => Promise<string | null | undefined> | string | null | undefined
 
   onFinished?: () => Promise<void> | void
 }
