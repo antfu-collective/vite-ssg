@@ -6,19 +6,18 @@
     "serve": "vite preview"
   },
   "dependencies": {
-    "pinia": "2.0.0-rc.14",
-    "vue": "^3.2.20"
+    "pinia": "2.0.3",
+    "vue": "^3.2.22"
   },
   "devDependencies": {
     "@nuxt/devalue": "^2.0.0",
-    "@vitejs/plugin-vue": "^1.9.3",
-    "@vue/compiler-sfc": "^3.2.20",
+    "@vitejs/plugin-vue": "^1.9.4",
     "cross-env": "^7.0.3",
     "typescript": "^4.4.4",
-    "vite": "^2.6.10",
+    "vite": "^2.6.14",
     "vite-plugin-components": "^0.13.3",
-    "vite-plugin-md": "^0.11.2",
-    "vite-plugin-pages": "^0.18.1",
+    "vite-plugin-md": "^0.11.4",
+    "vite-plugin-pages": "^0.18.2",
     "vite-ssg": "workspace:*",
     "vue-router": "^4.0.12"
   }
