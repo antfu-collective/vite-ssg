@@ -121,7 +121,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   await Promise.all(
     routesPaths.map(async(route) => {
       try {
-        const appCtx = await createApp(false, route)
+        const appCtx = await createApp(false, route) as ViteSSGContext<true>
         const { app, router, head, initialState } = appCtx
 
         if (router) {
@@ -129,7 +129,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
           await router.isReady()
         }
 
-        const transformedIndexHTML = (await onBeforePageRender?.(route, indexHTML, appCtx as ViteSSGContext<true>)) || indexHTML
+        const transformedIndexHTML = (await onBeforePageRender?.(route, indexHTML, appCtx)) || indexHTML
 
         const ctx: SSRContext = {}
         const appHTML = await renderToString(app, ctx)
