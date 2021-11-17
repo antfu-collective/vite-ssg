@@ -9,8 +9,6 @@ importers:
       '@types/jsdom': ^16.2.13
       '@types/yargs': ^17.0.5
       '@typescript-eslint/eslint-plugin': ^5.4.0
-      '@vue/compiler-sfc': ^3.2.22
-      '@vue/server-renderer': ^3.2.22
       '@vueuse/head': ^0.6.0
       bumpp: ^7.1.1
       chalk: ^4.1.2
@@ -43,8 +41,6 @@ importers:
       '@types/jsdom': 16.2.13
       '@types/yargs': 17.0.5
       '@typescript-eslint/eslint-plugin': 5.4.0_eslint@8.2.0+typescript@4.4.4
-      '@vue/compiler-sfc': 3.2.22
-      '@vue/server-renderer': 3.2.22_vue@3.2.22
       '@vueuse/head': 0.6.0_vue@3.2.22
       bumpp: 7.1.1
       critters: 0.0.14
@@ -80,14 +76,13 @@ importers:
       vite: 2.6.14
       vite-plugin-components: 0.13.3_vite@2.6.14
       vite-plugin-md: 0.11.4_vite@2.6.14
-      vite-plugin-pages: 0.18.2_744c3dc4f4777e47e76c501a561da7bf
+      vite-plugin-pages: 0.18.2_vite@2.6.14
       vite-ssg: link:../..
       vue-router: 4.0.12_vue@3.2.22
 
   examples/multiple-pages-pwa:
     specifiers:
       '@vitejs/plugin-vue': ^1.9.4
-      '@vue/compiler-sfc': ^3.2.22
       cross-env: ^7.0.3
       typescript: ^4.4.4
       vite: ^2.6.14
@@ -102,13 +97,12 @@ importers:
       vue: 3.2.22
     devDependencies:
       '@vitejs/plugin-vue': 1.9.4_vite@2.6.14
-      '@vue/compiler-sfc': 3.2.22
       cross-env: 7.0.3
       typescript: 4.4.4
       vite: 2.6.14
       vite-plugin-components: 0.13.3_vite@2.6.14
       vite-plugin-md: 0.11.4_vite@2.6.14
-      vite-plugin-pages: 0.18.2_744c3dc4f4777e47e76c501a561da7bf
+      vite-plugin-pages: 0.18.2_vite@2.6.14
       vite-plugin-pwa: 0.11.5_vite@2.6.14
       vite-ssg: link:../..
       vue-router: 4.0.12_vue@3.2.22
@@ -117,7 +111,6 @@ importers:
     specifiers:
       '@nuxt/devalue': ^2.0.0
       '@vitejs/plugin-vue': ^1.9.4
-      '@vue/compiler-sfc': ^3.2.22
       cross-env: ^7.0.3
       pinia: 2.0.3
       typescript: ^4.4.4
@@ -134,13 +127,12 @@ importers:
     devDependencies:
       '@nuxt/devalue': 2.0.0
       '@vitejs/plugin-vue': 1.9.4_vite@2.6.14
-      '@vue/compiler-sfc': 3.2.22
       cross-env: 7.0.3
       typescript: 4.4.4
       vite: 2.6.14
       vite-plugin-components: 0.13.3_vite@2.6.14
       vite-plugin-md: 0.11.4_vite@2.6.14
-      vite-plugin-pages: 0.18.2_744c3dc4f4777e47e76c501a561da7bf
+      vite-plugin-pages: 0.18.2_vite@2.6.14
       vite-ssg: link:../..
       vue-router: 4.0.12_vue@3.2.22
 
@@ -6438,7 +6430,7 @@ packages:
       vite: 2.6.14
     dev: true
 
-  /vite-plugin-pages/0.18.2_744c3dc4f4777e47e76c501a561da7bf:
+  /vite-plugin-pages/0.18.2_vite@2.6.14:
     resolution: {integrity: sha512-Z6ylvMKYSiCngtSpWw9pHN4UzjMQvOG7f0RtLMDKm1LrO5iye7V8BS8Rfdvrl9Nz+D2W+i0pi98+vOL5VsmTvQ==}
     peerDependencies:
       '@vue/compiler-sfc': '>=3'
@@ -6448,7 +6440,6 @@ packages:
         optional: true
     dependencies:
       '@antfu/utils': 0.3.0
-      '@vue/compiler-sfc': 3.2.22
       debug: 4.3.2
       deep-equal: 2.0.5
       fast-glob: 3.2.7
