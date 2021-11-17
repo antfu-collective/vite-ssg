@@ -1,4 +1,4 @@
-import { createSSRApp, Component, createApp as createClientApp } from 'vue'
+import { createSSRApp, Component } from 'vue'
 import { createMemoryHistory, createRouter, createWebHistory } from 'vue-router'
 import { createHead, HeadClient } from '@vueuse/head'
 import { deserializeState, serializeState } from '../utils/state'
@@ -22,9 +22,7 @@ export function ViteSSG(
   const isClient = typeof window !== 'undefined'
 
   async function createApp(client = false, routePath?: string) {
-    const app = client
-      ? createClientApp(App)
-      : createSSRApp(App)
+    const app = createSSRApp(App)
 
     let head: HeadClient | undefined
 
