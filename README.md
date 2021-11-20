@@ -297,7 +297,7 @@ You can use the `includedRoutes` hook to exclude/include route paths to render, 
 export default {
   plugins: [ /*...*/ ],
   ssgOptions: {
-    includedRoutes(paths) {
+    includedRoutes(paths, routes) {
       // exclude all the route paths that contains 'foo'
       return paths.filter(i => !i.includes('foo'))
     }
