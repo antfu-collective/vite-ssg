@@ -72,7 +72,7 @@ export interface ViteSSGOptions {
    * Default to a handler that filter out all the dynamic routes,
    * when passing your custom handler, you should also take care the dynamic routes yourself.
    */
-  includedRoutes?: (routes: string[]) => Promise<string[]> | string[]
+  includedRoutes?: (paths: string[], routes: RouteRecordRaw[]) => Promise<string[]> | string[]
 
   /**
    * Callback to be called before every page render.

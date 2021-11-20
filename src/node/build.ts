@@ -11,6 +11,7 @@ import { ViteSSGContext, ViteSSGOptions } from '../client'
 import { renderPreloadLinks } from './preload-links'
 import { buildLog, routesToPaths, getSize } from './utils'
 import { getCritters } from './critical'
+import { RouteRecordRaw } from 'vue-router'
 
 export interface Manifest {
   [key: string]: string[]
@@ -18,7 +19,7 @@ export interface Manifest {
 
 export type CreateAppFactory = (client: boolean, routePath?: string) => Promise<ViteSSGContext<true> | ViteSSGContext<false>>
 
-function DefaultIncludedRoutes(paths: string[]) {
+function DefaultIncludedRoutes(paths: string[], routes: RouteRecordRaw[]) {
   // ignore dynamic routes
   return paths.filter(i => !i.includes(':') && !i.includes('*'))
 }
@@ -95,7 +96,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
   let routesPaths = includeAllRoutes
     ? routesToPaths(routes)
-    : await includedRoutes(routesToPaths(routes))
+    : await includedRoutes(routesToPaths(routes), routes || [])
 
   // uniq
   routesPaths = Array.from(new Set(routesPaths))

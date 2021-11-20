@@ -297,9 +297,26 @@ You can use the `includedRoutes` hook to exclude/include route paths to render, 
 export default {
   plugins: [ /*...*/ ],
   ssgOptions: {
-    includedRoutes(routes) {
+    includedRoutes(paths) {
       // exclude all the route paths that contains 'foo'
-      return routes.filter(i => !i.includes('foo'))
+      return paths.filter(i => !i.includes('foo'))
+    }
+  }
+}
+```
+```js
+// vite.config.js
+
+export default {
+  plugins: [ /*...*/ ],
+  ssgOptions: {
+    includedRoutes(paths, routes) {
+      // use original route records
+      return routes.flatMap(route => {
+        return route.name === 'Blog'
+          ? myBlogSlugs.map(slug => `/blog/${slug}`)
+          : route.path
+      })
     }
   }
 }
