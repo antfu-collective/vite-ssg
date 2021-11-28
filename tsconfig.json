@@ -11,11 +11,10 @@
     "strictNullChecks": true,
     "moduleResolution": "Node",
     "resolveJsonModule": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
   },
   "exclude": [
     "**/dist",
-    "**/node_modules",
-    "**/test"
+    "**/node_modules"
   ]
 }

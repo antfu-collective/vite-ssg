@@ -5,6 +5,7 @@ export default <Options>{
     'src/index.ts',
     'src/client/single-page.ts',
     'src/node/cli.ts',
+    'src/node/utils.ts'
   ],
   dts: true,
   splitting: true,
@@ -16,6 +17,7 @@ export default <Options>{
     'vue',
     'vue/server-renderer',
     'vue/compiler-sfc',
+    'ava'
   ],
   clean: true,
 }

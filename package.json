@@ -55,9 +55,10 @@
     "example:single:dev": "npm -C examples/single-page run dev",
     "example:single:build": "npm -C examples/single-page run build",
     "example:single:serve": "npm -C examples/single-page run serve",
-    "build": "tsup && npm run copy-single-page-dts",
+    "build": "tsup && npm run copy-single-page-dts && tsup test/main.ts -d dist-test",
     "prepublishOnly": "npm run build",
-    "release": "npx bumpp --push --tag --commit"
+    "release": "npx bumpp --push --tag --commit",
+    "test": "ava"
   },
   "dependencies": {
     "chalk": "^4.1.2",
@@ -81,11 +82,13 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.10.0",
+    "@ava/typescript": "^3.0.1",
     "@types/fs-extra": "^9.0.13",
     "@types/jsdom": "^16.2.13",
     "@types/yargs": "^17.0.5",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@vueuse/head": "^0.6.0",
+    "ava": "^4.0.0-rc.1",
     "bumpp": "^7.1.1",
     "critters": "^0.0.14",
     "eslint": "^8.2.0",
