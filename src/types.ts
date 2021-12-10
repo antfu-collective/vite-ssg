@@ -100,6 +100,7 @@ export interface ViteSSGContext<HasRouter extends boolean = true> {
   initialState: Record<string, any>
   head: HeadClient | undefined
   isClient: boolean
+  onSsrAppRendered(cb: Function): void
   /**
    * Current router path on SSG, `undefined` on client side.
    */

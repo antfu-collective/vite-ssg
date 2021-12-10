@@ -11,6 +11,7 @@ import { ViteSSGContext, ViteSSGOptions } from '../client'
 import { renderPreloadLinks } from './preload-links'
 import { buildLog, routesToPaths, getSize } from './utils'
 import { getCritters } from './critical'
+import { serializeState } from '../utils/state';
 
 export interface Manifest {
   [key: string]: string[]
@@ -133,9 +134,10 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
         const ctx: SSRContext = {}
         const appHTML = await renderToString(app, ctx)
-
+        const transformedAppHTML = (await app.config.globalProperties.VITE_SSG_ON_SSR_APP_RENDERED?.(route, appHTML, appCtx)) || appHTML
+        const transformState = app.config.globalProperties.VITE_SSG_TRANSFORM_STATE || serializeState
         // need to resolve assets so render content first
-        const renderedHTML = renderHTML({ indexHTML: transformedIndexHTML, appHTML, initialState })
+        const renderedHTML = renderHTML({ indexHTML: transformedIndexHTML, appHTML: transformedAppHTML, initialState: transformState(initialState) })
 
         // create jsdom from renderedHTML
         const jsdom = new JSDOM(renderedHTML)
