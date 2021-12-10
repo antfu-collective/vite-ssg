@@ -270,6 +270,25 @@ export default defineConfig({
 })
 ```
 
+### Async Components
+
+Some applications may make use of Vue features that cause components to render asynchronously (e.g. [`suspense`](https://v3.vuejs.org/guide/migration/suspense.html)). When these features are used in ways that can influence `initialState`, the `onSsrAppRendered` may be used in order to ensure that all async operations have finished as part of the initial application render:
+
+```ts
+const { app, router, initialState, isClient, onSsrAppRendered } = ctx;
+
+const pinia = createPinia()
+app.use(pinia)
+
+if (isClient) {
+  pinia.state.value = (initialState.pinia) || {}
+} else {
+  onSsrAppRendered(() => {
+    initialState.pinia = pinia.state.value
+  })
+}
+```
+
 ## Configuration
 
 You can pass options to Vite SSG in the `ssgOptions` field of your `vite.config.js`
