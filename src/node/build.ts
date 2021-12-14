@@ -107,11 +107,16 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
     console.log(`${chalk.gray('[vite-ssg]')} ${chalk.blue('Critical CSS generation enabled via `critters`')}`)
 
   if (mock) {
-    const virtualConsole = new VirtualConsole()
-    const jsdom = new JSDOM('', { url: 'http://localhost', virtualConsole })
+    /*
+      remove manual `new VirtualConsole()`, as it did not forward the console correctly
+
+      https://github.com/jsdom/jsdom#virtual-consoles:
+      "By default, the JSDOM constructor will return an instance with a virtual console that forwards all its output to the Node.js console."
+    */
+    const jsdom = new JSDOM('', { url: 'http://localhost' })
     // @ts-ignore
     global.window = jsdom.window
-    Object.assign(global, jsdom.window)
+    Object.assign(global, jsdom.window) // FIXME: throws an error when using esm
   }
 
   const ssrManifest: Manifest = JSON.parse(await fs.readFile(join(out, 'ssr-manifest.json'), 'utf-8'))
