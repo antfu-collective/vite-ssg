@@ -1,8 +1,9 @@
 /* eslint-disable no-unused-expressions */
 import yargs from 'yargs'
+import { hideBin } from 'yargs/helpers'
 import { build } from './build'
 
-yargs
+yargs(hideBin(process.argv))
   .scriptName('vite-ssg')
   .usage('$0 [args]')
   .command(
