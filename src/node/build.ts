@@ -113,10 +113,14 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
       https://github.com/jsdom/jsdom#virtual-consoles:
       "By default, the JSDOM constructor will return an instance with a virtual console that forwards all its output to the Node.js console."
     */
-    const jsdom = new JSDOM('', { url: 'http://localhost' })
+    // const jsdom = new JSDOM('', { url: 'http://localhost' })
+    // // @ts-ignore
+    // global.window = jsdom.window
+    // Object.assign(global, jsdom.window) // FIXME: throws an error when using esm
+
     // @ts-ignore
-    global.window = jsdom.window
-    Object.assign(global, jsdom.window) // FIXME: throws an error when using esm
+    const jsdomGlobal = (await import('./jsdomGlobal')).default
+    jsdomGlobal()
   }
 
   const ssrManifest: Manifest = JSON.parse(await fs.readFile(join(out, 'ssr-manifest.json'), 'utf-8'))
