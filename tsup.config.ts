@@ -8,6 +8,7 @@ export default <Options>{
   ],
   dts: true,
   splitting: true,
+  target: 'node14', // needed for working ESM
   format: [
     'esm',
     'cjs',

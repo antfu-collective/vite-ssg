@@ -81,15 +81,15 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
       cssCodeSplit: false,
       rollupOptions: {
         output: {
-          entryFileNames: `[name].${isTypeModule ? 'cjs' : 'js'}`,
+          entryFileNames: '[name].mjs',
+          format: 'esm',
         },
       },
     },
     mode: config.mode,
   })
 
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { createApp } = require(join(ssgOut, `${parse(ssrEntry).name}.${isTypeModule ? 'cjs' : 'js'}`)) as { createApp: CreateAppFactory }
+  const { createApp } = await import(join(ssgOut, `${parse(ssrEntry).name}.mjs`)) as { createApp: CreateAppFactory }
 
   const { routes } = await createApp(false)
 
@@ -102,16 +102,25 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
   buildLog('Rendering Pages...', routesPaths.length)
 
-  const critters = crittersOptions !== false ? getCritters(outDir, crittersOptions) : undefined
+  const critters = crittersOptions !== false ? await getCritters(outDir, crittersOptions) : undefined
   if (critters)
     console.log(`${chalk.gray('[vite-ssg]')} ${chalk.blue('Critical CSS generation enabled via `critters`')}`)
 
   if (mock) {
-    const virtualConsole = new VirtualConsole()
-    const jsdom = new JSDOM('', { url: 'http://localhost', virtualConsole })
+    /*
+      remove manual `new VirtualConsole()`, as it did not forward the console correctly
+
+      https://github.com/jsdom/jsdom#virtual-consoles:
+      "By default, the JSDOM constructor will return an instance with a virtual console that forwards all its output to the Node.js console."
+    */
+    // const jsdom = new JSDOM('', { url: 'http://localhost' })
+    // // @ts-ignore
+    // global.window = jsdom.window
+    // Object.assign(global, jsdom.window) // FIXME: throws an error when using esm
+
     // @ts-ignore
-    global.window = jsdom.window
-    Object.assign(global, jsdom.window)
+    const jsdomGlobal = (await import('./jsdomGlobal')).default
+    jsdomGlobal()
   }
 
   const ssrManifest: Manifest = JSON.parse(await fs.readFile(join(out, 'ssr-manifest.json'), 'utf-8'))
@@ -151,7 +160,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
         if (critters)
           transformed = await critters.process(transformed)
 
-        const formatted = format(transformed, formatting)
+        const formatted = await format(transformed, formatting)
 
         const relativeRouteFile = `${(route.endsWith('/') ? `${route}index` : route).replace(/^\//g, '')}.html`
         const filename = dirStyle === 'nested'
@@ -209,10 +218,10 @@ function renderHTML({ indexHTML, appHTML, initialState }: { indexHTML: string; a
     )
 }
 
-function format(html: string, formatting: ViteSSGOptions['formatting']) {
+async function format(html: string, formatting: ViteSSGOptions['formatting']) {
   if (formatting === 'minify') {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    return require('html-minifier').minify(html, {
+    const htmlMinifier = await import('html-minifier')
+    return htmlMinifier.minify(html, {
       collapseWhitespace: true,
       caseSensitive: true,
       collapseInlineTagWhitespace: false,
@@ -221,8 +230,12 @@ function format(html: string, formatting: ViteSSGOptions['formatting']) {
     })
   }
   else if (formatting === 'prettify') {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    return require('prettier').format(html, { semi: false, parser: 'html' })
+    // @ts-ignore
+    const prettier = (await import('prettier/esm/standalone.mjs')).default
+    // @ts-ignore
+    const parserHTML = (await import('prettier/esm/parser-html.mjs')).default
+
+    return prettier.format(html, { semi: false, parser: 'html', plugins: [parserHTML] })
   }
   return html
 }

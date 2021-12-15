@@ -65,7 +65,7 @@
     "html-minifier": "^4.0.0",
     "jsdom": "^17.0.0",
     "prettier": "^2.4.1",
-    "yargs": "^17.2.1"
+    "yargs": "^17.3.0"
   },
   "peerDependencies": {
     "@vueuse/head": "^0.5.1",
@@ -82,7 +82,9 @@
   "devDependencies": {
     "@antfu/eslint-config": "^0.10.0",
     "@types/fs-extra": "^9.0.13",
+    "@types/html-minifier": "^4.0.1",
     "@types/jsdom": "^16.2.13",
+    "@types/prettier": "^2.4.2",
     "@types/yargs": "^17.0.5",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@vueuse/head": "^0.6.0",
