@@ -1,7 +1,7 @@
 {
   "name": "vite-ssg",
   "description": "Server-side generation for Vite",
-  "version": "0.16.2",
+  "version": "0.17.0",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
