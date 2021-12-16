@@ -89,7 +89,9 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
     mode: config.mode,
   })
 
-  const { createApp } = await import(join(ssgOut, `${parse(ssrEntry).name}.mjs`)) as { createApp: CreateAppFactory }
+  const prifix = process.platform === "win32" ? 'file://' : '';
+
+  const { createApp } = await import(join(prifix, ssgOut, `${parse(ssrEntry).name}.mjs`)) as { createApp: CreateAppFactory }
 
   const { routes } = await createApp(false)
 
