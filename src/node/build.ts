@@ -50,6 +50,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
     onFinished,
     dirStyle = 'flat',
     includeAllRoutes = false,
+    format: buildFormat = 'esm',
   }: ViteSSGOptions = Object.assign({}, config.ssgOptions || {}, cliOptions)
 
   if (fs.existsSync(ssgOut))
@@ -80,18 +81,24 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
       minify: false,
       cssCodeSplit: false,
       rollupOptions: {
-        output: {
-          entryFileNames: '[name].mjs',
-          format: 'esm',
-        },
+        output: buildFormat === 'esm'
+          ? {
+            entryFileNames: '[name].mjs',
+            format: 'esm',
+          }
+          : {
+            entryFileNames: '[name].cjs',
+            format: 'cjs',
+          },
       },
     },
     mode: config.mode,
   })
 
-  const prifix = process.platform === "win32" ? 'file://' : '';
+  const prefix = process.platform === 'win32' ? 'file://' : ''
+  const ext = buildFormat === 'esm' ? '.mjs' : '.cjs'
 
-  const { createApp } = await import(join(prifix, ssgOut, `${parse(ssrEntry).name}.mjs`)) as { createApp: CreateAppFactory }
+  const { createApp } = await import(join(prefix, ssgOut, parse(ssrEntry).name + ext)) as { createApp: CreateAppFactory }
 
   const { routes } = await createApp(false)
 

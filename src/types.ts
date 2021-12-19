@@ -13,6 +13,13 @@ export interface ViteSSGOptions {
   script?: 'sync' | 'async' | 'defer' | 'async defer'
 
   /**
+   * Built format
+   *
+   * @default 'esm'
+   */
+  format?: 'esm' | 'cjs'
+
+  /**
    * The path of main entry, relative to the project root
    *
    * @default 'src/main.ts'
