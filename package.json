@@ -43,7 +43,7 @@
     "ssr"
   ],
   "scripts": {
-    "dev": "tsup -- --watch src",
+    "dev": "tsup --watch src",
     "copy-readme-files": "esno scripts/copy-readme-files.ts",
     "copy-single-page-dts": "esno scripts/copy-single-page-dts.ts",
     "example:dev": "npm run copy-readme-files && npm -C examples/multiple-pages run dev",

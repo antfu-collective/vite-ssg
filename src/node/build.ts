@@ -1,10 +1,11 @@
 /* eslint-disable no-console */
-import { join, dirname, isAbsolute, parse, resolve } from 'path'
+import { join, dirname, isAbsolute, parse } from 'path'
+import { createRequire } from 'module'
 import chalk from 'chalk'
 import fs from 'fs-extra'
 import { build as viteBuild, resolveConfig, ResolvedConfig } from 'vite'
-import { renderToString, SSRContext } from 'vue/server-renderer'
-import { JSDOM, VirtualConsole } from 'jsdom'
+import type { SSRContext } from 'vue/server-renderer'
+import { JSDOM } from 'jsdom'
 import { RollupOutput } from 'rollup'
 import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
 import { ViteSSGContext, ViteSSGOptions } from '../client'
@@ -36,7 +37,6 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   const ssgOut = join(root, '.vite-ssg-temp')
   const outDir = config.build.outDir || 'dist'
   const out = isAbsolute(outDir) ? outDir : join(root, outDir)
-  const isTypeModule = readJson(resolve(cwd, 'package.json')).type === 'module'
 
   const {
     script = 'sync',
@@ -97,8 +97,13 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
   const prefix = process.platform === 'win32' ? 'file://' : ''
   const ext = buildFormat === 'esm' ? '.mjs' : '.cjs'
+  const serverEntry = join(prefix, ssgOut, parse(ssrEntry).name + ext)
 
-  const { createApp } = await import(join(prefix, ssgOut, parse(ssrEntry).name + ext)) as { createApp: CreateAppFactory }
+  const _require = createRequire(import.meta.url)
+
+  const { createApp }: { createApp: CreateAppFactory } = buildFormat === 'esm'
+    ? await import(serverEntry)
+    : _require(serverEntry)
 
   const { routes } = await createApp(false)
 
@@ -116,17 +121,6 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
     console.log(`${chalk.gray('[vite-ssg]')} ${chalk.blue('Critical CSS generation enabled via `critters`')}`)
 
   if (mock) {
-    /*
-      remove manual `new VirtualConsole()`, as it did not forward the console correctly
-
-      https://github.com/jsdom/jsdom#virtual-consoles:
-      "By default, the JSDOM constructor will return an instance with a virtual console that forwards all its output to the Node.js console."
-    */
-    // const jsdom = new JSDOM('', { url: 'http://localhost' })
-    // // @ts-ignore
-    // global.window = jsdom.window
-    // Object.assign(global, jsdom.window) // FIXME: throws an error when using esm
-
     // @ts-ignore
     const jsdomGlobal = (await import('./jsdomGlobal')).default
     jsdomGlobal()
@@ -135,6 +129,10 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   const ssrManifest: Manifest = JSON.parse(await fs.readFile(join(out, 'ssr-manifest.json'), 'utf-8'))
   let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
   indexHTML = rewriteScripts(indexHTML, script)
+
+  const { renderToString }: typeof import('vue/server-renderer') = buildFormat === 'esm'
+    ? await import('vue/server-renderer')
+    : _require('vue/server-renderer')
 
   await Promise.all(
     routesPaths.map(async(route) => {
@@ -171,7 +169,10 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
         const formatted = await format(transformed, formatting)
 
-        const relativeRouteFile = `${(route.endsWith('/') ? `${route}index` : route).replace(/^\//g, '')}.html`
+        const relativeRouteFile = `${(route.endsWith('/')
+          ? `${route}index`
+          : route).replace(/^\//g, '')}.html`
+
         const filename = dirStyle === 'nested'
           ? join(route.replace(/^\//g, ''), 'index.html')
           : relativeRouteFile
@@ -188,7 +189,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
     }),
   )
 
-  await fs.remove(ssgOut)
+  // await fs.remove(ssgOut)
 
   // when `vite-plugin-pwa` is presented, use it to regenerate SW after rendering
   const pwaPlugin: VitePluginPWAAPI = config.plugins.find(i => i.name === 'vite-plugin-pwa')?.api
