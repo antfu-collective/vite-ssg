@@ -1,16 +1,17 @@
 /* eslint-disable no-console */
-import { join, dirname, isAbsolute, parse } from 'path'
+import { dirname, isAbsolute, join, parse } from 'path'
 import { createRequire } from 'module'
 import chalk from 'chalk'
 import fs from 'fs-extra'
-import { build as viteBuild, resolveConfig, ResolvedConfig } from 'vite'
+import type { ResolvedConfig } from 'vite'
+import { resolveConfig, build as viteBuild } from 'vite'
 import type { SSRContext } from 'vue/server-renderer'
 import { JSDOM } from 'jsdom'
-import { RollupOutput } from 'rollup'
+import type { RollupOutput } from 'rollup'
 import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
-import { ViteSSGContext, ViteSSGOptions } from '../client'
+import type { ViteSSGContext, ViteSSGOptions } from '../client'
 import { renderPreloadLinks } from './preload-links'
-import { buildLog, routesToPaths, getSize } from './utils'
+import { buildLog, getSize, routesToPaths } from './utils'
 import { getCritters } from './critical'
 
 export interface Manifest {

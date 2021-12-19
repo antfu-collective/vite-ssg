@@ -44,6 +44,7 @@
   ],
   "scripts": {
     "dev": "tsup --watch src",
+    "lint": "eslint --ext .ts,.js .",
     "copy-readme-files": "esno scripts/copy-readme-files.ts",
     "copy-single-page-dts": "esno scripts/copy-single-page-dts.ts",
     "example:dev": "npm run copy-readme-files && npm -C examples/multiple-pages run dev",
@@ -80,7 +81,7 @@
     }
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^0.10.0",
+    "@antfu/eslint-config": "^0.14.0",
     "@types/fs-extra": "^9.0.13",
     "@types/html-minifier": "^4.0.1",
     "@types/jsdom": "^16.2.13",
