@@ -18,6 +18,7 @@ export const useRootStore = defineStore({
     initialize() {
       if (this.isReady) return
 
+      // eslint-disable-next-line no-console
       console.log('Initialize user ...')
       this.user = {
         id: 1,

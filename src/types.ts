@@ -1,6 +1,6 @@
 /* eslint-disable no-use-before-define */
 import type { App } from 'vue'
-import type { Router, RouteRecordRaw, RouterOptions as VueRouterOptions } from 'vue-router'
+import type { RouteRecordRaw, Router, RouterOptions as VueRouterOptions } from 'vue-router'
 import type { HeadClient } from '@vueuse/head'
 import type { Options as CrittersOptions } from 'critters'
 
@@ -11,6 +11,13 @@ export interface ViteSSGOptions {
    * @default 'sync'
    */
   script?: 'sync' | 'async' | 'defer' | 'async defer'
+
+  /**
+   * Built format
+   *
+   * @default 'esm'
+   */
+  format?: 'esm' | 'cjs'
 
   /**
    * The path of main entry, relative to the project root

@@ -1,4 +1,4 @@
-import { Options } from 'tsup'
+import type { Options } from 'tsup'
 
 export default <Options>{
   entryPoints: [
@@ -8,6 +8,7 @@ export default <Options>{
   ],
   dts: true,
   splitting: true,
+  target: 'node14', // needed for working ESM
   format: [
     'esm',
     'cjs',

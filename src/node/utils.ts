@@ -1,5 +1,5 @@
 import chalk from 'chalk'
-import { RouteRecordRaw } from 'vue-router'
+import type { RouteRecordRaw } from 'vue-router'
 
 export function buildLog(text: string, count?: number) {
   // eslint-disable-next-line no-console

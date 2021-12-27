@@ -1,7 +1,7 @@
 {
   "name": "vite-ssg",
   "description": "Server-side generation for Vite",
-  "version": "0.16.1",
+  "version": "0.17.2",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -43,7 +43,8 @@
     "ssr"
   ],
   "scripts": {
-    "dev": "tsup -- --watch src",
+    "dev": "tsup --watch src",
+    "lint": "eslint --ext .ts,.js .",
     "copy-readme-files": "esno scripts/copy-readme-files.ts",
     "copy-single-page-dts": "esno scripts/copy-single-page-dts.ts",
     "example:dev": "npm run copy-readme-files && npm -C examples/multiple-pages run dev",
@@ -63,9 +64,9 @@
     "chalk": "^4.1.2",
     "fs-extra": "^10.0.0",
     "html-minifier": "^4.0.0",
-    "jsdom": "^17.0.0",
-    "prettier": "^2.4.1",
-    "yargs": "^17.2.1"
+    "jsdom": "^19.0.0",
+    "prettier": "^2.5.1",
+    "yargs": "^17.3.0"
   },
   "peerDependencies": {
     "@vueuse/head": "^0.5.1",
@@ -80,23 +81,25 @@
     }
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^0.10.0",
+    "@antfu/eslint-config": "^0.14.0",
     "@types/fs-extra": "^9.0.13",
+    "@types/html-minifier": "^4.0.1",
     "@types/jsdom": "^16.2.13",
-    "@types/yargs": "^17.0.5",
-    "@typescript-eslint/eslint-plugin": "^5.4.0",
-    "@vueuse/head": "^0.6.0",
+    "@types/prettier": "^2.4.2",
+    "@types/yargs": "^17.0.7",
+    "@typescript-eslint/eslint-plugin": "^5.7.0",
+    "@vueuse/head": "^0.7.4",
     "bumpp": "^7.1.1",
-    "critters": "^0.0.14",
-    "eslint": "^8.2.0",
-    "esno": "^0.12.0",
-    "rollup": "^2.60.0",
+    "critters": "^0.0.15",
+    "eslint": "^8.5.0",
+    "esno": "^0.13.0",
+    "rollup": "^2.61.1",
     "standard-version": "^9.3.2",
-    "tsup": "^5.7.1",
-    "typescript": "^4.4.4",
-    "vite": "^2.6.14",
-    "vite-plugin-pwa": "^0.11.5",
-    "vue": "^3.2.22",
+    "tsup": "^5.11.6",
+    "typescript": "^4.5.4",
+    "vite": "^2.7.3",
+    "vite-plugin-pwa": "^0.11.12",
+    "vue": "^3.2.26",
     "vue-router": "^4.0.12"
   }
 }
