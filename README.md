@@ -272,10 +272,10 @@ export default defineConfig({
 
 ### Async Components
 
-Some applications may make use of Vue features that cause components to render asynchronously (e.g. [`suspense`](https://v3.vuejs.org/guide/migration/suspense.html)). When these features are used in ways that can influence `initialState`, the `onSsrAppRendered` may be used in order to ensure that all async operations have finished as part of the initial application render:
+Some applications may make use of Vue features that cause components to render asynchronously (e.g. [`suspense`](https://v3.vuejs.org/guide/migration/suspense.html)). When these features are used in ways that can influence `initialState`, the `onSSRAppRendered` may be used in order to ensure that all async operations have finished as part of the initial application render:
 
 ```ts
-const { app, router, initialState, isClient, onSsrAppRendered } = ctx;
+const { app, router, initialState, isClient, onSSRAppRendered } = ctx;
 
 const pinia = createPinia()
 app.use(pinia)
@@ -283,7 +283,7 @@ app.use(pinia)
 if (isClient) {
   pinia.state.value = (initialState.pinia) || {}
 } else {
-  onSsrAppRendered(() => {
+  onSSRAppRendered(() => {
     initialState.pinia = pinia.state.value
   })
 }

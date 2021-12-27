@@ -140,7 +140,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
     routesPaths.map(async(route) => {
       try {
         const appCtx = await createApp(false, route) as ViteSSGContext<true>
-        const { app, router, head, initialState } = appCtx
+        const { app, router, head, initialState, triggerOnSSRAppRendered, transformState = serializeState } = appCtx
 
         if (router) {
           await router.push(route)
@@ -151,8 +151,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
         const ctx: SSRContext = {}
         const appHTML = await renderToString(app, ctx)
-        const transformedAppHTML = (await app.config.globalProperties.VITE_SSG_ON_SSR_APP_RENDERED?.(route, appHTML, appCtx)) || appHTML
-        const transformState = app.config.globalProperties.VITE_SSG_TRANSFORM_STATE || serializeState
+        const transformedAppHTML = (await triggerOnSSRAppRendered?.(route, appHTML, appCtx)) || appHTML
         // need to resolve assets so render content first
         const renderedHTML = renderHTML({ indexHTML: transformedIndexHTML, appHTML: transformedAppHTML, initialState: transformState(initialState) })
 

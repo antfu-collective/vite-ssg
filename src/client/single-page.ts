@@ -34,15 +34,13 @@ export function ViteSSG(
     }
 
     const appRenderCallbacks: Function[] = []
-    const onSsrAppRendered = client
+    const onSSRAppRendered = client
       ? () => {}
       : (cb: Function) => appRenderCallbacks.push(cb)
-    app.config.globalProperties.VITE_SSG_ON_SSR_APP_RENDERED = () => {
+    const triggerOnSSRAppRendered = () => {
       return Promise.all(appRenderCallbacks.map(cb => cb()))
     }
-    if (transformState)
-      app.config.globalProperties.VITE_SSG_TRANSFORM_STATE = transformState
-    const context = { app, head, isClient, router: undefined, routes: undefined, initialState: {}, onSsrAppRendered }
+    const context = { app, head, isClient, router: undefined, routes: undefined, initialState: {}, onSSRAppRendered, triggerOnSSRAppRendered, transformState }
 
     if (registerComponents)
       app.component('ClientOnly', client ? ClientOnly : { render: () => null })
