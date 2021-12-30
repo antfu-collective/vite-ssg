@@ -190,7 +190,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
     }),
   )
 
-  // await fs.remove(ssgOut)
+  await fs.remove(ssgOut)
 
   // when `vite-plugin-pwa` is presented, use it to regenerate SW after rendering
   const pwaPlugin: VitePluginPWAAPI = config.plugins.find(i => i.name === 'vite-plugin-pwa')?.api
