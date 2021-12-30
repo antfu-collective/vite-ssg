@@ -1,47 +1,47 @@
 {
   "name": "vite-ssg",
-  "description": "Server-side generation for Vite",
   "version": "0.17.2",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
-  "exports": {
-    "./": "./",
-    ".": {
-      "require": "./dist/index.js",
-      "import": "./dist/index.mjs"
-    },
-    "./single-page": {
-      "require": "./dist/client/single-page.js",
-      "import": "./dist/client/single-page.mjs"
-    }
-  },
-  "license": "MIT",
-  "funding": "https://github.com/sponsors/antfu",
-  "author": "Anthony Fu <anthonyfu117@hotmail.com>",
-  "engines": {
-    "node": ">=14.0.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/antfu/vite-ssg"
-  },
-  "homepage": "https://github.com/antfu/vite-ssg",
-  "bugs": "https://github.com/antfu/vite-ssg/issues",
-  "files": [
-    "dist",
-    "bin",
-    "single-page.d.ts"
-  ],
-  "bin": {
-    "vite-ssg": "bin/vite-ssg.js"
-  },
+  "description": "Server-side generation for Vite",
   "keywords": [
     "vite",
     "vite-plugin",
     "ssg",
     "ssr"
   ],
+  "homepage": "https://github.com/antfu/vite-ssg",
+  "bugs": "https://github.com/antfu/vite-ssg/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/antfu/vite-ssg"
+  },
+  "funding": "https://github.com/sponsors/antfu",
+  "license": "MIT",
+  "author": "Anthony Fu <anthonyfu117@hotmail.com>",
+  "sideEffects": false,
+  "exports": {
+    "./": "./",
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./single-page": {
+      "require": "./dist/client/single-page.cjs",
+      "import": "./dist/client/single-page.mjs",
+      "types": "./dist/client/single-page.d.ts"
+    }
+  },
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "bin",
+    "*.d.ts"
+  ],
+  "bin": {
+    "vite-ssg": "bin/vite-ssg.js"
+  },
   "scripts": {
     "dev": "tsup --watch src",
     "lint": "eslint --ext .ts,.js .",
@@ -56,7 +56,7 @@
     "example:single:dev": "npm -C examples/single-page run dev",
     "example:single:build": "npm -C examples/single-page run build",
     "example:single:serve": "npm -C examples/single-page run serve",
-    "build": "tsup && npm run copy-single-page-dts",
+    "build": "unbuild && npm run copy-single-page-dts",
     "prepublishOnly": "npm run build",
     "release": "npx bumpp --push --tag --commit"
   },
@@ -97,9 +97,13 @@
     "standard-version": "^9.3.2",
     "tsup": "^5.11.9",
     "typescript": "^4.5.4",
+    "unbuild": "^0.6.7",
     "vite": "^2.7.10",
     "vite-plugin-pwa": "^0.11.12",
     "vue": "^3.2.26",
     "vue-router": "^4.0.12"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }

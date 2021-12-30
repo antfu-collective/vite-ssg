@@ -51,7 +51,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
     onFinished,
     dirStyle = 'flat',
     includeAllRoutes = false,
-    format: buildFormat = 'esm',
+    format = 'esm',
   }: ViteSSGOptions = Object.assign({}, config.ssgOptions || {}, cliOptions)
 
   if (fs.existsSync(ssgOut))
@@ -82,7 +82,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
       minify: false,
       cssCodeSplit: false,
       rollupOptions: {
-        output: buildFormat === 'esm'
+        output: format === 'esm'
           ? {
             entryFileNames: '[name].mjs',
             format: 'esm',
@@ -96,13 +96,13 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
     mode: config.mode,
   })
 
-  const prefix = process.platform === 'win32' ? 'file://' : ''
-  const ext = buildFormat === 'esm' ? '.mjs' : '.cjs'
+  const prefix = format === 'esm' && process.platform === 'win32' ? 'file://' : ''
+  const ext = format === 'esm' ? '.mjs' : '.cjs'
   const serverEntry = join(prefix, ssgOut, parse(ssrEntry).name + ext)
 
   const _require = createRequire(import.meta.url)
 
-  const { createApp }: { createApp: CreateAppFactory } = buildFormat === 'esm'
+  const { createApp }: { createApp: CreateAppFactory } = format === 'esm'
     ? await import(serverEntry)
     : _require(serverEntry)
 
@@ -131,7 +131,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
   indexHTML = rewriteScripts(indexHTML, script)
 
-  const { renderToString }: typeof import('vue/server-renderer') = buildFormat === 'esm'
+  const { renderToString }: typeof import('vue/server-renderer') = format === 'esm'
     ? await import('vue/server-renderer')
     : _require('vue/server-renderer')
 
@@ -168,7 +168,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
         if (critters)
           transformed = await critters.process(transformed)
 
-        const formatted = await format(transformed, formatting)
+        const formatted = await formatHtml(transformed, formatting)
 
         const relativeRouteFile = `${(route.endsWith('/')
           ? `${route}index`
@@ -248,7 +248,7 @@ function renderHTML({ indexHTML, appHTML, initialState }: { indexHTML: string; a
     )
 }
 
-async function format(html: string, formatting: ViteSSGOptions['formatting']) {
+async function formatHtml(html: string, formatting: ViteSSGOptions['formatting']) {
   if (formatting === 'minify') {
     const htmlMinifier = await import('html-minifier')
     return htmlMinifier.minify(html, {
