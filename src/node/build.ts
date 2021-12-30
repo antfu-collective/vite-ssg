@@ -9,7 +9,7 @@ import type { SSRContext } from 'vue/server-renderer'
 import { JSDOM } from 'jsdom'
 import type { RollupOutput } from 'rollup'
 import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
-import type { ViteSSGContext, ViteSSGOptions } from '../client'
+import type { ViteSSGContext, ViteSSGOptions } from '../types'
 import { renderPreloadLinks } from './preload-links'
 import { buildLog, getSize, routesToPaths } from './utils'
 import { getCritters } from './critical'
@@ -194,7 +194,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
   // when `vite-plugin-pwa` is presented, use it to regenerate SW after rendering
   const pwaPlugin: VitePluginPWAAPI = config.plugins.find(i => i.name === 'vite-plugin-pwa')?.api
-  if (pwaPlugin?.generateSW) {
+  if (pwaPlugin && !pwaPlugin.disabled && pwaPlugin.generateSW) {
     buildLog('Regenerate PWA...')
     await pwaPlugin.generateSW()
   }
