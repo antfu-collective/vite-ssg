@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { dirname, isAbsolute, join, parse } from 'path'
 import { createRequire } from 'module'
-import chalk from 'chalk'
+import { blue, cyan, dim, gray, green, red, yellow } from 'kolorist'
 import fs from 'fs-extra'
 import type { ResolvedConfig } from 'vite'
 import { resolveConfig, build as viteBuild } from 'vite'
@@ -119,7 +119,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
   const critters = crittersOptions !== false ? await getCritters(outDir, crittersOptions) : undefined
   if (critters)
-    console.log(`${chalk.gray('[vite-ssg]')} ${chalk.blue('Critical CSS generation enabled via `critters`')}`)
+    console.log(`${gray('[vite-ssg]')} ${blue('Critical CSS generation enabled via `critters`')}`)
 
   if (mock) {
     // @ts-ignore
@@ -181,11 +181,11 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
         await fs.ensureDir(join(out, dirname(filename)))
         await fs.writeFile(join(out, filename), formatted, 'utf-8')
         config.logger.info(
-          `${chalk.dim(`${outDir}/`)}${chalk.cyan(filename.padEnd(15, ' '))}  ${chalk.dim(getSize(formatted))}`,
+          `${dim(`${outDir}/`)}${cyan(filename.padEnd(15, ' '))}  ${dim(getSize(formatted))}`,
         )
       }
       catch (err: any) {
-        throw new Error(`${chalk.gray('[vite-ssg]')} ${chalk.red(`Error on page: ${chalk.cyan(route)}`)}\n${err.stack}`)
+        throw new Error(`${gray('[vite-ssg]')} ${red(`Error on page: ${cyan(route)}`)}\n${err.stack}`)
       }
     }),
   )
@@ -199,17 +199,36 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
     await pwaPlugin.generateSW()
   }
 
-  console.log(`\n${chalk.gray('[vite-ssg]')} ${chalk.green('Build finished.')}`)
+  console.log(`\n${gray('[vite-ssg]')} ${green('Build finished.')}`)
 
   await onFinished?.()
 
   // ensure build process always exits
   const waitInSeconds = 15
   const timeout = setTimeout(() => {
-    console.log(`${chalk.gray('[vite-ssg]')} ${chalk.yellow(`Build process still running after ${waitInSeconds}s. There might be something misconfigured in your setup. Force exit.`)}`)
+    console.log(`${gray('[vite-ssg]')} ${yellow(`Build process still running after ${waitInSeconds}s. There might be something misconfigured in your setup. Force exit.`)}`)
     process.exit(0)
   }, waitInSeconds * 1000)
   timeout.unref() // don't wait for timeout
+}
+
+async function detectEntry(root: string) {
+  // pick the first script tag of type module as the entry
+  const scriptSrcReg = /<script(?:.*?)src=["'](.+?)["'](?!<)(?:.*)\>(?:[\n\r\s]*?)(?:<\/script>)/img
+  const html = await fs.readFile(join(root, 'index.html'), 'utf-8')
+  const scripts = [...html.matchAll(scriptSrcReg)] || []
+  const [, entry] = scripts.find((matchResult) => {
+    const [script] = matchResult
+    const [, scriptType] = script.match(/.*\stype=(?:'|")?([^>'"\s]+)/i) || []
+    return scriptType === 'module'
+  }) || []
+  return entry || 'src/main.ts'
+}
+
+async function resolveAlias(config: ResolvedConfig, entry: string) {
+  const resolver = config.createResolver()
+  const result = await resolver(entry, config.root)
+  return result || join(config.root, entry)
 }
 
 function rewriteScripts(indexHTML: string, mode?: string) {
@@ -249,23 +268,4 @@ async function format(html: string, formatting: ViteSSGOptions['formatting']) {
     return prettier.format(html, { semi: false, parser: 'html', plugins: [parserHTML] })
   }
   return html
-}
-
-async function detectEntry(root: string) {
-  // pick the first script tag of type module as the entry
-  const scriptSrcReg = /<script(?:.*?)src=["'](.+?)["'](?!<)(?:.*)\>(?:[\n\r\s]*?)(?:<\/script>)/img
-  const html = await fs.readFile(join(root, 'index.html'), 'utf-8')
-  const scripts = [...html.matchAll(scriptSrcReg)] || []
-  const [, entry] = scripts.find((matchResult) => {
-    const [script] = matchResult
-    const [, scriptType] = script.match(/.*\stype=(?:'|")?([^>'"\s]+)/i) || []
-    return scriptType === 'module'
-  }) || []
-  return entry || 'src/main.ts'
-}
-
-async function resolveAlias(config: ResolvedConfig, entry: string) {
-  const resolver = config.createResolver()
-  const result = await resolver(entry, config.root)
-  return result || join(config.root, entry)
 }

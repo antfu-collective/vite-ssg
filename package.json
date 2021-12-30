@@ -61,10 +61,10 @@
     "release": "npx bumpp --push --tag --commit"
   },
   "dependencies": {
-    "chalk": "^5.0.0",
     "fs-extra": "^10.0.0",
     "html-minifier": "^4.0.0",
     "jsdom": "^19.0.0",
+    "kolorist": "^1.5.1",
     "prettier": "^2.5.1",
     "yargs": "^17.3.1"
   },
