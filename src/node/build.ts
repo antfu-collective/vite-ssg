@@ -13,6 +13,7 @@ import type { ViteSSGContext, ViteSSGOptions } from '../types'
 import { renderPreloadLinks } from './preload-links'
 import { buildLog, getSize, routesToPaths } from './utils'
 import { getCritters } from './critical'
+import { serializeState } from '../utils/state';
 
 export interface Manifest {
   [key: string]: string[]
@@ -139,7 +140,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
     routesPaths.map(async(route) => {
       try {
         const appCtx = await createApp(false, route) as ViteSSGContext<true>
-        const { app, router, head, initialState } = appCtx
+        const { app, router, head, initialState, triggerOnSSRAppRendered, transformState = serializeState } = appCtx
 
         if (router) {
           await router.push(route)
@@ -150,9 +151,9 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
         const ctx: SSRContext = {}
         const appHTML = await renderToString(app, ctx)
-
+        const transformedAppHTML = (await triggerOnSSRAppRendered?.(route, appHTML, appCtx)) || appHTML
         // need to resolve assets so render content first
-        const renderedHTML = renderHTML({ indexHTML: transformedIndexHTML, appHTML, initialState })
+        const renderedHTML = renderHTML({ indexHTML: transformedIndexHTML, appHTML: transformedAppHTML, initialState: transformState(initialState) })
 
         // create jsdom from renderedHTML
         const jsdom = new JSDOM(renderedHTML)
