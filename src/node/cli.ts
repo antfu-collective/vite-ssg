@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-expressions */
-import chalk from 'chalk'
+import { bold, gray, red, reset, underline } from 'kolorist'
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 import { build } from './build'
@@ -24,8 +24,8 @@ yargs(hideBin(process.argv))
     },
   )
   .fail((msg, err, yargs) => {
-    console.error(`\n${chalk.gray('[vite-ssg]')} ${chalk.red.bold('An internal error occurred.')}`)
-    console.error(`${chalk.gray('[vite-ssg]')} ${chalk.white(`Please report an issue, if none already exists: ${chalk.underline('https://github.com/antfu/vite-ssg/issues')}`)}`)
+    console.error(`\n${gray('[vite-ssg]')} ${bold(red('An internal error occurred.'))}`)
+    console.error(`${gray('[vite-ssg]')} ${reset(`Please report an issue, if none already exists: ${underline('https://github.com/antfu/vite-ssg/issues')}`)}`)
     yargs.exit(1, err)
   })
   .showHelpOnFail(false)

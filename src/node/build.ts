@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { dirname, isAbsolute, join, parse } from 'path'
 import { createRequire } from 'module'
-import chalk from 'chalk'
+import { blue, cyan, dim, gray, green, red, yellow } from 'kolorist'
 import fs from 'fs-extra'
 import type { ResolvedConfig } from 'vite'
 import { resolveConfig, build as viteBuild } from 'vite'
@@ -9,7 +9,7 @@ import type { SSRContext } from 'vue/server-renderer'
 import { JSDOM } from 'jsdom'
 import type { RollupOutput } from 'rollup'
 import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
-import type { ViteSSGContext, ViteSSGOptions } from '../client'
+import type { ViteSSGContext, ViteSSGOptions } from '../types'
 import { renderPreloadLinks } from './preload-links'
 import { buildLog, getSize, routesToPaths } from './utils'
 import { getCritters } from './critical'
@@ -51,7 +51,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
     onFinished,
     dirStyle = 'flat',
     includeAllRoutes = false,
-    format: buildFormat = 'esm',
+    format = 'esm',
   }: ViteSSGOptions = Object.assign({}, config.ssgOptions || {}, cliOptions)
 
   if (fs.existsSync(ssgOut))
@@ -82,7 +82,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
       minify: false,
       cssCodeSplit: false,
       rollupOptions: {
-        output: buildFormat === 'esm'
+        output: format === 'esm'
           ? {
             entryFileNames: '[name].mjs',
             format: 'esm',
@@ -96,13 +96,13 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
     mode: config.mode,
   })
 
-  const prefix = process.platform === 'win32' ? 'file://' : ''
-  const ext = buildFormat === 'esm' ? '.mjs' : '.cjs'
+  const prefix = format === 'esm' && process.platform === 'win32' ? 'file://' : ''
+  const ext = format === 'esm' ? '.mjs' : '.cjs'
   const serverEntry = join(prefix, ssgOut, parse(ssrEntry).name + ext)
 
   const _require = createRequire(import.meta.url)
 
-  const { createApp }: { createApp: CreateAppFactory } = buildFormat === 'esm'
+  const { createApp }: { createApp: CreateAppFactory } = format === 'esm'
     ? await import(serverEntry)
     : _require(serverEntry)
 
@@ -119,7 +119,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
   const critters = crittersOptions !== false ? await getCritters(outDir, crittersOptions) : undefined
   if (critters)
-    console.log(`${chalk.gray('[vite-ssg]')} ${chalk.blue('Critical CSS generation enabled via `critters`')}`)
+    console.log(`${gray('[vite-ssg]')} ${blue('Critical CSS generation enabled via `critters`')}`)
 
   if (mock) {
     // @ts-ignore
@@ -131,7 +131,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
   let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
   indexHTML = rewriteScripts(indexHTML, script)
 
-  const { renderToString }: typeof import('vue/server-renderer') = buildFormat === 'esm'
+  const { renderToString }: typeof import('vue/server-renderer') = format === 'esm'
     ? await import('vue/server-renderer')
     : _require('vue/server-renderer')
 
@@ -168,7 +168,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
         if (critters)
           transformed = await critters.process(transformed)
 
-        const formatted = await format(transformed, formatting)
+        const formatted = await formatHtml(transformed, formatting)
 
         const relativeRouteFile = `${(route.endsWith('/')
           ? `${route}index`
@@ -181,74 +181,35 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
         await fs.ensureDir(join(out, dirname(filename)))
         await fs.writeFile(join(out, filename), formatted, 'utf-8')
         config.logger.info(
-          `${chalk.dim(`${outDir}/`)}${chalk.cyan(filename.padEnd(15, ' '))}  ${chalk.dim(getSize(formatted))}`,
+          `${dim(`${outDir}/`)}${cyan(filename.padEnd(15, ' '))}  ${dim(getSize(formatted))}`,
         )
       }
       catch (err: any) {
-        throw new Error(`${chalk.gray('[vite-ssg]')} ${chalk.red(`Error on page: ${chalk.cyan(route)}`)}\n${err.stack}`)
+        throw new Error(`${gray('[vite-ssg]')} ${red(`Error on page: ${cyan(route)}`)}\n${err.stack}`)
       }
     }),
   )
 
-  // await fs.remove(ssgOut)
+  await fs.remove(ssgOut)
 
   // when `vite-plugin-pwa` is presented, use it to regenerate SW after rendering
   const pwaPlugin: VitePluginPWAAPI = config.plugins.find(i => i.name === 'vite-plugin-pwa')?.api
-  if (pwaPlugin?.generateSW) {
+  if (pwaPlugin && !pwaPlugin.disabled && pwaPlugin.generateSW) {
     buildLog('Regenerate PWA...')
     await pwaPlugin.generateSW()
   }
 
-  console.log(`\n${chalk.gray('[vite-ssg]')} ${chalk.green('Build finished.')}`)
+  console.log(`\n${gray('[vite-ssg]')} ${green('Build finished.')}`)
 
   await onFinished?.()
 
   // ensure build process always exits
   const waitInSeconds = 15
   const timeout = setTimeout(() => {
-    console.log(`${chalk.gray('[vite-ssg]')} ${chalk.yellow(`Build process still running after ${waitInSeconds}s. There might be something misconfigured in your setup. Force exit.`)}`)
+    console.log(`${gray('[vite-ssg]')} ${yellow(`Build process still running after ${waitInSeconds}s. There might be something misconfigured in your setup. Force exit.`)}`)
     process.exit(0)
   }, waitInSeconds * 1000)
   timeout.unref() // don't wait for timeout
-}
-
-function rewriteScripts(indexHTML: string, mode?: string) {
-  if (!mode || mode === 'sync')
-    return indexHTML
-  return indexHTML.replace(/<script type="module" /g, `<script type="module" ${mode} `)
-}
-
-function renderHTML({ indexHTML, appHTML, initialState }: { indexHTML: string; appHTML: string; initialState: any }) {
-  const stateScript = initialState
-    ? `\n<script>window.__INITIAL_STATE__=${initialState}</script>`
-    : ''
-  return indexHTML
-    .replace(
-      '<div id="app"></div>',
-      `<div id="app" data-server-rendered="true">${appHTML}</div>${stateScript}`,
-    )
-}
-
-async function format(html: string, formatting: ViteSSGOptions['formatting']) {
-  if (formatting === 'minify') {
-    const htmlMinifier = await import('html-minifier')
-    return htmlMinifier.minify(html, {
-      collapseWhitespace: true,
-      caseSensitive: true,
-      collapseInlineTagWhitespace: false,
-      minifyJS: true,
-      minifyCSS: true,
-    })
-  }
-  else if (formatting === 'prettify') {
-    // @ts-ignore
-    const prettier = (await import('prettier/esm/standalone.mjs')).default
-    // @ts-ignore
-    const parserHTML = (await import('prettier/esm/parser-html.mjs')).default
-
-    return prettier.format(html, { semi: false, parser: 'html', plugins: [parserHTML] })
-  }
-  return html
 }
 
 async function detectEntry(root: string) {
@@ -268,4 +229,43 @@ async function resolveAlias(config: ResolvedConfig, entry: string) {
   const resolver = config.createResolver()
   const result = await resolver(entry, config.root)
   return result || join(config.root, entry)
+}
+
+function rewriteScripts(indexHTML: string, mode?: string) {
+  if (!mode || mode === 'sync')
+    return indexHTML
+  return indexHTML.replace(/<script type="module" /g, `<script type="module" ${mode} `)
+}
+
+function renderHTML({ indexHTML, appHTML, initialState }: { indexHTML: string; appHTML: string; initialState: any }) {
+  const stateScript = initialState
+    ? `\n<script>window.__INITIAL_STATE__=${initialState}</script>`
+    : ''
+  return indexHTML
+    .replace(
+      '<div id="app"></div>',
+      `<div id="app" data-server-rendered="true">${appHTML}</div>${stateScript}`,
+    )
+}
+
+async function formatHtml(html: string, formatting: ViteSSGOptions['formatting']) {
+  if (formatting === 'minify') {
+    const htmlMinifier = await import('html-minifier')
+    return htmlMinifier.minify(html, {
+      collapseWhitespace: true,
+      caseSensitive: true,
+      collapseInlineTagWhitespace: false,
+      minifyJS: true,
+      minifyCSS: true,
+    })
+  }
+  else if (formatting === 'prettify') {
+    // @ts-ignore
+    const prettier = (await import('prettier/esm/standalone.mjs')).default
+    // @ts-ignore
+    const parserHTML = (await import('prettier/esm/parser-html.mjs')).default
+
+    return prettier.format(html, { semi: false, parser: 'html', plugins: [parserHTML] })
+  }
+  return html
 }
