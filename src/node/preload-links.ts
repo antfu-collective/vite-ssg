@@ -1,4 +1,4 @@
-import { Manifest } from './build'
+import type { Manifest } from './build'
 
 export function renderPreloadLinks(document: Document, modules: Set<string>, ssrManifest: Manifest) {
   const seen = new Set()

@@ -1,4 +1,4 @@
-import { UserConfig } from 'vite'
+import type { UserConfig } from 'vite'
 import Vue from '@vitejs/plugin-vue'
 
 const config: UserConfig = {

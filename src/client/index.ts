@@ -1,10 +1,12 @@
-import { createSSRApp, Component } from 'vue'
+import type { Component } from 'vue'
+import { createApp as createClientApp, createSSRApp } from 'vue'
 import { createMemoryHistory, createRouter, createWebHistory } from 'vue-router'
-import { createHead, HeadClient } from '@vueuse/head'
+import type { HeadClient } from '@vueuse/head'
+import { createHead } from '@vueuse/head'
 import { deserializeState, serializeState } from '../utils/state'
-import type { RouterOptions, ViteSSGContext, ViteSSGClientOptions } from '../types'
+import { documentReady } from '../utils/document-ready'
+import type { RouterOptions, ViteSSGClientOptions, ViteSSGContext } from '../types'
 import { ClientOnly } from './components/ClientOnly'
-
 export * from '../types'
 
 export function ViteSSG(
@@ -22,7 +24,9 @@ export function ViteSSG(
   const isClient = typeof window !== 'undefined'
 
   async function createApp(client = false, routePath?: string) {
-    const app = createSSRApp(App)
+    const app = client
+      ? createClientApp(App)
+      : createSSRApp(App)
 
     let head: HeadClient | undefined
 
@@ -43,19 +47,31 @@ export function ViteSSG(
     if (registerComponents)
       app.component('ClientOnly', client ? ClientOnly : { render: () => null })
 
+    const appRenderCallbacks: Function[] = []
+    const onSSRAppRendered = client
+      ? () => {}
+      : (cb: Function) => appRenderCallbacks.push(cb)
+    const triggerOnSSRAppRendered = () => {
+      return Promise.all(appRenderCallbacks.map(cb => cb()))
+    }
     const context: ViteSSGContext<true> = {
       app,
       head,
       isClient,
       router,
       routes,
+      onSSRAppRendered,
+      triggerOnSSRAppRendered,
       initialState: {},
+      transformState,
       routePath,
     }
 
-    if (client)
+    if (client) {
+      await documentReady()
       // @ts-ignore
       context.initialState = transformState?.(window.__INITIAL_STATE__ || {}) || deserializeState(window.__INITIAL_STATE__)
+    }
 
     await fn?.(context)
 
@@ -82,8 +98,7 @@ export function ViteSSG(
       context.initialState = router.currentRoute.value.meta.state as Record<string, any> || {}
     }
 
-    // serialize initial state for SSR app for it to be interpolated to output HTML
-    const initialState = transformState?.(context.initialState) || serializeState(context.initialState)
+    const initialState = context.initialState
 
     return {
       ...context,

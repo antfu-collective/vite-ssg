@@ -1,4 +1,4 @@
-import { UserConfig } from 'vite'
+import type { UserConfig } from 'vite'
 import Markdown from 'vite-plugin-md'
 import Pages from 'vite-plugin-pages'
 import Components from 'vite-plugin-components'
