@@ -152,9 +152,9 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
         const ctx: SSRContext = {}
         const appHTML = await renderToString(app, ctx)
-        const transformedAppHTML = (await triggerOnSSRAppRendered?.(route, appHTML, appCtx)) || appHTML
+        await triggerOnSSRAppRendered?.(route, appHTML, appCtx)
         // need to resolve assets so render content first
-        const renderedHTML = renderHTML({ indexHTML: transformedIndexHTML, appHTML: transformedAppHTML, initialState: transformState(initialState) })
+        const renderedHTML = renderHTML({ indexHTML: transformedIndexHTML, appHTML, initialState: transformState(initialState) })
 
         // create jsdom from renderedHTML
         const jsdom = new JSDOM(renderedHTML)
