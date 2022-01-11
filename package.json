@@ -1,6 +1,6 @@
 {
   "name": "vite-ssg",
-  "version": "0.17.5",
+  "version": "0.17.6",
   "description": "Server-side generation for Vite",
   "keywords": [
     "vite",
