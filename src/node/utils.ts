@@ -1,9 +1,9 @@
-import chalk from 'chalk'
-import { RouteRecordRaw } from 'vue-router'
+import { blue, gray, yellow } from 'kolorist'
+import type { RouteRecordRaw } from 'vue-router'
 
 export function buildLog(text: string, count?: number) {
   // eslint-disable-next-line no-console
-  console.log(`\n${chalk.gray('[vite-ssg]')} ${chalk.yellow(text)}${count ? chalk.blue(` (${count})`) : ''}`)
+  console.log(`\n${gray('[vite-ssg]')} ${yellow(text)}${count ? blue(` (${count})`) : ''}`)
 }
 
 export function getSize(str: string) {

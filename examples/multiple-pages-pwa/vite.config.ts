@@ -1,4 +1,4 @@
-import { UserConfig } from 'vite'
+import type { UserConfig } from 'vite'
 import Pages from 'vite-plugin-pages'
 import { VitePWA } from 'vite-plugin-pwa'
 import Vue from '@vitejs/plugin-vue'

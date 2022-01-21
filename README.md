@@ -270,6 +270,25 @@ export default defineConfig({
 })
 ```
 
+### Async Components
+
+Some applications may make use of Vue features that cause components to render asynchronously (e.g. [`suspense`](https://v3.vuejs.org/guide/migration/suspense.html)). When these features are used in ways that can influence `initialState`, the `onSSRAppRendered` may be used in order to ensure that all async operations have finished as part of the initial application render:
+
+```ts
+const { app, router, initialState, isClient, onSSRAppRendered } = ctx;
+
+const pinia = createPinia()
+app.use(pinia)
+
+if (isClient) {
+  pinia.state.value = (initialState.pinia) || {}
+} else {
+  onSSRAppRendered(() => {
+    initialState.pinia = pinia.state.value
+  })
+}
+```
+
 ## Configuration
 
 You can pass options to Vite SSG in the `ssgOptions` field of your `vite.config.js`
@@ -297,9 +316,26 @@ You can use the `includedRoutes` hook to exclude/include route paths to render, 
 export default {
   plugins: [ /*...*/ ],
   ssgOptions: {
-    includedRoutes(routes) {
+    includedRoutes(paths, routes) {
       // exclude all the route paths that contains 'foo'
-      return routes.filter(i => !i.includes('foo'))
+      return paths.filter(i => !i.includes('foo'))
+    }
+  }
+}
+```
+```js
+// vite.config.js
+
+export default {
+  plugins: [ /*...*/ ],
+  ssgOptions: {
+    includedRoutes(paths, routes) {
+      // use original route records
+      return routes.flatMap(route => {
+        return route.name === 'Blog'
+          ? myBlogSlugs.map(slug => `/blog/${slug}`)
+          : route.path
+      })
     }
   }
 }

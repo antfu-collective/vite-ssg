@@ -1,6 +1,6 @@
 /* eslint-disable no-use-before-define */
 import type { App } from 'vue'
-import type { Router, RouteRecordRaw, RouterOptions as VueRouterOptions } from 'vue-router'
+import type { RouteRecordRaw, Router, RouterOptions as VueRouterOptions } from 'vue-router'
 import type { HeadClient } from '@vueuse/head'
 import type { Options as CrittersOptions } from 'critters'
 
@@ -11,6 +11,13 @@ export interface ViteSSGOptions {
    * @default 'sync'
    */
   script?: 'sync' | 'async' | 'defer' | 'async defer'
+
+  /**
+   * Built format
+   *
+   * @default 'esm'
+   */
+  format?: 'esm' | 'cjs'
 
   /**
    * The path of main entry, relative to the project root
@@ -72,7 +79,7 @@ export interface ViteSSGOptions {
    * Default to a handler that filter out all the dynamic routes,
    * when passing your custom handler, you should also take care the dynamic routes yourself.
    */
-  includedRoutes?: (routes: string[]) => Promise<string[]> | string[]
+  includedRoutes?: (paths: string[], routes: RouteRecordRaw[]) => Promise<string[]> | string[]
 
   /**
    * Callback to be called before every page render.
@@ -100,6 +107,9 @@ export interface ViteSSGContext<HasRouter extends boolean = true> {
   initialState: Record<string, any>
   head: HeadClient | undefined
   isClient: boolean
+  onSSRAppRendered(cb: Function): void
+  triggerOnSSRAppRendered(route: string, appHTML: string, appCtx: ViteSSGContext): Promise<unknown[]>
+  transformState?(state: any): any
   /**
    * Current router path on SSG, `undefined` on client side.
    */

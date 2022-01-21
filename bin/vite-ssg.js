@@ -1,3 +1,6 @@
 #!/usr/bin/env node
 'use strict'
-require('../dist/node/cli')
+if (typeof __dirname !== 'undefined')
+  require('../dist/node/cli.cjs')
+else
+  import('../dist/node/cli.mjs')
