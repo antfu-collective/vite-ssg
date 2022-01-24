@@ -19,7 +19,6 @@
   "author": "Anthony Fu <anthonyfu117@hotmail.com>",
   "sideEffects": false,
   "exports": {
-    "./": "./",
     ".": {
       "require": "./dist/index.cjs",
       "import": "./dist/index.mjs",
@@ -69,8 +68,8 @@
     "yargs": "^17.3.1"
   },
   "peerDependencies": {
-    "@vueuse/head": "^0.5.1",
-    "critters": "^0.0.10",
+    "@vueuse/head": "^0.5.0 || ^0.6.0 || ^0.7.0",
+    "critters": "^0.0.16",
     "vite": "^2.0.0",
     "vue": "^3.2.10",
     "vue-router": "^4.0.1"
@@ -81,26 +80,26 @@
     }
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^0.14.2",
+    "@antfu/eslint-config": "^0.16.0",
     "@types/fs-extra": "^9.0.13",
     "@types/html-minifier": "^4.0.2",
     "@types/jsdom": "^16.2.14",
-    "@types/prettier": "^2.4.2",
+    "@types/prettier": "^2.4.3",
     "@types/yargs": "^17.0.8",
-    "@typescript-eslint/eslint-plugin": "^5.8.1",
-    "@vueuse/head": "^0.7.4",
+    "@typescript-eslint/eslint-plugin": "^5.10.0",
+    "@vueuse/head": "^0.7.5",
     "bumpp": "^7.1.1",
-    "critters": "^0.0.15",
-    "eslint": "^8.5.0",
-    "esno": "^0.13.0",
-    "rollup": "^2.62.0",
+    "critters": "^0.0.16",
+    "eslint": "^8.7.0",
+    "esno": "^0.14.0",
+    "rollup": "^2.66.0",
     "standard-version": "^9.3.2",
-    "tsup": "^5.11.9",
-    "typescript": "^4.5.4",
-    "unbuild": "^0.6.7",
-    "vite": "^2.7.10",
-    "vite-plugin-pwa": "^0.11.12",
-    "vue": "^3.2.26",
+    "tsup": "^5.11.11",
+    "typescript": "^4.5.5",
+    "unbuild": "^0.6.8",
+    "vite": "^2.7.13",
+    "vite-plugin-pwa": "^0.11.13",
+    "vue": "^3.2.29",
     "vue-router": "^4.0.12"
   },
   "engines": {
