@@ -16,9 +16,7 @@ import { renderPreloadLinks } from './preload-links'
 import { buildLog, getSize, routesToPaths } from './utils'
 import { getCritters } from './critical'
 
-export interface Manifest {
-  [key: string]: string[]
-}
+export type Manifest = Record<string, string[]>
 
 export type CreateAppFactory = (client: boolean, routePath?: string) => Promise<ViteSSGContext<true> | ViteSSGContext<false>>
 
@@ -124,7 +122,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
     console.log(`${gray('[vite-ssg]')} ${blue('Critical CSS generation enabled via `critters`')}`)
 
   if (mock) {
-    // @ts-ignore
+    // @ts-expect-error dynamic import
     const jsdomGlobal = (await import('./jsdomGlobal')).default
     jsdomGlobal()
   }
@@ -262,9 +260,9 @@ async function formatHtml(html: string, formatting: ViteSSGOptions['formatting']
     })
   }
   else if (formatting === 'prettify') {
-    // @ts-ignore
+    // @ts-expect-error dynamic import
     const prettier = (await import('prettier/esm/standalone.mjs')).default
-    // @ts-ignore
+    // @ts-expect-error dynamic import
     const parserHTML = (await import('prettier/esm/parser-html.mjs')).default
 
     return prettier.format(html, { semi: false, parser: 'html', plugins: [parserHTML] })

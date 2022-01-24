@@ -3,7 +3,7 @@ import { createApp as createClientApp, createSSRApp } from 'vue'
 import type { HeadClient } from '@vueuse/head'
 import { createHead } from '@vueuse/head'
 import type { ViteSSGClientOptions, ViteSSGContext } from '../types'
-import { deserializeState, serializeState } from '../utils/state'
+import { deserializeState } from '../utils/state'
 import { documentReady } from '../utils/document-ready'
 import { ClientOnly } from './components/ClientOnly'
 export * from '../types'
@@ -47,7 +47,7 @@ export function ViteSSG(
 
     if (client) {
       await documentReady()
-      // @ts-ignore
+      // @ts-expect-error global variable
       context.initialState = transformState?.(window.__INITIAL_STATE__ || {}) || deserializeState(window.__INITIAL_STATE__)
     }
 
