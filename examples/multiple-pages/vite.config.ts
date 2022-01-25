@@ -1,7 +1,7 @@
 import type { UserConfig } from 'vite'
 import Markdown from 'vite-plugin-md'
 import Pages from 'vite-plugin-pages'
-import Components from 'vite-plugin-components'
+import Components from 'unplugin-vue-components/vite'
 import Vue from '@vitejs/plugin-vue'
 
 const config: UserConfig = {
@@ -16,7 +16,7 @@ const config: UserConfig = {
       headEnabled: true,
     }),
     Components({
-      customLoaderMatcher: path => path.endsWith('.md'),
+      extensions: ['vue', 'md'],
     }),
   ],
   ssgOptions: {
