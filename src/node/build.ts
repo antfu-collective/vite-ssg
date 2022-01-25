@@ -242,7 +242,7 @@ function renderHTML({ indexHTML, appHTML, initialState }: { indexHTML: string; a
     ? `\n<script>window.__INITIAL_STATE__=${initialState}</script>`
     : ''
   if (!indexHTML.includes('<div id="app"></div>')) {
-    throw new Error(`Could not find '<div id="app"></div>' to replace it with server-side rendered HTML!`)
+    throw new Error(`Could not find '<div id="app"></div>' to replace it with server-side rendered HTML`)
   }
   return indexHTML
     .replace(
