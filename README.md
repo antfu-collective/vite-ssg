@@ -1,6 +1,6 @@
 # Vite SSG
 
-Static-side generation for Vue 3 on Vite.
+Static-site generation for Vue 3 on Vite.
 
 [![NPM version](https://img.shields.io/npm/v/vite-ssg?color=a1b858)](https://www.npmjs.com/package/vite-ssg)
 
@@ -103,7 +103,7 @@ Critical CSS generation will be enabled automatically for you.
 
 ## Initial State
 
-The initial state comprises data that is serialized to your static-side generated HTML that is hydrated in
+The initial state comprises data that is serialized to your server-side generated HTML that is hydrated in
 the browser when accessed. This data can be data fetched from a CDN, an API, etc, and is typically needed
 as soon as the application starts or is accessed for the first time.
 
