@@ -1,6 +1,6 @@
 # Vite SSG
 
-Server-side generation for Vue 3 on Vite.
+Static-site generation for Vue 3 on Vite.
 
 [![NPM version](https://img.shields.io/npm/v/vite-ssg?color=a1b858)](https://www.npmjs.com/package/vite-ssg)
 
@@ -371,4 +371,4 @@ See [Vitesse](https://github.com/antfu/vitesse)
 
 ## License
 
-MIT License © 2020 [Anthony Fu](https://github.com/antfu)
+MIT License © 2020-PRESENT [Anthony Fu](https://github.com/antfu)
