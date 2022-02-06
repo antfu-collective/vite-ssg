@@ -341,6 +341,34 @@ export default {
 }
 ```
 
+Alternatively, you may export the `includedRoutes` hook from your server entry file. This will be necessary if fetching your routes requires the use of environment variables managed by Vite. 
+
+```ts
+// main.ts
+
+import { ViteSSG } from 'vite-ssg'
+import App from './App.vue'
+
+export const createApp = ViteSSG(
+  App,
+  { routes },
+  ({ app, router, initialState }) => {
+    // ...
+  },
+)
+export async function includedRoutes(paths, routes) {
+  // Sensitive key is managed by Vite - this would not be available inside 
+  // vite.config.js as it runs before the environment has been populated.
+  const apiClient = new MyApiClient(import.meta.env.MY_API_KEY) 
+
+  return routes.flatMap(route => {
+    return route.name === 'Blog'
+      ? (await apiClient.fetchBlogSlugs()).map(slug => `/blog/${slug}`)
+      : route.path
+  })
+}
+```
+
 ## Comparsion
 
 ### Use [Vitepress](https://github.com/vuejs/vitepress) when you want:
