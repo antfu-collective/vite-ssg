@@ -361,11 +361,13 @@ export async function includedRoutes(paths, routes) {
   // vite.config.js as it runs before the environment has been populated.
   const apiClient = new MyApiClient(import.meta.env.MY_API_KEY) 
 
-  return routes.flatMap(route => {
-    return route.name === 'Blog'
-      ? (await apiClient.fetchBlogSlugs()).map(slug => `/blog/${slug}`)
-      : route.path
-  })
+  return Promise.all(
+    routes.flatMap(async route => {
+      return route.name === 'Blog'
+        ? (await apiClient.fetchBlogSlugs()).map(slug => `/blog/${slug}`)
+        : route.path
+    })
+  )
 }
 ```
 
