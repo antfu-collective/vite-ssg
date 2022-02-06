@@ -45,7 +45,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
     entry = await detectEntry(root),
     formatting = 'none',
     crittersOptions = {},
-    includedRoutes = DefaultIncludedRoutes,
+    includedRoutes: configIncludedRoutes = DefaultIncludedRoutes,
     onBeforePageRender,
     onPageRendered,
     onFinished,
@@ -102,10 +102,10 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
 
   const _require = createRequire(import.meta.url)
 
-  const { createApp }: { createApp: CreateAppFactory } = format === 'esm'
+  const { createApp, includedRoutes: serverEntryIncludedRoutes }: { createApp: CreateAppFactory; includedRoutes: ViteSSGOptions['includedRoutes'] } = format === 'esm'
     ? await import(serverEntry)
     : _require(serverEntry)
-
+  const includedRoutes = serverEntryIncludedRoutes || configIncludedRoutes
   const { routes } = await createApp(false)
 
   let routesPaths = includeAllRoutes
