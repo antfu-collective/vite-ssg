@@ -1,6 +1,6 @@
 {
   "name": "vite-ssg",
-  "version": "0.17.9",
+  "version": "0.17.10",
   "description": "Server-side generation for Vite",
   "keywords": [
     "vite",
@@ -35,7 +35,9 @@
   "types": "dist/index.d.ts",
   "typesVersions": {
     "*": {
-      "single-page": ["dist/client/single-page.d.ts"]
+      "single-page": [
+        "dist/client/single-page.d.ts"
+      ]
     }
   },
   "files": [
