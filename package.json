@@ -33,6 +33,11 @@
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "single-page": ["dist/client/single-page.d.ts"]
+    }
+  },
   "files": [
     "dist",
     "bin",
@@ -45,7 +50,6 @@
     "dev": "tsup --watch src",
     "lint": "eslint --ext .ts,.js .",
     "copy-readme-files": "esno scripts/copy-readme-files.ts",
-    "copy-single-page-dts": "esno scripts/copy-single-page-dts.ts",
     "example:dev": "npm run copy-readme-files && npm -C examples/multiple-pages run dev",
     "example:build": "npm run copy-readme-files && npm -C examples/multiple-pages run build",
     "example:serve": "npm run copy-readme-files && npm -C examples/multiple-pages run serve",
@@ -55,7 +59,7 @@
     "example:single:dev": "npm -C examples/single-page run dev",
     "example:single:build": "npm -C examples/single-page run build",
     "example:single:serve": "npm -C examples/single-page run serve",
-    "build": "unbuild && npm run copy-single-page-dts",
+    "build": "unbuild",
     "prepublishOnly": "npm run build",
     "release": "npx bumpp --push --tag --commit"
   },
