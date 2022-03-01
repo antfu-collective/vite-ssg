@@ -30,7 +30,7 @@ Static-site generation for Vue 3 on Vite.
 import { ViteSSG } from 'vite-ssg'
 import App from './App.vue'
 
-// `export const createApp` is required
+// `export const createApp` is required instead of the original `createApp(App).mount('#app')`
 export const createApp = ViteSSG(
   // the root component
   App,
@@ -45,11 +45,14 @@ export const createApp = ViteSSG(
 
 ### Single Page SSG
 
-To have SSG for the index page only (without `vue-router`), import from `vite-ssg/single-page` instead.
+To have SSG for the index page only (without `vue-router`), import from `vite-ssg/single-page` instead, and you only need to install `npm i -D vite-ssg @vueuse/head`.
 
 ```ts
+// src/main.ts
 import { ViteSSG } from 'vite-ssg/single-page'
+import App from './App.vue'
 
+// `export const createApp` is required instead of the original `createApp(App).mount('#app')`
 export const createApp = ViteSSG(App)
 ```
 
