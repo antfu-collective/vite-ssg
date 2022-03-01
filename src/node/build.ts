@@ -52,6 +52,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
     dirStyle = 'flat',
     includeAllRoutes = false,
     format = 'esm',
+    rootContainerId = 'app',
   }: ViteSSGOptions = Object.assign({}, config.ssgOptions || {}, cliOptions)
 
   if (fs.existsSync(ssgOut))
@@ -152,7 +153,12 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
         const appHTML = await renderToString(app, ctx)
         await triggerOnSSRAppRendered?.(route, appHTML, appCtx)
         // need to resolve assets so render content first
-        const renderedHTML = await renderHTML({ indexHTML: transformedIndexHTML, appHTML, initialState: transformState(initialState) })
+        const renderedHTML = await renderHTML({
+          rootContainerId,
+          indexHTML: transformedIndexHTML,
+          appHTML,
+          initialState: transformState(initialState),
+        })
 
         // create jsdom from renderedHTML
         const jsdom = new JSDOM(renderedHTML)
@@ -237,21 +243,32 @@ function rewriteScripts(indexHTML: string, mode?: string) {
   return indexHTML.replace(/<script type="module" /g, `<script type="module" ${mode} `)
 }
 
-async function renderHTML({ indexHTML, appHTML, initialState }: { indexHTML: string; appHTML: string; initialState: any }) {
+async function renderHTML({
+  rootContainerId,
+  indexHTML,
+  appHTML,
+  initialState,
+}: {
+  rootContainerId: string
+  indexHTML: string
+  appHTML: string
+  initialState: any
+},
+) {
   const stateScript = initialState
     ? `\n<script>window.__INITIAL_STATE__=${initialState}</script>`
     : ''
-  if (indexHTML.includes('<div id="app"></div>')) {
+  const container = `<div id="${rootContainerId}"></div>`
+  if (indexHTML.includes(container)) {
     return indexHTML
       .replace(
-        '<div id="app"></div>',
-        `<div id="app" data-server-rendered="true">${appHTML}</div>${stateScript}`,
+        container,
+        `<div id="${rootContainerId}" data-server-rendered="true">${appHTML}</div>${stateScript}`,
       )
   }
 
   const html5Parser = await import('html5parser')
   const ast = html5Parser.parse(indexHTML)
-  const idAttributeValue = 'app'
   let renderedOutput: string | undefined
 
   html5Parser.walk(ast, {
@@ -260,7 +277,7 @@ async function renderHTML({ indexHTML, appHTML, initialState }: { indexHTML: str
           && node?.type === html5Parser.SyntaxKind.Tag
           && Array.isArray(node.attributes)
           && node.attributes.length > 0
-          && node.attributes.some(attr => attr.name.value === 'id' && attr.value?.value === idAttributeValue)
+          && node.attributes.some(attr => attr.name.value === 'id' && attr.value?.value === rootContainerId)
       ) {
         const attributesStringified = [...node.attributes.map(({ name: { value: name }, value }) => `${name}="${value!.value}"`)].join(' ')
         const indexHTMLBefore = indexHTML.slice(0, node.start)
@@ -271,7 +288,7 @@ async function renderHTML({ indexHTML, appHTML, initialState }: { indexHTML: str
   })
 
   if (!renderedOutput)
-    throw new Error(`Could not find a tag with id="${idAttributeValue}" to replace it with server-side rendered HTML`)
+    throw new Error(`Could not find a tag with id="${rootContainerId}" to replace it with server-side rendered HTML`)
 
   return renderedOutput
 }

@@ -96,6 +96,13 @@ export interface ViteSSGOptions {
   onPageRendered?: (route: string, renderedHTML: string, appCtx: ViteSSGContext<true>) => Promise<string | null | undefined> | string | null | undefined
 
   onFinished?: () => Promise<void> | void
+
+  /**
+   * The app root container `id`.
+   *
+   * @default `app`
+   */
+  rootContainerId?: string
 }
 
 type PartialKeys<T, Keys extends keyof T> = Omit<T, Keys> & Partial<Pick<T, Keys>>
@@ -120,6 +127,11 @@ export interface ViteSSGClientOptions {
   transformState?: (state: any) => any
   registerComponents?: boolean
   useHead?: boolean
+  /**
+   * The app root container query selector.
+   *
+   * @default `#app`
+   */
   rootContainer?: string | Element
 }
 
