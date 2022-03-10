@@ -123,8 +123,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
     console.log(`${gray('[vite-ssg]')} ${blue('Critical CSS generation enabled via `critters`')}`)
 
   if (mock) {
-    // @ts-expect-error dynamic import
-    const jsdomGlobal = (await import('./jsdomGlobal')).default
+    const jsdomGlobal = _require('./jsdomGlobal').default
     jsdomGlobal()
   }
 
