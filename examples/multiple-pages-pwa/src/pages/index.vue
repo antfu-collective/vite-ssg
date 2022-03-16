@@ -1,6 +1,10 @@
 <template>
-  <router-link to="/nested/deep/a">A</router-link>
-  <router-link to="/b">B</router-link>
+  <router-link to="/nested/deep/a">
+    A
+  </router-link>
+  <router-link to="/b">
+    B
+  </router-link>
 </template>
 
 <script lang="ts">

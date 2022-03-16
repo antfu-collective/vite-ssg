@@ -39,7 +39,7 @@ export const createApp = ViteSSG(
   // function to have custom setups
   ({ app, router, routes, isClient, initialState }) => {
     // install plugins etc.
-  }
+  },
 )
 ```
 
@@ -130,13 +130,14 @@ export const createApp = ViteSSG(
     if (import.meta.env.SSR) {
       // Set initial state during server side
       initialState.data = { cats: 2, dogs: 3 }
-    } else {
+    }
+    else {
       // Restore or read the initial state on the client side in the browser
       console.log(initialState.data) // => { cats: 2, dogs: 3 }
     }
 
     // ...
-  }
+  },
 )
 ```
 
@@ -165,11 +166,10 @@ export const createApp = ViteSSG(
     const pinia = createPinia()
     app.use(pinia)
 
-    if (import.meta.env.SSR) {
+    if (import.meta.env.SSR)
       initialState.pinia = pinia.state.value
-    } else {
+    else
       pinia.state.value = initialState.pinia || {}
-    }
 
     router.beforeEach((to, from, next) => {
       const store = useRootStore(pinia)
@@ -205,11 +205,10 @@ export const createApp = ViteSSG(
   ({ app, router, initialState }) => {
     app.use(store)
 
-    if (import.meta.env.SSR) {
+    if (import.meta.env.SSR)
       initialState.store = store.state
-    } else {
+    else
       store.replaceState(initialState.store)
-    }
 
     router.beforeEach((to, from, next) => {
       // perform the (user-implemented) store action to fill the store's state
@@ -261,7 +260,7 @@ within the package `@nuxt/devalue`, you have to add the following piece of confi
 
 ```ts
 // vite.config.ts
-//...
+// ...
 
 export default defineConfig({
   resolve: {
@@ -278,14 +277,15 @@ export default defineConfig({
 Some applications may make use of Vue features that cause components to render asynchronously (e.g. [`suspense`](https://v3.vuejs.org/guide/migration/suspense.html)). When these features are used in ways that can influence `initialState`, the `onSSRAppRendered` may be used in order to ensure that all async operations have finished as part of the initial application render:
 
 ```ts
-const { app, router, initialState, isClient, onSSRAppRendered } = ctx;
+const { app, router, initialState, isClient, onSSRAppRendered } = ctx
 
 const pinia = createPinia()
 app.use(pinia)
 
 if (isClient) {
   pinia.state.value = (initialState.pinia) || {}
-} else {
+}
+else {
   onSSRAppRendered(() => {
     initialState.pinia = pinia.state.value
   })
@@ -300,10 +300,10 @@ You can pass options to Vite SSG in the `ssgOptions` field of your `vite.config.
 // vite.config.js
 
 export default {
-  plugins: [ /*...*/ ],
+  plugins: [],
   ssgOptions: {
-    script: 'async'
-  }
+    script: 'async',
+  },
 }
 ```
 
@@ -317,30 +317,30 @@ You can use the `includedRoutes` hook to exclude/include route paths to render, 
 // vite.config.js
 
 export default {
-  plugins: [ /*...*/ ],
+  plugins: [],
   ssgOptions: {
     includedRoutes(paths, routes) {
       // exclude all the route paths that contains 'foo'
       return paths.filter(i => !i.includes('foo'))
-    }
-  }
+    },
+  },
 }
 ```
 ```js
 // vite.config.js
 
 export default {
-  plugins: [ /*...*/ ],
+  plugins: [],
   ssgOptions: {
     includedRoutes(paths, routes) {
       // use original route records
-      return routes.flatMap(route => {
+      return routes.flatMap((route) => {
         return route.name === 'Blog'
           ? myBlogSlugs.map(slug => `/blog/${slug}`)
           : route.path
       })
-    }
-  }
+    },
+  },
 }
 ```
 
@@ -360,16 +360,16 @@ export const createApp = ViteSSG(
   },
 )
 export async function includedRoutes(paths, routes) {
-  // Sensitive key is managed by Vite - this would not be available inside 
+  // Sensitive key is managed by Vite - this would not be available inside
   // vite.config.js as it runs before the environment has been populated.
-  const apiClient = new MyApiClient(import.meta.env.MY_API_KEY) 
+  const apiClient = new MyApiClient(import.meta.env.MY_API_KEY)
 
   return Promise.all(
-    routes.flatMap(async route => {
+    routes.flatMap(async(route) => {
       return route.name === 'Blog'
         ? (await apiClient.fetchBlogSlugs()).map(slug => `/blog/${slug}`)
         : route.path
-    })
+    }),
   )
 }
 ```
