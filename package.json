@@ -66,12 +66,12 @@
     "release": "npx bumpp --push --tag --commit"
   },
   "dependencies": {
-    "fs-extra": "^10.0.0",
+    "fs-extra": "^10.0.1",
     "html-minifier": "^4.0.0",
     "html5parser": "^2.0.2",
     "jsdom": "^19.0.0",
     "kolorist": "^1.5.1",
-    "prettier": "^2.5.1",
+    "prettier": "^2.6.0",
     "yargs": "^17.3.1"
   },
   "peerDependencies": {
@@ -87,27 +87,26 @@
     }
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^0.16.0",
+    "@antfu/eslint-config": "^0.18.8",
     "@types/fs-extra": "^9.0.13",
     "@types/html-minifier": "^4.0.2",
     "@types/jsdom": "^16.2.14",
-    "@types/prettier": "^2.4.3",
-    "@types/yargs": "^17.0.8",
-    "@typescript-eslint/eslint-plugin": "^5.10.1",
+    "@types/prettier": "^2.4.4",
+    "@types/yargs": "^17.0.9",
     "@vueuse/head": "^0.7.5",
     "bumpp": "^7.1.1",
     "critters": "^0.0.16",
-    "eslint": "^8.7.0",
-    "esno": "^0.14.0",
-    "rollup": "^2.66.1",
+    "eslint": "^8.11.0",
+    "esno": "^0.14.1",
+    "rollup": "^2.70.1",
     "standard-version": "^9.3.2",
-    "tsup": "^5.11.11",
-    "typescript": "^4.5.5",
-    "unbuild": "^0.6.8",
-    "vite": "^2.7.13",
+    "tsup": "^5.12.1",
+    "typescript": "^4.6.2",
+    "unbuild": "^0.7.0",
+    "vite": "^2.8.6",
     "vite-plugin-pwa": "^0.11.13",
-    "vue": "^3.2.29",
-    "vue-router": "^4.0.12"
+    "vue": "^3.2.31",
+    "vue-router": "^4.0.14"
   },
   "engines": {
     "node": ">=14.0.0"
