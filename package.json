@@ -26,6 +26,11 @@
       "import": "./dist/index.mjs",
       "types": "./dist/index.d.ts"
     },
+    "./node": {
+      "require": "./dist/node.cjs",
+      "import": "./dist/node.mjs",
+      "types": "./dist/node.d.ts"
+    },
     "./single-page": {
       "require": "./dist/client/single-page.cjs",
       "import": "./dist/client/single-page.mjs",
