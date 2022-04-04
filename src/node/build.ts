@@ -3,7 +3,7 @@ import { dirname, isAbsolute, join, parse } from 'path'
 import { createRequire } from 'module'
 import { blue, cyan, dim, gray, green, red, yellow } from 'kolorist'
 import fs from 'fs-extra'
-import type { ResolvedConfig } from 'vite'
+import type { InlineConfig, ResolvedConfig } from 'vite'
 import { resolveConfig, build as viteBuild } from 'vite'
 import type { SSRContext } from 'vue/server-renderer'
 import { JSDOM } from 'jsdom'
@@ -29,9 +29,9 @@ function readJson(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf8'))
 }
 
-export async function build(cliOptions: Partial<ViteSSGOptions> = {}) {
+export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig: InlineConfig = {}) {
   const mode = process.env.MODE || process.env.NODE_ENV || cliOptions.mode || 'production'
-  const config = await resolveConfig({}, 'build', mode)
+  const config = await resolveConfig(viteConfig, 'build', mode)
 
   const cwd = process.cwd()
   const root = config.root || cwd
