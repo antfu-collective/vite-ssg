@@ -50,6 +50,9 @@
     "*": {
       "single-page": [
         "dist/client/single-page.d.ts"
+      ],
+      "node": [
+        "dist/node.d.ts"
       ]
     }
   },
