@@ -4,7 +4,7 @@ import { createRequire } from 'module'
 import { blue, cyan, dim, gray, green, red, yellow } from 'kolorist'
 import fs from 'fs-extra'
 import type { InlineConfig, ResolvedConfig } from 'vite'
-import { resolveConfig, build as viteBuild } from 'vite'
+import { mergeConfig, resolveConfig, build as viteBuild } from 'vite'
 import type { SSRContext } from 'vue/server-renderer'
 import { JSDOM } from 'jsdom'
 import type { RollupOutput } from 'rollup'
@@ -60,7 +60,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
 
   // client
   buildLog('Build for client...')
-  await viteBuild({
+  await viteBuild(mergeConfig(viteConfig, {
     build: {
       ssrManifest: true,
       rollupOptions: {
@@ -70,13 +70,13 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
       },
     },
     mode: config.mode,
-  }) as RollupOutput
+  })) as RollupOutput
 
   // server
   buildLog('Build for server...')
   process.env.VITE_SSG = 'true'
   const ssrEntry = await resolveAlias(config, entry)
-  await viteBuild({
+  await viteBuild(mergeConfig(viteConfig, {
     build: {
       ssr: ssrEntry,
       outDir: ssgOut,
@@ -95,7 +95,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
       },
     },
     mode: config.mode,
-  })
+  }))
 
   const prefix = format === 'esm' && process.platform === 'win32' ? 'file://' : ''
   const ext = format === 'esm' ? '.mjs' : '.cjs'
