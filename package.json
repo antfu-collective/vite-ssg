@@ -17,9 +17,9 @@
     "url": "https://github.com/antfu/vite-ssg"
   },
   "funding": "https://github.com/sponsors/antfu",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "require": "./dist/index.cjs",
@@ -43,7 +43,7 @@
     "*.d.ts"
   ],
   "bin": {
-    "vite-ssg": "./bin/vite-ssg.js"
+    "vite-ssg": "bin/vite-ssg.js"
   },
   "sideEffects": false,
   "typesVersions": {
