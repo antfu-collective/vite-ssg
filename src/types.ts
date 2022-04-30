@@ -103,6 +103,13 @@ export interface ViteSSGOptions {
    * @default `app`
    */
   rootContainerId?: string
+
+  /**
+   * Size of generation processing queue.
+   *
+   * @default 20
+   */
+  concurrency?: number
 }
 
 type PartialKeys<T, Keys extends keyof T> = Omit<T, Keys> & Partial<Pick<T, Keys>>

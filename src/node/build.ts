@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import { dirname, isAbsolute, join, parse } from 'path'
 import { createRequire } from 'module'
+import PQueue from 'p-queue'
 import { blue, cyan, dim, gray, green, red, yellow } from 'kolorist'
 import fs from 'fs-extra'
 import type { InlineConfig, ResolvedConfig } from 'vite'
@@ -52,6 +53,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
     dirStyle = 'flat',
     includeAllRoutes = false,
     format = 'esm',
+    concurrency = 20,
     rootContainerId = 'app',
   }: ViteSSGOptions = Object.assign({}, config.ssgOptions || {}, cliOptions)
 
@@ -135,8 +137,10 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
     ? await import('vue/server-renderer')
     : _require('vue/server-renderer')
 
-  await Promise.all(
-    routesPaths.map(async(route) => {
+  const queue = new PQueue({ concurrency })
+
+  for (const route of routesPaths.slice(0, 1)) {
+    queue.add(async() => {
       try {
         const appCtx = await createApp(false, route) as ViteSSGContext<true>
         const { app, router, head, initialState, triggerOnSSRAppRendered, transformState = serializeState } = appCtx
@@ -192,8 +196,10 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
       catch (err: any) {
         throw new Error(`${gray('[vite-ssg]')} ${red(`Error on page: ${cyan(route)}`)}\n${err.stack}`)
       }
-    }),
-  )
+    })
+  }
+
+  await queue.start().onIdle()
 
   await fs.remove(ssgOut)
 
