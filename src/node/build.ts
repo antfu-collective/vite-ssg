@@ -139,7 +139,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
 
   const queue = new PQueue({ concurrency })
 
-  for (const route of routesPaths.slice(0, 1)) {
+  for (const route of routesPaths) {
     queue.add(async() => {
       try {
         const appCtx = await createApp(false, route) as ViteSSGContext<true>
