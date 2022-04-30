@@ -46,11 +46,13 @@ export default function jsdomGlobal(html = defaultHtml, options = {}) {
     return global.document.destroy
 
   // set a default url if we don't get one - otherwise things explode when we copy localstorage keys
-  if (!('url' in options)) Object.assign(options, { url: 'http://localhost:3000' })
+  if (!('url' in options))
+    Object.assign(options, { url: 'http://localhost:3000' })
 
   // enable pretendToBeVisual by default since react needs
   // window.requestAnimationFrame, see https://github.com/jsdom/jsdom#pretending-to-be-a-visual-browser
-  if (!('pretendToBeVisual' in options)) Object.assign(options, { pretendToBeVisual: true })
+  if (!('pretendToBeVisual' in options))
+    Object.assign(options, { pretendToBeVisual: true })
 
   const jsdom = new JSDOM.JSDOM(html, options)
   const { window } = jsdom

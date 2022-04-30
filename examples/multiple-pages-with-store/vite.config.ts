@@ -18,6 +18,8 @@ const config: UserConfig = {
     }),
     Components({
       extensions: ['vue', 'md'],
+      // allow auto import and register components used in markdown
+      include: [/\.vue$/, /\.vue\?vue/, /\.md$/],
     }),
   ],
   ssgOptions: {

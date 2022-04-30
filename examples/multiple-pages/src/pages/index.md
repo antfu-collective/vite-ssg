@@ -6,14 +6,14 @@ title: Index Page
 
 This is a counter
 
-<counter/>
+<counter />
 
 <br>
 
 Mouse (Client Only):
 
 <client-only>
-  <mouse-pos/>
+  <mouse-pos />
 </client-only>
 
 <router-link to="/a">/a</router-link><br>
