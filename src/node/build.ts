@@ -8,7 +8,6 @@ import type { InlineConfig, ResolvedConfig } from 'vite'
 import { mergeConfig, resolveConfig, build as viteBuild } from 'vite'
 import type { SSRContext } from 'vue/server-renderer'
 import { JSDOM } from 'jsdom'
-import type { RollupOutput } from 'rollup'
 import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
 import type { RouteRecordRaw } from 'vue-router'
 import type { ViteSSGContext, ViteSSGOptions } from '../types'
@@ -72,7 +71,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
       },
     },
     mode: config.mode,
-  })) as RollupOutput
+  }))
 
   // server
   buildLog('Build for server...')
@@ -125,7 +124,8 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
     console.log(`${gray('[vite-ssg]')} ${blue('Critical CSS generation enabled via `critters`')}`)
 
   if (mock) {
-    const jsdomGlobal = _require('./jsdomGlobal').default
+    // @ts-expect-error just ignore it
+    const { jsdomGlobal }: { jsdomGlobal: () => void } = await import('./jsdomGlobal.mjs')
     jsdomGlobal()
   }
 
@@ -137,7 +137,9 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
     ? await import('vue/server-renderer')
     : _require('vue/server-renderer')
 
-  const queue = new PQueue({ concurrency })
+  // @ts-expect-error just ignore it hasn't exports on its package
+  // eslint-disable-next-line new-cap
+  const queue = new PQueue.default({ concurrency })
 
   for (const route of routesPaths) {
     queue.add(async() => {

@@ -9,6 +9,7 @@ const config: UserConfig = {
   ],
   ssgOptions: {
     script: 'async',
+    format: 'cjs',
     formatting: 'prettify',
   },
 }
