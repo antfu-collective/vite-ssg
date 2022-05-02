@@ -36,7 +36,7 @@ const defaultHtml = '<!doctype html><html><head><meta charset="utf-8"></head><bo
 
 const KEYS = []
 
-export default function jsdomGlobal(html = defaultHtml, options = {}) {
+export function jsdomGlobal(html = defaultHtml, options = {}) {
   // Idempotency
   if (global.navigator
     && global.navigator.userAgent
@@ -46,11 +46,13 @@ export default function jsdomGlobal(html = defaultHtml, options = {}) {
     return global.document.destroy
 
   // set a default url if we don't get one - otherwise things explode when we copy localstorage keys
-  if (!('url' in options)) Object.assign(options, { url: 'http://localhost:3000' })
+  if (!('url' in options))
+    Object.assign(options, { url: 'http://localhost:3000' })
 
   // enable pretendToBeVisual by default since react needs
   // window.requestAnimationFrame, see https://github.com/jsdom/jsdom#pretending-to-be-a-visual-browser
-  if (!('pretendToBeVisual' in options)) Object.assign(options, { pretendToBeVisual: true })
+  if (!('pretendToBeVisual' in options))
+    Object.assign(options, { pretendToBeVisual: true })
 
   const jsdom = new JSDOM.JSDOM(html, options)
   const { window } = jsdom
@@ -65,6 +67,7 @@ export default function jsdomGlobal(html = defaultHtml, options = {}) {
     // going to add our jsdom instance, see below
     KEYS.push('$jsdom')
   }
+
   // eslint-disable-next-line no-return-assign
   KEYS.forEach(key => global[key] = window[key])
 
