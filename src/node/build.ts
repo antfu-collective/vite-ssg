@@ -133,9 +133,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
   let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
   indexHTML = rewriteScripts(indexHTML, script)
 
-  const { renderToString }: typeof import('vue/server-renderer') = format === 'esm'
-    ? await import('vue/server-renderer')
-    : _require('vue/server-renderer')
+  const { renderToString }: typeof import('vue/server-renderer') = await import('vue/server-renderer')
 
   // @ts-expect-error just ignore it hasn't exports on its package
   // eslint-disable-next-line new-cap
@@ -203,7 +201,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
 
   await queue.start().onIdle()
 
-  await fs.remove(ssgOut)
+  fs.remove(ssgOut)
 
   // when `vite-plugin-pwa` is presented, use it to regenerate SW after rendering
   const pwaPlugin: VitePluginPWAAPI = config.plugins.find(i => i.name === 'vite-plugin-pwa')?.api
