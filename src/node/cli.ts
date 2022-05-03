@@ -19,7 +19,7 @@ yargs(hideBin(process.argv))
         type: 'boolean',
         describe: 'Mock browser globals (window, document, etc.) for SSG',
       }),
-    async(args) => {
+    async (args) => {
       await build(args)
     },
   )

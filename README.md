@@ -365,7 +365,7 @@ export async function includedRoutes(paths, routes) {
   const apiClient = new MyApiClient(import.meta.env.MY_API_KEY)
 
   return Promise.all(
-    routes.flatMap(async(route) => {
+    routes.flatMap(async (route) => {
       return route.name === 'Blog'
         ? (await apiClient.fetchBlogSlugs()).map(slug => `/blog/${slug}`)
         : route.path

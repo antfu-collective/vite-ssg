@@ -6,14 +6,14 @@
     "serve": "vite preview"
   },
   "dependencies": {
-    "pinia": "^2.0.12",
-    "vue": "^3.2.31"
+    "pinia": "^2.0.13",
+    "vue": "^3.2.33"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^2.2.4",
+    "@vitejs/plugin-vue": "^2.3.1",
     "cross-env": "^7.0.3",
-    "typescript": "^4.6.2",
-    "vite": "^2.8.6",
+    "typescript": "^4.6.4",
+    "vite": "^2.9.7",
     "vite-ssg": "workspace:*"
   }
 }

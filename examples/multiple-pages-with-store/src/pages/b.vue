@@ -1,11 +1,3 @@
-<template>
-  <p>Hello I am B</p>
-  <img src="../assets/test.jpg" alt="">
-  <pre>
-    {{ JSON.stringify(user) }}
-  </pre>
-</template>
-
 <script lang="ts">
 import { computed } from 'vue'
 import { useHead } from '@vueuse/head'
@@ -40,3 +32,11 @@ export default {
   },
 }
 </script>
+
+<template>
+  <p>Hello I am B</p>
+  <img src="../assets/test.jpg" alt="">
+  <pre>
+    {{ JSON.stringify(user) }}
+  </pre>
+</template>

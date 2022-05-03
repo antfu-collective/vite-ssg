@@ -1,12 +1,3 @@
-<template>
-  <router-link to="/nested/deep/a">
-    A
-  </router-link>
-  <router-link to="/b">
-    B
-  </router-link>
-</template>
-
 <script lang="ts">
 import { useHead } from '@vueuse/head'
 
@@ -18,3 +9,12 @@ export default {
   },
 }
 </script>
+
+<template>
+  <router-link to="/nested/deep/a">
+    A
+  </router-link>
+  <router-link to="/b">
+    B
+  </router-link>
+</template>

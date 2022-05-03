@@ -63,7 +63,7 @@ export function ViteSSG(
   }
 
   if (isClient) {
-    (async() => {
+    (async () => {
       const { app } = await createApp(true)
       app.mount(rootContainer, true)
     })()

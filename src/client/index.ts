@@ -107,7 +107,7 @@ export function ViteSSG(
   }
 
   if (isClient) {
-    (async() => {
+    (async () => {
       const { app, router } = await createApp(true)
       // wait until page component is fetched before mounting
       await router.isReady()

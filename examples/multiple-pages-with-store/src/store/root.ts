@@ -16,7 +16,8 @@ export const useRootStore = defineStore({
   },
   actions: {
     initialize() {
-      if (this.isReady) return
+      if (this.isReady)
+        return
 
       // eslint-disable-next-line no-console
       console.log('Initialize user ...')

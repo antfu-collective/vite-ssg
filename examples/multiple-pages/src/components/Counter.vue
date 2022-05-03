@@ -1,3 +1,11 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const props = defineProps<{ init?: number }>()
+
+const counter = ref(props.init || 0)
+</script>
+
 <template>
   <div class="counter">
     <div>Counter: {{ counter }}</div>
@@ -9,14 +17,6 @@
     </button>
   </div>
 </template>
-
-<script setup lang="ts">
-import { ref } from 'vue'
-
-const props = defineProps<{ init?: number }>()
-
-const counter = ref(props.init || 0)
-</script>
 
 <style scoped>
 .counter {

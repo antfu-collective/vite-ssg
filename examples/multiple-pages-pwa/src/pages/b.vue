@@ -1,7 +1,3 @@
-<template>
-  <p>Hello I am B</p>
-</template>
-
 <script lang="ts">
 import { useHead } from '@vueuse/head'
 
@@ -24,3 +20,7 @@ export default {
   },
 }
 </script>
+
+<template>
+  <p>Hello I am B</p>
+</template>

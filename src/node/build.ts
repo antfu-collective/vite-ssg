@@ -86,13 +86,13 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
       rollupOptions: {
         output: format === 'esm'
           ? {
-            entryFileNames: '[name].mjs',
-            format: 'esm',
-          }
+              entryFileNames: '[name].mjs',
+              format: 'esm',
+            }
           : {
-            entryFileNames: '[name].cjs',
-            format: 'cjs',
-          },
+              entryFileNames: '[name].cjs',
+              format: 'cjs',
+            },
       },
     },
     mode: config.mode,
@@ -140,7 +140,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
   const queue = new PQueue.default({ concurrency })
 
   for (const route of routesPaths) {
-    queue.add(async() => {
+    queue.add(async () => {
       try {
         const appCtx = await createApp(false, route) as ViteSSGContext<true>
         const { app, router, head, initialState, triggerOnSSRAppRendered, transformState = serializeState } = appCtx
