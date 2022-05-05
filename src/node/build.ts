@@ -73,6 +73,13 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
     mode: config.mode,
   }))
 
+  // load jsdom before building the SSR and so jsdom will be available
+  if (mock) {
+    // @ts-expect-error just ignore it
+    const { jsdomGlobal }: { jsdomGlobal: () => void } = await import('./jsdomGlobal.mjs')
+    jsdomGlobal()
+  }
+
   // server
   buildLog('Build for server...')
   process.env.VITE_SSG = 'true'
@@ -122,12 +129,6 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
   const critters = crittersOptions !== false ? await getCritters(outDir, crittersOptions) : undefined
   if (critters)
     console.log(`${gray('[vite-ssg]')} ${blue('Critical CSS generation enabled via `critters`')}`)
-
-  if (mock) {
-    // @ts-expect-error just ignore it
-    const { jsdomGlobal }: { jsdomGlobal: () => void } = await import('./jsdomGlobal.mjs')
-    jsdomGlobal()
-  }
 
   const ssrManifest: Manifest = JSON.parse(await fs.readFile(join(out, 'ssr-manifest.json'), 'utf-8'))
   let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
