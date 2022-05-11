@@ -14,26 +14,38 @@ export function routesToPaths(routes?: RouteRecordRaw[]) {
   if (!routes)
     return ['/']
 
-  const paths: Set<string> = new Set()
+    const pathsSet = new Set();
 
-  const getPaths = (routes: RouteRecordRaw[], prefix = '') => {
-    // remove trailing slash
-    prefix = prefix.replace(/\/$/g, '')
-    for (const route of routes) {
-      let path = route.path
-      // check for leading slash
-      if (route.path) {
-        path = prefix && !route.path.startsWith('/')
-          ? `${prefix}/${route.path}`
-          : route.path
-
-        paths.add(path)
-      }
-      if (Array.isArray(route.children))
-        getPaths(route.children, path)
-    }
-  }
-
-  getPaths(routes)
-  return [...paths]
+    const getPath:string = (prefix: string, path: string) => (prefix && !path.startsWith('/')
+      ? `${prefix}/${path}` : path);
+  
+    const pathWitPrefix:string[] = (prefixes:string[], paths:string[]) => paths
+      .flatMap((path:string) => prefixes
+        .map((prefix:string) => getPath(prefix, path)));
+  
+    const getPaths = (routes:RouteRecordRaw[], prefixes:string[] = ['']) => {
+      const tempPrefixes:string[] = prefixes.map((prefix:string) => prefix.replace(/\/$/g, ''));
+  
+      routes.forEach((route:RouteRecordRaw) => {
+        const generatedPaths:string[] = [];
+  
+        if (route.path) {
+          generatedPaths.push(...pathWitPrefix(tempPrefixes, [route.path]));
+        }
+  
+        if (Array.isArray(route.alias)) {
+          generatedPaths.push(...pathWitPrefix(tempPrefixes, route.alias));
+        }
+  
+        generatedPaths.forEach((generatedPath) => pathsSet.add(generatedPath));
+  
+        if (Array.isArray(route.children)) {
+          getPaths(route.children, generatedPaths);
+        }
+      });
+    };
+  
+    getPaths(allRoutes);
+  
+    return [...pathsSet];
 }
