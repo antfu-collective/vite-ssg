@@ -402,6 +402,10 @@ See [Vitesse](https://github.com/antfu/vitesse)
 - [vue3-vite-ssr-example](https://github.com/tbgse/vue3-vite-ssr-example)
 - [vite-ssr](https://github.com/frandiox/vite-ssr)
 
+## Contribution
+
+Please refer to https://github.com/antfu/contribute
+
 ## License
 
 MIT License © 2020-PRESENT [Anthony Fu](https://github.com/antfu)
