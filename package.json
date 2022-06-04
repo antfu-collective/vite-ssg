@@ -1,6 +1,6 @@
 {
   "name": "vite-ssg",
-  "version": "0.20.0",
+  "version": "0.20.1",
   "packageManager": "pnpm@7.1.7",
   "description": "Server-side generation for Vite",
   "keywords": [
