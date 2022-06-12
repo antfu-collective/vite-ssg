@@ -91,7 +91,7 @@ export function ViteSSG(
     })
 
     if (!client) {
-      const route = context.routePath ?? routerOptions.base ?? '/'
+      const route = context.routePath ?? '/'
       router.push(route)
 
       await router.isReady()
