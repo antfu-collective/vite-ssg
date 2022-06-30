@@ -1,5 +1,5 @@
 import type { UserConfig } from 'vite'
-import Markdown from 'vite-plugin-md'
+import Markdown from 'vite-plugin-vue-markdown'
 import Pages from 'vite-plugin-pages'
 import Components from 'unplugin-vue-components/vite'
 import Vue from '@vitejs/plugin-vue'

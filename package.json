@@ -1,52 +1,44 @@
 {
   "name": "vite-ssg",
   "version": "0.20.1",
-  "packageManager": "pnpm@7.1.7",
+  "packageManager": "pnpm@7.4.0",
   "description": "Server-side generation for Vite",
+  "author": "Anthony Fu <anthonyfu117@hotmail.com>",
+  "license": "MIT",
+  "funding": "https://github.com/sponsors/antfu",
+  "homepage": "https://github.com/antfu/vite-ssg",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/antfu/vite-ssg"
+  },
+  "bugs": "https://github.com/antfu/vite-ssg/issues",
   "keywords": [
     "vite",
     "vite-plugin",
     "ssg",
     "ssr"
   ],
-  "homepage": "https://github.com/antfu/vite-ssg",
-  "bugs": "https://github.com/antfu/vite-ssg/issues",
-  "license": "MIT",
-  "author": "Anthony Fu <anthonyfu117@hotmail.com>",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/antfu/vite-ssg"
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.mjs"
+    },
+    "./node": {
+      "types": "./dist/node.d.ts",
+      "require": "./dist/node.cjs",
+      "import": "./dist/node.mjs"
+    },
+    "./single-page": {
+      "types": "./dist/client/single-page.d.ts",
+      "require": "./dist/client/single-page.cjs",
+      "import": "./dist/client/single-page.mjs"
+    }
   },
-  "funding": "https://github.com/sponsors/antfu",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.mjs",
-      "types": "./dist/index.d.ts"
-    },
-    "./node": {
-      "require": "./dist/node.cjs",
-      "import": "./dist/node.mjs",
-      "types": "./dist/node.d.ts"
-    },
-    "./single-page": {
-      "require": "./dist/client/single-page.cjs",
-      "import": "./dist/client/single-page.mjs",
-      "types": "./dist/client/single-page.d.ts"
-    }
-  },
-  "files": [
-    "dist",
-    "bin",
-    "*.d.ts"
-  ],
-  "bin": {
-    "vite-ssg": "bin/vite-ssg.js"
-  },
-  "sideEffects": false,
   "typesVersions": {
     "*": {
       "single-page": [
@@ -56,6 +48,17 @@
         "dist/node.d.ts"
       ]
     }
+  },
+  "bin": {
+    "vite-ssg": "bin/vite-ssg.js"
+  },
+  "files": [
+    "dist",
+    "bin",
+    "*.d.ts"
+  ],
+  "engines": {
+    "node": ">=14.0.0"
   },
   "scripts": {
     "dev": "tsup --watch src",
@@ -75,7 +78,7 @@
     "example:single:serve": "npm -C examples/single-page run serve",
     "build": "unbuild",
     "prepublishOnly": "npm run build",
-    "release": "npx bumpp --push --tag --commit"
+    "release": "bumpp"
   },
   "peerDependencies": {
     "@vueuse/head": "^0.5.0 || ^0.6.0 || ^0.7.0",
@@ -93,35 +96,31 @@
     "fs-extra": "^10.1.0",
     "html-minifier": "^4.0.0",
     "html5parser": "^2.0.2",
-    "jsdom": "^19.0.0",
+    "jsdom": "^20.0.0",
     "kolorist": "^1.5.1",
     "p-queue": "6.6.2",
-    "prettier": "^2.6.2",
-    "yargs": "^17.4.1"
+    "prettier": "^2.7.1",
+    "yargs": "^17.5.1"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^0.23.0",
+    "@antfu/eslint-config": "^0.25.2",
     "@types/fs-extra": "^9.0.13",
     "@types/html-minifier": "^4.0.2",
     "@types/jsdom": "^16.2.14",
-    "@types/prettier": "^2.6.0",
+    "@types/prettier": "^2.6.3",
     "@types/yargs": "^17.0.10",
     "@vueuse/head": "^0.7.6",
-    "bumpp": "^7.1.1",
+    "bumpp": "^8.2.1",
     "critters": "^0.0.16",
-    "eslint": "^8.14.0",
-    "esno": "^0.14.1",
-    "rollup": "^2.71.1",
-    "standard-version": "^9.3.2",
-    "tsup": "^5.12.6",
-    "typescript": "^4.6.4",
+    "eslint": "^8.18.0",
+    "esno": "^0.16.3",
+    "rollup": "^2.75.7",
+    "tsup": "^6.1.2",
+    "typescript": "^4.7.4",
     "unbuild": "^0.7.4",
-    "vite": "^2.9.7",
-    "vite-plugin-pwa": "^0.12.0",
-    "vue": "^3.2.33",
-    "vue-router": "^4.0.14"
-  },
-  "engines": {
-    "node": ">=14.0.0"
+    "vite": "^2.9.13",
+    "vite-plugin-pwa": "^0.12.1",
+    "vue": "^3.2.37",
+    "vue-router": "^4.0.16"
   }
 }
