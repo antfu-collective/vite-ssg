@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { dirname, isAbsolute, join, parse } from 'path'
 import { createRequire } from 'module'
-import PQueue from 'p-queue'
+import { default as PQueue } from 'p-queue'
 import { blue, cyan, dim, gray, green, red, yellow } from 'kolorist'
 import fs from 'fs-extra'
 import type { InlineConfig, ResolvedConfig } from 'vite'
@@ -27,6 +27,18 @@ function DefaultIncludedRoutes(paths: string[], routes: RouteRecordRaw[]) {
 
 function readJson(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf8'))
+}
+
+function getRouteFileName(route: string, dirStyle: ViteSSGOptions["dirStyle"], out: string): string {
+  const relativeRouteFile = `${(route.endsWith('/')
+  ? `${route}index`
+  : route).replace(/^\//g, '')}.html`
+
+  const filename = dirStyle === 'nested'
+    ? join(route.replace(/^\//g, ''), 'index.html')
+    : relativeRouteFile
+
+  return join(out, filename);
 }
 
 export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig: InlineConfig = {}) {
@@ -58,20 +70,6 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
 
   if (fs.existsSync(ssgOut))
     await fs.remove(ssgOut)
-
-  // client
-  buildLog('Build for client...')
-  await viteBuild(mergeConfig(viteConfig, {
-    build: {
-      ssrManifest: true,
-      rollupOptions: {
-        input: {
-          app: join(root, './index.html'),
-        },
-      },
-    },
-    mode: config.mode,
-  }))
 
   // load jsdom before building the SSR and so jsdom will be available
   if (mock) {
@@ -124,38 +122,79 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
   // uniq
   routesPaths = Array.from(new Set(routesPaths))
 
-  buildLog('Rendering Pages...', routesPaths.length)
+  buildLog('Rendering SSR app for each route...', routesPaths.length)
 
   const critters = crittersOptions !== false ? await getCritters(outDir, crittersOptions) : undefined
   if (critters)
     console.log(`${gray('[vite-ssg]')} ${blue('Critical CSS generation enabled via `critters`')}`)
 
-  const ssrManifest: Manifest = JSON.parse(await fs.readFile(join(out, 'ssr-manifest.json'), 'utf-8'))
-  let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
-  indexHTML = rewriteScripts(indexHTML, script)
-
   const { renderToString }: typeof import('vue/server-renderer') = await import('vue/server-renderer')
 
-  // @ts-expect-error just ignore it hasn't exports on its package
-  // eslint-disable-next-line new-cap
-  const queue = new PQueue.default({ concurrency })
+  const appRenderQueue = new PQueue({ concurrency })
+
+  // First we want to render the SSR app for all routes.
+  const appRenderResults : {filename: string, route: string, ctx: SSRContext, appCtx: ViteSSGContext<true> }[] = [];
 
   for (const route of routesPaths) {
-    queue.add(async () => {
+    appRenderQueue.add(async () => {
       try {
         const appCtx = await createApp(false, route) as ViteSSGContext<true>
-        const { app, router, head, initialState, triggerOnSSRAppRendered, transformState = serializeState } = appCtx
+        const { app, router, triggerOnSSRAppRendered } = appCtx
 
         if (router) {
           await router.push(route)
           await router.isReady()
         }
 
-        const transformedIndexHTML = (await onBeforePageRender?.(route, indexHTML, appCtx)) || indexHTML
-
         const ctx: SSRContext = {}
         const appHTML = await renderToString(app, ctx)
         await triggerOnSSRAppRendered?.(route, appHTML, appCtx)
+
+        const filename = getRouteFileName(route, dirStyle, ssgOut)
+
+        // Write file to keep memory usage down
+        await fs.ensureDir(dirname(filename))
+        await fs.writeFile(filename, appHTML, 'utf-8')
+
+        appRenderResults.push({ filename, route, ctx, appCtx })
+      }
+      catch (err: any) {
+        throw new Error(`${gray('[vite-ssg]')} ${red(`Error rendering SSR app: ${cyan(route)}`)}\n${err.stack}`)
+      }
+    })
+  }
+
+  await appRenderQueue.start().onIdle()
+
+  // Now that the SSR apps have run (which may have created client assets), we can run the client build. 
+  buildLog('Build for client...')
+  await viteBuild(mergeConfig(viteConfig, {
+    build: {
+      ssrManifest: true,
+      rollupOptions: {
+        input: {
+          app: join(root, './index.html'),
+        },
+      },
+    },
+    mode: config.mode,
+  }))
+
+  const ssrManifest: Manifest = JSON.parse(await fs.readFile(join(out, 'ssr-manifest.json'), 'utf-8'))
+  let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
+  indexHTML = rewriteScripts(indexHTML, script)
+
+  const htmlTransformQueue = new PQueue({ concurrency })
+
+  buildLog('Apply HTML transformations...')
+
+  htmlTransformQueue.addAll(appRenderResults.map(({route, filename, appCtx, ctx }) =>
+    async () => {
+      try {
+        const { head, initialState, transformState = serializeState } = appCtx
+        const appHTML = (await fs.readFile(filename)).toString('utf-8')
+
+        const transformedIndexHTML = (await onBeforePageRender?.(route, indexHTML, appCtx)) || indexHTML
         // need to resolve assets so render content first
         const renderedHTML = await renderHTML({
           rootContainerId,
@@ -180,27 +219,21 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
 
         const formatted = await formatHtml(transformed, formatting)
 
-        const relativeRouteFile = `${(route.endsWith('/')
-          ? `${route}index`
-          : route).replace(/^\//g, '')}.html`
+        const outFilename = getRouteFileName(route, dirStyle, out)
+        await fs.ensureDir(dirname(outFilename))
+        await fs.writeFile(outFilename, formatted, 'utf-8')
 
-        const filename = dirStyle === 'nested'
-          ? join(route.replace(/^\//g, ''), 'index.html')
-          : relativeRouteFile
-
-        await fs.ensureDir(join(out, dirname(filename)))
-        await fs.writeFile(join(out, filename), formatted, 'utf-8')
         config.logger.info(
           `${dim(`${outDir}/`)}${cyan(filename.padEnd(15, ' '))}  ${dim(getSize(formatted))}`,
         )
       }
       catch (err: any) {
-        throw new Error(`${gray('[vite-ssg]')} ${red(`Error on page: ${cyan(route)}`)}\n${err.stack}`)
+        throw new Error(`${gray('[vite-ssg]')} ${red(`Error transforming HTML: ${cyan(route)}`)}\n${err.stack}`)
       }
-    })
-  }
+    }
+  ))
 
-  await queue.start().onIdle()
+  await htmlTransformQueue.start().onIdle()
 
   await fs.remove(ssgOut)
 
