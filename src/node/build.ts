@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { dirname, isAbsolute, join, parse } from 'path'
 import { createRequire } from 'module'
-import { default as PQueue } from 'p-queue'
+import PQueue from 'p-queue'
 import { blue, cyan, dim, gray, green, red, yellow } from 'kolorist'
 import fs from 'fs-extra'
 import type { InlineConfig, ResolvedConfig } from 'vite'
@@ -129,8 +129,9 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
     console.log(`${gray('[vite-ssg]')} ${blue('Critical CSS generation enabled via `critters`')}`)
 
   const { renderToString }: typeof import('vue/server-renderer') = await import('vue/server-renderer')
-
-  const appRenderQueue = new PQueue({ concurrency })
+  // @ts-expect-error just ignore it hasn't exports on its package
+  // eslint-disable-next-line new-cap
+  const appRenderQueue = new PQueue.default({ concurrency })
 
   // First we want to render the SSR app for all routes.
   const appRenderResults : {filename: string, route: string, ctx: SSRContext, appCtx: ViteSSGContext<true> }[] = [];
@@ -183,8 +184,9 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
   const ssrManifest: Manifest = JSON.parse(await fs.readFile(join(out, 'ssr-manifest.json'), 'utf-8'))
   let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
   indexHTML = rewriteScripts(indexHTML, script)
-
-  const htmlTransformQueue = new PQueue({ concurrency })
+  // @ts-expect-error just ignore it hasn't exports on its package
+  // eslint-disable-next-line new-cap
+  const htmlTransformQueue = new PQueue.default({ concurrency })
 
   buildLog('Apply HTML transformations...')
 
