@@ -146,7 +146,7 @@ Typically, you will use this with an application store, such as
 For examples, see below:
 
 <details><summary>When using Pinia</summary>
-<p>
+
 Following [Pinia's guide](https://pinia.esm.dev/ssr), you will to adapt your `main.{ts,js}` file to look
 like this:
 
@@ -181,7 +181,7 @@ export const createApp = ViteSSG(
   },
 )
 ```
-</p></details>
+</details>
 
 <details><summary>When using Vuex</summary>
 <p>
