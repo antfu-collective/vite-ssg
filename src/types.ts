@@ -78,7 +78,7 @@ export interface ViteSSGOptions {
    * Default to a handler that filter out all the dynamic routes,
    * when passing your custom handler, you should also take care the dynamic routes yourself.
    */
-  includedRoutes?: (paths: string[], routes: RouteRecordRaw[]) => Promise<string[]> | string[]
+  includedRoutes?: (paths: string[], routes: Readonly<RouteRecordRaw[]>) => Promise<string[]> | string[]
 
   /**
    * Callback to be called before every page render.
@@ -116,7 +116,7 @@ type PartialKeys<T, Keys extends keyof T> = Omit<T, Keys> & Partial<Pick<T, Keys
 export interface ViteSSGContext<HasRouter extends boolean = true> {
   app: App<Element>
   router: HasRouter extends true ? Router : undefined
-  routes: HasRouter extends true ? RouteRecordRaw[] : undefined
+  routes: HasRouter extends true ? Readonly<RouteRecordRaw[]> : undefined
   initialState: Record<string, any>
   head: HeadClient | undefined
   isClient: boolean
