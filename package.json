@@ -76,9 +76,10 @@
     "example:single:dev": "npm -C examples/single-page run dev",
     "example:single:build": "npm -C examples/single-page run build",
     "example:single:serve": "npm -C examples/single-page run serve",
-    "test": "pnpm -r --filter=./examples/* build",
+    "test": "pnpm -r --filter=./examples/* build && vitest run",
     "build": "unbuild",
     "prepublishOnly": "npm run build",
+    "typecheck": "vue-tsc --noEmit",
     "release": "bumpp"
   },
   "peerDependencies": {
@@ -115,13 +116,16 @@
     "critters": "^0.0.16",
     "eslint": "^8.21.0",
     "esno": "^0.16.3",
+    "fast-glob": "^3.2.11",
     "rollup": "^2.77.2",
     "tsup": "^6.2.1",
     "typescript": "^4.7.4",
     "unbuild": "^0.7.6",
     "vite": "^3.0.4",
     "vite-plugin-pwa": "^0.12.3",
+    "vitest": "^0.21.0",
     "vue": "^3.2.37",
-    "vue-router": "^4.1.3"
+    "vue-router": "^4.1.3",
+    "vue-tsc": "^0.39.5"
   }
 }
