@@ -20,7 +20,7 @@ export type Manifest = Record<string, string[]>
 
 export type CreateAppFactory = (client: boolean, routePath?: string) => Promise<ViteSSGContext<true> | ViteSSGContext<false>>
 
-function DefaultIncludedRoutes(paths: string[], routes: RouteRecordRaw[]) {
+function DefaultIncludedRoutes(paths: string[], routes: Readonly<RouteRecordRaw[]>) {
   // ignore dynamic routes
   return paths.filter(i => !i.includes(':') && !i.includes('*'))
 }
