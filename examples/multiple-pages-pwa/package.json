@@ -1,6 +1,6 @@
 {
-  "private": true,
   "type": "module",
+  "private": true,
   "scripts": {
     "dev": "cross-env DEBUG=vite-ssg:* vite",
     "build": "cross-env DEBUG=vite-ssg:* vite-ssg build",
