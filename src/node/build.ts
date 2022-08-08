@@ -29,7 +29,7 @@ function readJson(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf8'))
 }
 
-function getRouteFileName(route: string, dirStyle: ViteSSGOptions["dirStyle"], out: string): string {
+function getRouteFileName(route: string, dirStyle: ViteSSGOptions['dirStyle'], out: string): string {
   const relativeRouteFile = `${(route.endsWith('/')
   ? `${route}index`
   : route).replace(/^\//g, '')}.html`
@@ -38,7 +38,7 @@ function getRouteFileName(route: string, dirStyle: ViteSSGOptions["dirStyle"], o
     ? join(route.replace(/^\//g, ''), 'index.html')
     : relativeRouteFile
 
-  return join(out, filename);
+  return join(out, filename)
 }
 
 export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig: InlineConfig = {}) {
@@ -134,7 +134,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
   const appRenderQueue = new PQueue.default({ concurrency })
 
   // First we want to render the SSR app for all routes.
-  const appRenderResults : {filename: string, route: string, ctx: SSRContext, appCtx: ViteSSGContext<true> }[] = [];
+  const appRenderResults: { filename: string; route: string; ctx: SSRContext; appCtx: ViteSSGContext<true> }[] = []
 
   for (const route of routesPaths) {
     appRenderQueue.add(async () => {
@@ -167,7 +167,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
 
   await appRenderQueue.start().onIdle()
 
-  // Now that the SSR apps have run (which may have created client assets), we can run the client build. 
+  // Now that the SSR apps have run (which may have created client assets), we can run the client build.
   buildLog('Build for client...')
   await viteBuild(mergeConfig(viteConfig, {
     build: {
@@ -190,7 +190,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
 
   buildLog('Apply HTML transformations...')
 
-  htmlTransformQueue.addAll(appRenderResults.map(({route, filename, appCtx, ctx }) =>
+  htmlTransformQueue.addAll(appRenderResults.map(({ route, filename, appCtx, ctx }) =>
     async () => {
       try {
         const { head, initialState, transformState = serializeState } = appCtx
@@ -232,7 +232,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
       catch (err: any) {
         throw new Error(`${gray('[vite-ssg]')} ${red(`Error transforming HTML: ${cyan(route)}`)}\n${err.stack}`)
       }
-    }
+    },
   ))
 
   await htmlTransformQueue.start().onIdle()
