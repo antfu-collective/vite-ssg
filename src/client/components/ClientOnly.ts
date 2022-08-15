@@ -6,7 +6,10 @@ export const ClientOnly = defineComponent({
     onMounted(() => (mounted.value = true))
 
     return () => {
-      return mounted.value && slots.default && slots.default({})
+      if (!mounted.value)
+        return slots.placeholder && slots.placeholder({})
+
+      return slots.default && slots.default({})
     }
   },
 })

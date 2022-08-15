@@ -63,6 +63,9 @@ Component `ClientOnly` is registered globally along with the app creation.
 ```html
 <client-only>
   <your-client-side-components />
+  <template #placeholder>
+    <your-placeholder-components />
+  </template>
 </client-only>
 ```
 
