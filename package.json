@@ -92,6 +92,9 @@
   "peerDependenciesMeta": {
     "critters": {
       "optional": true
+    },
+    "vue-router": {
+      "optional": true
     }
   },
   "dependencies": {
