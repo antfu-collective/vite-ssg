@@ -45,7 +45,7 @@ export function ViteSSG(
     const { routes } = routerOptions
 
     if (registerComponents)
-      app.component('ClientOnly', client ? ClientOnly : { render: () => null })
+      app.component('ClientOnly', ClientOnly)
 
     const appRenderCallbacks: Function[] = []
     const onSSRAppRendered = client

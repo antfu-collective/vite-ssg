@@ -43,7 +43,7 @@ export function ViteSSG(
     const context = { app, head, isClient, router: undefined, routes: undefined, initialState: {}, onSSRAppRendered, triggerOnSSRAppRendered, transformState }
 
     if (registerComponents)
-      app.component('ClientOnly', client ? ClientOnly : { render: () => null })
+      app.component('ClientOnly', ClientOnly)
 
     if (client) {
       await documentReady()
