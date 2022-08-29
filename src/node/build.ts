@@ -136,9 +136,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
 
   const { renderToString }: typeof import('vue/server-renderer') = await import('vue/server-renderer')
 
-  // @ts-expect-error just ignore it hasn't exports on its package
-  // eslint-disable-next-line new-cap
-  const queue = new PQueue.default({ concurrency })
+  const queue = new PQueue({ concurrency })
 
   for (const route of routesPaths) {
     queue.add(async () => {

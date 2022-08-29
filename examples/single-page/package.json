@@ -7,14 +7,14 @@
     "serve": "vite preview"
   },
   "dependencies": {
-    "pinia": "^2.0.17",
+    "pinia": "^2.0.21",
     "vue": "^3.2.37"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^3.0.1",
+    "@vitejs/plugin-vue": "^3.0.3",
     "cross-env": "^7.0.3",
-    "typescript": "^4.7.4",
-    "vite": "^3.0.4",
+    "typescript": "^4.8.2",
+    "vite": "^3.0.9",
     "vite-ssg": "workspace:*"
   }
 }

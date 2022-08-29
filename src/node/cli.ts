@@ -31,3 +31,5 @@ yargs(hideBin(process.argv))
   .showHelpOnFail(false)
   .help()
   .argv
+
+export {}
