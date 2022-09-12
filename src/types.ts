@@ -5,42 +5,42 @@ import type { Options as CrittersOptions } from 'critters'
 
 export interface ViteSSGOptions {
   /**
-   * Rewrite scripts loading mode, only works for `type="module"`
+   * Rewrite scripts loading mode. Only works for `type="module"`.
    *
    * @default 'sync'
    */
   script?: 'sync' | 'async' | 'defer' | 'async defer'
 
   /**
-   * Built format
+   * Build format.
    *
    * @default 'esm'
    */
   format?: 'esm' | 'cjs'
 
   /**
-   * The path of main entry, relative to the project root
+   * The path of the main entry file (relative to the project root).
    *
    * @default 'src/main.ts'
    */
   entry?: string
 
   /**
-   * Mock browser global variables (window, document, etc.) for SSG
+   * Mock browser global variables (window, document, etc...) for SSG.
    *
    * @default false
    */
   mock?: boolean
 
   /**
-   * Applying formatter to the generated index file.
+   * Apply formatter to the generated index file.
    *
    * @default 'none'
    */
   formatting?: 'minify' | 'prettify' | 'none'
 
   /**
-   * Vite environment mode
+   * Vite environment mode.
    */
   mode?: string
 
@@ -64,19 +64,19 @@ export interface ViteSSGOptions {
   includeAllRoutes?: boolean
 
   /**
-   * Options for critters
+   * Options for critters.
    *
    * @see https://github.com/GoogleChromeLabs/critters
    */
   crittersOptions?: CrittersOptions | false
 
   /**
-   * Custom functions to modified the routes to do the SSG.
+   * Custom function to modify the routes to do the SSG.
    *
    * Works only when `includeAllRoutes` is set to false.
    *
-   * Default to a handler that filter out all the dynamic routes,
-   * when passing your custom handler, you should also take care the dynamic routes yourself.
+   * Defaults to a handler that filters out all the dynamic routes.
+   * When passing your custom handler, you should also take care of the dynamic routes yourself.
    */
   includedRoutes?: (paths: string[], routes: Readonly<RouteRecordRaw[]>) => Promise<string[]> | string[]
 
@@ -88,7 +88,7 @@ export interface ViteSSGOptions {
   onBeforePageRender?: (route: string, indexHTML: string, appCtx: ViteSSGContext<true>) => Promise<string | null | undefined> | string | null | undefined
 
   /**
-   * Callback to be called on every page rendered.
+   * Callback to be called on every rendered page.
    *
    * Also give the change to transform the rendered html by returning a string.
    */
