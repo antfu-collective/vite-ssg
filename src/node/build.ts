@@ -25,12 +25,8 @@ function DefaultIncludedRoutes(paths: string[], routes: Readonly<RouteRecordRaw[
   return paths.filter(i => !i.includes(':') && !i.includes('*'))
 }
 
-function readJson(path: string) {
-  return JSON.parse(fs.readFileSync(path, 'utf8'))
-}
-
-export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig: InlineConfig = {}) {
-  const mode = process.env.MODE || process.env.NODE_ENV || cliOptions.mode || 'production'
+export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig: InlineConfig = {}) {
+  const mode = process.env.MODE || process.env.NODE_ENV || ssgOptions.mode || 'production'
   const config = await resolveConfig(viteConfig, 'build', mode)
 
   const cwd = process.cwd()
@@ -54,7 +50,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
     format = 'esm',
     concurrency = 20,
     rootContainerId = 'app',
-  }: ViteSSGOptions = Object.assign({}, config.ssgOptions || {}, cliOptions)
+  }: ViteSSGOptions = Object.assign({}, config.ssgOptions || {}, ssgOptions)
 
   if (fs.existsSync(ssgOut))
     await fs.remove(ssgOut)

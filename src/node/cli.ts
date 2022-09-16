@@ -18,9 +18,16 @@ yargs(hideBin(process.argv))
       .option('mock', {
         type: 'boolean',
         describe: 'Mock browser globals (window, document, etc.) for SSG',
+      })
+      .option('config', {
+        alias: 'c',
+        type: 'string',
+        describe: 'The vite config file to use',
       }),
     async (args) => {
-      await build(args)
+      const { config: configFile = undefined, ...ssgOptions } = args
+
+      await build(ssgOptions, { configFile })
     },
   )
   .fail((msg, err, yargs) => {
