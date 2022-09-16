@@ -21,6 +21,9 @@ Static-site generation for Vue 3 on Vite.
     "dev": "vite",
 -   "build": "vite build"
 +   "build": "vite-ssg build"
+
+    // OR if you want to use another vite config file
++   "build": "vite-ssg build -c another-vite.config.ts"
   }
 }
 ```
