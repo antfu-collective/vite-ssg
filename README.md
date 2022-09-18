@@ -21,6 +21,9 @@ Static-site generation for Vue 3 on Vite.
     "dev": "vite",
 -   "build": "vite build"
 +   "build": "vite-ssg build"
+
+    // OR if you want to use another vite config file
++   "build": "vite-ssg build -c another-vite.config.ts"
   }
 }
 ```
@@ -45,7 +48,7 @@ export const createApp = ViteSSG(
 
 ### Single Page SSG
 
-To have SSG for the index page only (without `vue-router`), import from `vite-ssg/single-page` instead, and you only need to install `npm i -D vite-ssg @vueuse/head`.
+For SSG of an index page only (i.e. without `vue-router`); import `vite-ssg/single-page` instead, and only install `@vueuse/head` (`npm i -D vite-ssg @vueuse/head`).
 
 ```ts
 // src/main.ts
@@ -58,7 +61,7 @@ export const createApp = ViteSSG(App)
 
 ### `<ClientOnly/>`
 
-Component `ClientOnly` is registered globally along with the app creation.
+The `ClientOnly` component is registered globally when the app is created.
 
 ```html
 <client-only>
@@ -71,7 +74,8 @@ Component `ClientOnly` is registered globally along with the app creation.
 
 ## Document head
 
-From `v0.4.0`, we ship [`@vueuse/head`](https://github.com/vueuse/head) to manage the document head out-of-box. You can directly use it in your pages/components, for example:
+From `v0.4.0` onwards, we ship [`@vueuse/head`](https://github.com/vueuse/head) to manage the document-head out of the box. You can use it directly in your pages/components.
+For example:
 
 ```html
 <template>
@@ -85,39 +89,40 @@ useHead({
   title: 'Website Title',
   meta: [
     {
-      name: `description`,
-      content: `Website description`,
+      name: 'description',
+      content: 'Website description',
     },
   ],
 })
 </script>
 ```
 
-That's all, no configuration is needed. Vite SSG will handle the server-side rendering and merging automatically.
+That's all! No configuration is needed. Vite SSG will automatically handle the server-side rendering and merging.
 
-Refer to [`@vueuse/head`'s docs](https://github.com/vueuse/head) for more usage about `useHead`.
+See [`@vueuse/head`'s docs](https://github.com/vueuse/head) for more usage information about `useHead`.
 
 ## Critical CSS
 
-Vite SSG has built-in support for generating [Critical CSS](https://web.dev/extract-critical-css/) inlined in the HTML via the [`critters`](https://github.com/GoogleChromeLabs/critters) package. Install it via:
+Vite SSG has built-in support for generating [Critical CSS](https://web.dev/extract-critical-css/) inlined in the HTML via the [`critters`](https://github.com/GoogleChromeLabs/critters) package.
+Install it with:
 
 ```bash
 npm i -D critters
 ```
 
-Critical CSS generation will be enabled automatically for you.
+Critical CSS generation will automatically be enabled for you.
 
 ## Initial State
 
-The initial state comprises data that is serialized to your server-side generated HTML that is hydrated in
+The initial state comprises data that is serialized with your server-side generated HTML and is hydrated in
 the browser when accessed. This data can be data fetched from a CDN, an API, etc, and is typically needed
 as soon as the application starts or is accessed for the first time.
 
 The main advantage of setting the application's initial state is that the statically generated pages do not
-need to fetch the data again as the data is fetched during build time and serialized into the page's HTML.
+need to refetch the data as it is fetched and serialized into the page's HTML at build time.
 
-The initial state is a plain JavaScript object that can be set during SSR, i.e., when statically generating
-the pages, like this:
+The initial state is a plain JavaScript object that can be set during SSR. I.e. when statically generating
+the pages like this:
 
 ```ts
 // src/main.ts
@@ -146,7 +151,7 @@ export const createApp = ViteSSG(
 
 Typically, you will use this with an application store, such as
 [Vuex](https://vuex.vuejs.org/) or [Pinia](https://pinia.esm.dev/).
-For examples, see below:
+See below for examples:
 
 <details><summary>When using Pinia</summary>
 
@@ -225,16 +230,15 @@ export const createApp = ViteSSG(
 ```
 </p></details>
 
-For the example of how to use a store with an initial state in a single page app,
+For an example on how to use a store with an initial state in a single page app,
 see [the single page example](./examples/single-page/src/main.ts).
 
 ### State Serialization
 
-Per default, the state is deserialized and serialized by using `JSON.stringify` and `JSON.parse`.
-If this approach works for you, you should definitely stick to it as it yields far better
-performance.
+By default, the state is deserialized and serialized by using `JSON.stringify` and `JSON.parse` respectively.
+If this approach works for you, you should definitely stick to it as it yields far better performance.
 
-You may use the option `transformState` in the `ViteSSGClientOptions` as displayed below.
+You may use the `transformState` option in the `ViteSSGClientOptions` options object as shown below.
 A valid approach besides `JSON.stringify` and `JSON.parse` is
 [`@nuxt/devalue`](https://github.com/nuxt-contrib/devalue) (which is used by Nuxt.js):
 
@@ -277,7 +281,8 @@ export default defineConfig({
 
 ### Async Components
 
-Some applications may make use of Vue features that cause components to render asynchronously (e.g. [`suspense`](https://v3.vuejs.org/guide/migration/suspense.html)). When these features are used in ways that can influence `initialState`, the `onSSRAppRendered` may be used in order to ensure that all async operations have finished as part of the initial application render:
+Some applications may make use of Vue features that cause components to render asynchronously (e.g. [`suspense`](https://v3.vuejs.org/guide/migration/suspense.html)). When these features are used in ways that can influence `initialState`, the `onSSRAppRendered` may be used in order to ensure that all async operations are complete during the initial application render.
+For example:
 
 ```ts
 const { app, router, initialState, isClient, onSSRAppRendered } = ctx
@@ -314,7 +319,7 @@ See [src/types.ts](./src/types.ts). for more options available.
 
 ### Custom Routes to Render
 
-You can use the `includedRoutes` hook to exclude/include route paths to render, or even provide some complete custom ones.
+You can use the `includedRoutes` hook to include or exclude route paths to render, or even provide some completely custom ones.
 
 ```js
 // vite.config.js
@@ -347,7 +352,7 @@ export default {
 }
 ```
 
-Alternatively, you may export the `includedRoutes` hook from your server entry file. This will be necessary if fetching your routes requires the use of environment variables managed by Vite. 
+Alternatively, you may export the `includedRoutes` hook from your server entry file. This will be necessary if fetching your routes requires the use of environment variables managed by Vite.
 
 ```ts
 // main.ts
@@ -381,14 +386,14 @@ export async function includedRoutes(paths, routes) {
 
 ### Use [Vitepress](https://github.com/vuejs/vitepress) when you want:
 
-- Zero config, out-of-box
-- Single-purpose documentation site
+- Zero config, out of the box SSG
+- A single-purpose documentation site
 - Lightweight ([No double payload](https://twitter.com/youyuxi/status/1274834280091389955))
 
-### Use Vite SSG when you want
+### Use Vite SSG when you want:
 
-- More controls on the build process and tooling
-- The flexible plugin systems
+- More control on the build process and tooling
+- The flexible plugin system
 - Multi-purpose application with some SSG to improve SEO and loading speed
 
 Cons:
@@ -397,7 +402,7 @@ Cons:
 
 ## Example
 
-See [Vitesse](https://github.com/antfu/vitesse)
+See [Vitesse](https://github.com/antfu/vitesse).
 
 ## Thanks to the prior work
 
@@ -407,7 +412,7 @@ See [Vitesse](https://github.com/antfu/vitesse)
 
 ## Contribution
 
-Please refer to https://github.com/antfu/contribute
+Please refer to https://github.com/antfu/contribute.
 
 ## License
 

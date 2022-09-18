@@ -5,7 +5,7 @@ import type { Options as CrittersOptions } from 'critters'
 
 export interface ViteSSGOptions {
   /**
-   * Rewrite scripts loading mode. Only works for `type="module"`.
+   * Set the scripts' loading mode. Only works for `type="module"`.
    *
    * @default 'sync'
    */
@@ -64,7 +64,7 @@ export interface ViteSSGOptions {
   includeAllRoutes?: boolean
 
   /**
-   * Options for critters.
+   * Options for the critters package.
    *
    * @see https://github.com/GoogleChromeLabs/critters
    */
@@ -83,28 +83,34 @@ export interface ViteSSGOptions {
   /**
    * Callback to be called before every page render.
    *
-   * Also give the change to transform the index html passed to the renderer.
+   * It can be used to transform the project's `index.html` file before passing it to the renderer.
+   *
+   * To do so, you can change the 'index.html' file contents (passed in through the `indexHTML` parameter), and return it.
+   * The returned value will then be passed to renderer.
    */
   onBeforePageRender?: (route: string, indexHTML: string, appCtx: ViteSSGContext<true>) => Promise<string | null | undefined> | string | null | undefined
 
   /**
    * Callback to be called on every rendered page.
    *
-   * Also give the change to transform the rendered html by returning a string.
+   * It can be used to transform the current route's rendered HTML.
+   *
+   * To do so, you can transform the route's rendered HTML (passed in through the `renderedHTML` parameter), and return it.
+   * The returned value will be used as the HTML of the route.
    */
   onPageRendered?: (route: string, renderedHTML: string, appCtx: ViteSSGContext<true>) => Promise<string | null | undefined> | string | null | undefined
 
   onFinished?: () => Promise<void> | void
 
   /**
-   * The app root container `id`.
+   * The application's root container `id`.
    *
    * @default `app`
    */
   rootContainerId?: string
 
   /**
-   * Size of generation processing queue.
+   * The size of the SSG processing queue.
    *
    * @default 20
    */
@@ -134,7 +140,7 @@ export interface ViteSSGClientOptions {
   registerComponents?: boolean
   useHead?: boolean
   /**
-   * The app root container query selector.
+   * The application's root container query selector.
    *
    * @default `#app`
    */
