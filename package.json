@@ -80,7 +80,7 @@
     "build": "unbuild",
     "prepublishOnly": "npm run build",
     "typecheck": "vue-tsc --noEmit",
-    "release": "bumpp"
+    "release": "bumpp && npm publish"
   },
   "peerDependencies": {
     "@vueuse/head": "^0.5.0 || ^0.6.0 || ^0.7.0",
