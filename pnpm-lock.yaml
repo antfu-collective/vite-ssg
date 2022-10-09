@@ -35,7 +35,6 @@ importers:
       vue-tsc: ^0.40.13
       yargs: ^17.6.0
     dependencies:
-      '@vueuse/head': 0.9.7_vue@3.2.40
       fs-extra: registry.npmmirror.com/fs-extra/10.1.0
       html-minifier: registry.npmmirror.com/html-minifier/4.0.0
       html5parser: registry.npmmirror.com/html5parser/2.0.2
@@ -50,6 +49,7 @@ importers:
       '@types/jsdom': 20.0.0
       '@types/prettier': 2.7.1
       '@types/yargs': 17.0.13
+      '@vueuse/head': 0.9.7_vue@3.2.40
       bumpp: registry.npmmirror.com/bumpp/8.2.1
       critters: registry.npmmirror.com/critters/0.0.16
       eslint: 8.24.0
@@ -2149,7 +2149,7 @@ packages:
       vue: 3.2.40
     transitivePeerDependencies:
       - '@vue/composition-api'
-    dev: false
+    dev: true
 
   /@vueuse/shared/9.3.0_vue@3.2.40:
     resolution: {integrity: sha512-caGUWLY0DpPC6l31KxeUy6vPVNA0yKxx81jFYLoMpyP6cF84FG5Dkf69DfSUqL57wX8JcUkJDMnQaQIZPWFEQQ==}
@@ -2158,13 +2158,13 @@ packages:
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
-    dev: false
+    dev: true
 
   /@zhead/schema-raw/0.8.5:
     resolution: {integrity: sha512-Aq+9mksf5zbtj7HYluT6PVyfpQ6z7mja9MzjFxg76Vt+Q9i0oL1XN6ZYaCXImWRafwbyAxjFQ5aUCVyFn79OpA==}
     dependencies:
       '@zhead/schema': 0.8.5
-    dev: false
+    dev: true
 
   /@zhead/schema-vue/0.8.5_vue@3.2.40:
     resolution: {integrity: sha512-6aXjYy3fZVeYBLrHcJQqzqwzC/2tafRO5UxZEgBHnryRnzeLNZV6nTptDvIPWiJObMoJTK21vbg3gkfLNQg84g==}
@@ -2177,11 +2177,11 @@ packages:
       vue: 3.2.40
     transitivePeerDependencies:
       - '@vue/composition-api'
-    dev: false
+    dev: true
 
   /@zhead/schema/0.8.5:
     resolution: {integrity: sha512-1S3Otr2zpl1zwP72dNseVXQNG9tnTQ6hHUEUYwINvBjRj6bHcUwdE+Itc9OLxnGAJT/7p8P7GHGo5sshXJNJsA==}
-    dev: false
+    dev: true
 
   /abab/2.0.6:
     resolution: {integrity: sha512-j2afSsaIENvHZN2B8GOpF566vZ5WVk5opAiMTvWgaQT8DkbOqsTfvNAvHoRGU2zzP8cPoqys+xHTRDWW8L+/BA==}
@@ -6439,7 +6439,6 @@ packages:
         optional: true
     dependencies:
       vue: 3.2.40
-    dev: false
 
   /vue-eslint-parser/9.0.3_eslint@8.24.0:
     resolution: {integrity: sha512-yL+ZDb+9T0ELG4VIFo/2anAOz8SvBdlqEnQnvJ3M7Scq56DvtjY0VY88bByRZB0D4J0u8olBcfrXTVONXsh4og==}
