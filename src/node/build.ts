@@ -7,6 +7,7 @@ import fs from 'fs-extra'
 import type { InlineConfig, ResolvedConfig } from 'vite'
 import { mergeConfig, resolveConfig, build as viteBuild } from 'vite'
 import type { SSRContext } from 'vue/server-renderer'
+import { nextTick } from 'vue';
 import { JSDOM } from 'jsdom'
 import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
 import type { RouteRecordRaw } from 'vue-router'
@@ -172,6 +173,9 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
 
         // render head
         head?.updateDOM(jsdom.window.document)
+
+        // wait for waiting HTML changes to be applied
+        await nextTick();
 
         const html = jsdom.serialize()
         let transformed = (await onPageRendered?.(route, html, appCtx)) || html
