@@ -174,7 +174,7 @@ export async function build(cliOptions: Partial<ViteSSGOptions> = {}, viteConfig
         // render head
         head?.updateDOM(jsdom.window.document)
 
-        // wait for waiting HTML changes to be applied
+        // wait for waiting HTML changes to be applied [see https://github.com/antfu/vite-ssg/pull/312]
         await nextTick();
 
         const html = jsdom.serialize()
