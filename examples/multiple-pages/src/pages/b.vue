@@ -18,7 +18,7 @@ export default {
       ],
     })
   },
-  serverPrefetch() {
+  async serverPrefetch() {
     // eslint-disable-next-line no-console
     console.log('prefetch')
   },

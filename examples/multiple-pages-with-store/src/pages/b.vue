@@ -26,7 +26,7 @@ export default {
       user: computed(() => store.user),
     }
   },
-  serverPrefetch() {
+  async serverPrefetch() {
     // eslint-disable-next-line no-console
     console.log('prefetch')
   },
