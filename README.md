@@ -112,6 +112,22 @@ npm i -D critters
 
 Critical CSS generation will automatically be enabled for you.
 
+To configure `critters`, pass [its options](https://github.com/GoogleChromeLabs/critters#usage) into `ssgOptions.crittersOptions` in `vite.config.ts`:
+
+```ts
+// vite.config.ts
+export default defineConfig({
+  ssgOptions: {
+    crittersOptions: {
+      // E.g., change the preload strategy
+      preload: "media",
+      // Other options: https://github.com/GoogleChromeLabs/critters#usage
+    },
+  },
+})
+```
+
+
 ## Initial State
 
 The initial state comprises data that is serialized with your server-side generated HTML and is hydrated in
