@@ -120,7 +120,7 @@ export default defineConfig({
   ssgOptions: {
     crittersOptions: {
       // E.g., change the preload strategy
-      preload: "media",
+      preload: 'media',
       // Other options: https://github.com/GoogleChromeLabs/critters#usage
     },
   },
