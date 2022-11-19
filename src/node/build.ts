@@ -11,6 +11,7 @@ import { nextTick } from 'vue'
 import { JSDOM } from 'jsdom'
 import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
 import type { RouteRecordRaw } from 'vue-router'
+import { renderDOMHead } from '@unhead/dom'
 import type { ViteSSGContext, ViteSSGOptions } from '../types'
 import { serializeState } from '../utils/state'
 import { renderPreloadLinks } from './preload-links'
@@ -166,10 +167,8 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
         renderPreloadLinks(jsdom.window.document, ctx.modules || new Set<string>(), ssrManifest)
 
         // render head
-        head?.updateDOM(jsdom.window.document)
-
-        // wait for waiting HTML changes to be applied [see https://github.com/antfu/vite-ssg/pull/312]
-        await nextTick()
+        if (head)
+          await renderDOMHead(head.unhead, { document: jsdom.window.document })
 
         const html = jsdom.serialize()
         let transformed = (await onPageRendered?.(route, html, appCtx)) || html
