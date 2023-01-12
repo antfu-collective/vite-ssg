@@ -33,7 +33,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
 
   const cwd = process.cwd()
   const root = config.root || cwd
-  const ssgOut = join(root, '.vite-ssg-temp')
+  const ssgOut = join(root, '.vite-ssg-temp-' + Math.random().toString(36).substring(2, 12))
   const outDir = config.build.outDir || 'dist'
   const out = isAbsolute(outDir) ? outDir : join(root, outDir)
 
