@@ -11,7 +11,7 @@ export * from '../types'
 
 export function ViteSSG(
   App: Component,
-  routerOptions: RouterOptions,
+  routerOptions: RouterOptions & { routerCreator?: typeof createRouter },
   fn?: (context: ViteSSGContext<true>) => Promise<void> | void,
   options: ViteSSGClientOptions = {},
 ) {
@@ -35,14 +35,14 @@ export function ViteSSG(
       app.use(head)
     }
 
-    const router = createRouter({
+    const { routerCreator = createRouter, routes, ...routerOpts } = routerOptions
+    const router = routerCreator({
       history: client
         ? createWebHistory(routerOptions.base)
         : createMemoryHistory(routerOptions.base),
-      ...routerOptions,
+      routes,
+      ...routerOpts,
     })
-
-    const { routes } = routerOptions
 
     if (registerComponents)
       app.component('ClientOnly', ClientOnly)
