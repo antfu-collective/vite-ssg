@@ -1,13 +1,12 @@
 /* eslint-disable no-console */
-import { dirname, isAbsolute, join, parse } from 'path'
-import { createRequire } from 'module'
+import { dirname, isAbsolute, join, parse } from 'node:path'
+import { createRequire } from 'node:module'
 import PQueue from 'p-queue'
 import { blue, cyan, dim, gray, green, red, yellow } from 'kolorist'
 import fs from 'fs-extra'
 import type { InlineConfig, ResolvedConfig } from 'vite'
 import { mergeConfig, resolveConfig, build as viteBuild } from 'vite'
 import type { SSRContext } from 'vue/server-renderer'
-import { nextTick } from 'vue'
 import { JSDOM } from 'jsdom'
 import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
 import type { RouteRecordRaw } from 'vue-router'
@@ -22,7 +21,7 @@ export type Manifest = Record<string, string[]>
 
 export type CreateAppFactory = (client: boolean, routePath?: string) => Promise<ViteSSGContext<true> | ViteSSGContext<false>>
 
-function DefaultIncludedRoutes(paths: string[], routes: Readonly<RouteRecordRaw[]>) {
+function DefaultIncludedRoutes(paths: string[], _routes: Readonly<RouteRecordRaw[]>) {
   // ignore dynamic routes
   return paths.filter(i => !i.includes(':') && !i.includes('*'))
 }
@@ -103,7 +102,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
     mode: config.mode,
   }))
 
-  const prefix = format === 'esm' && process.platform === 'win32' ? 'file://' : ''
+  const prefix = (format === 'esm' && process.platform === 'win32') ? 'file://' : ''
   const ext = format === 'esm' ? '.mjs' : '.cjs'
   const serverEntry = join(prefix, ssgOut, parse(ssrEntry).name + ext)
 

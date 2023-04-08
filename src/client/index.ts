@@ -7,6 +7,7 @@ import { deserializeState } from '../utils/state'
 import { documentReady } from '../utils/document-ready'
 import type { RouterOptions, ViteSSGClientOptions, ViteSSGContext } from '../types'
 import { ClientOnly } from './components/ClientOnly'
+
 export * from '../types'
 
 export function ViteSSG(

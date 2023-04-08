@@ -40,9 +40,11 @@ function renderPreloadLink(document: Document, file: string) {
   }
 }
 
-const createLink = (document: Document) => document.createElement('link')
+function createLink(document: Document) {
+  return document.createElement('link')
+}
 
-const setAttrs = (el: Element, attrs: Record<string, any>) => {
+function setAttrs(el: Element, attrs: Record<string, any>) {
   const keys = Object.keys(attrs)
   for (const key of keys)
     el.setAttribute(key, attrs[key])
