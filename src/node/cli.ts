@@ -23,6 +23,11 @@ yargs(hideBin(process.argv))
         alias: 'c',
         type: 'string',
         describe: 'The vite config file to use',
+      })
+      .option('base', {
+        alias: 'b',
+        type: 'string',
+        describe: 'The base path to render',
       }),
     async (args) => {
       const { config: configFile = undefined, ...ssgOptions } = args
