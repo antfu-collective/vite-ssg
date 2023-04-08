@@ -46,6 +46,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
     onBeforePageRender,
     onPageRendered,
     onFinished,
+    base,
     dirStyle = 'flat',
     includeAllRoutes = false,
     format = 'esm',
