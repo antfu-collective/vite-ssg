@@ -24,7 +24,7 @@ export function routesToPaths(routes?: Readonly<RouteRecordRaw[]>) {
 
       // check for leading slash
       if (route.path != null) {
-        path = prefix && !route.path.startsWith('/')
+        path = (prefix && !route.path.startsWith('/'))
           ? `${prefix}${route.path ? `/${route.path}` : ''}`
           : route.path
 

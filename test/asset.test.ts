@@ -1,4 +1,4 @@
-import fs from 'fs/promises'
+import fs from 'node:fs/promises'
 import { describe, expect, it } from 'vitest'
 import fg from 'fast-glob'
 

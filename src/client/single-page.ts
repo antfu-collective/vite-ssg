@@ -6,6 +6,7 @@ import type { ViteSSGClientOptions, ViteSSGContext } from '../types'
 import { deserializeState } from '../utils/state'
 import { documentReady } from '../utils/document-ready'
 import { ClientOnly } from './components/ClientOnly'
+
 export * from '../types'
 
 export function ViteSSG(
