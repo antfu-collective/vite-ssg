@@ -398,7 +398,7 @@ export async function includedRoutes(paths, routes) {
 }
 ```
 
-## Comparsion
+## Comparison
 
 ### Use [Vitepress](https://github.com/vuejs/vitepress) when you want:
 
