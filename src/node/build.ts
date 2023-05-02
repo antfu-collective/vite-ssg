@@ -167,7 +167,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
 
         // render head
         if (head)
-          await renderDOMHead(head.unhead, { document: jsdom.window.document })
+          await renderDOMHead(head, { document: jsdom.window.document })
 
         const html = jsdom.serialize()
         let transformed = (await onPageRendered?.(route, html, appCtx)) || html

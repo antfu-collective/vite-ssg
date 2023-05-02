@@ -1,6 +1,6 @@
 import type { App } from 'vue'
 import type { RouteRecordRaw, Router, RouterOptions as VueRouterOptions } from 'vue-router'
-import type { HeadClient } from '@vueuse/head'
+import type { MergeHead, VueHeadClient } from '@unhead/vue'
 import type { Options as CrittersOptions } from 'critters'
 
 export interface ViteSSGOptions {
@@ -124,7 +124,7 @@ export interface ViteSSGContext<HasRouter extends boolean = true> {
   router: HasRouter extends true ? Router : undefined
   routes: HasRouter extends true ? Readonly<RouteRecordRaw[]> : undefined
   initialState: Record<string, any>
-  head: HeadClient | undefined
+  head: VueHeadClient<MergeHead> | undefined
   isClient: boolean
   onSSRAppRendered(cb: Function): void
   triggerOnSSRAppRendered(route: string, appHTML: string, appCtx: ViteSSGContext): Promise<unknown[]>
