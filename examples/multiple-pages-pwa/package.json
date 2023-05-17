@@ -7,6 +7,7 @@
     "serve": "vite preview"
   },
   "dependencies": {
+    "@unhead/vue": "^1.1.26",
     "vue": "^3.2.47"
   },
   "devDependencies": {
@@ -16,7 +17,7 @@
     "vite": "^4.2.1",
     "vite-plugin-pages": "^0.29.0",
     "vite-plugin-pwa": "^0.14.7",
-    "vite-plugin-vue-markdown": "^0.22.4",
+    "vite-plugin-vue-markdown": "^0.23.5",
     "vite-ssg": "workspace:*",
     "vue-router": "^4.1.6"
   }
