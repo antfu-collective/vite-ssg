@@ -28,7 +28,7 @@ function DefaultIncludedRoutes(paths: string[], _routes: Readonly<RouteRecordRaw
 
 export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig: InlineConfig = {}) {
   const mode = process.env.MODE || process.env.NODE_ENV || ssgOptions.mode || 'production'
-  const config = await resolveConfig(viteConfig, 'build', mode)
+  const config = await resolveConfig(viteConfig, 'build', mode, mode)
 
   const cwd = process.cwd()
   const root = config.root || cwd
