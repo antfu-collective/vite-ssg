@@ -179,6 +179,7 @@ like this:
 import { ViteSSG } from 'vite-ssg'
 import { createPinia } from 'pinia'
 import routes from 'virtual:generated-pages'
+
 // use any store you configured that you need data from on start-up
 import { useRootStore } from './store/root'
 import App from './App.vue'
@@ -261,6 +262,7 @@ A valid approach besides `JSON.stringify` and `JSON.parse` is
 ```ts
 import devalue from '@nuxt/devalue'
 import { ViteSSG } from 'vite-ssg'
+
 // ...
 import App from './App.vue'
 
