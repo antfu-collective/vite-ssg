@@ -1,8 +1,8 @@
 import type { Component } from 'vue'
 import { createApp as createClientApp, createSSRApp } from 'vue'
 import { createMemoryHistory, createRouter, createWebHistory } from 'vue-router'
-import type { HeadClient } from '@vueuse/head'
-import { createHead } from '@vueuse/head'
+import type { MergeHead, VueHeadClient } from '@unhead/vue'
+import { createHead } from '@unhead/vue'
 import { deserializeState } from '../utils/state'
 import { documentReady } from '../utils/document-ready'
 import type { RouterOptions, ViteSSGClientOptions, ViteSSGContext } from '../types'
@@ -29,7 +29,7 @@ export function ViteSSG(
       ? createClientApp(App)
       : createSSRApp(App)
 
-    let head: HeadClient | undefined
+    let head: VueHeadClient<MergeHead> | undefined
 
     if (useHead) {
       head = createHead()

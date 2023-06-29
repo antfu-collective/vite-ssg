@@ -83,7 +83,7 @@
     "release": "bumpp && npm publish"
   },
   "peerDependencies": {
-    "@vueuse/head": "^1.0.0",
+    "@unhead/vue": "^1.1.26",
     "critters": "^0.0.16",
     "vite": "^2.0.0 || ^3.0.0 || ^4.0.0",
     "vue": "^3.2.10",
@@ -114,7 +114,7 @@
     "@types/jsdom": "^21.1.1",
     "@types/prettier": "^2.7.2",
     "@types/yargs": "^17.0.24",
-    "@vueuse/head": "^1.1.23",
+    "@unhead/vue": "^1.1.26",
     "bumpp": "^9.1.0",
     "critters": "^0.0.16",
     "eslint": "^8.38.0",

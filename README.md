@@ -11,7 +11,7 @@ Static-site generation for Vue 3 on Vite.
 > **This library requires Node.js version >= 14**
 
 <pre>
-<b>npm i -D vite-ssg</b> <em>vue-router @vueuse/head</em>
+<b>npm i -D vite-ssg</b> <em>vue-router @unhead/vue</em>
 </pre>
 
 ```diff
@@ -48,7 +48,7 @@ export const createApp = ViteSSG(
 
 ### Single Page SSG
 
-For SSG of an index page only (i.e. without `vue-router`); import `vite-ssg/single-page` instead, and only install `@vueuse/head` (`npm i -D vite-ssg @vueuse/head`).
+For SSG of an index page only (i.e. without `vue-router`); import `vite-ssg/single-page` instead, and only install `@unhead/vue` (`npm i -D vite-ssg @unhead/vue`).
 
 ```ts
 // src/main.ts
@@ -74,7 +74,7 @@ The `ClientOnly` component is registered globally when the app is created.
 
 ## Document head
 
-From `v0.4.0` onwards, we ship [`@vueuse/head`](https://github.com/vueuse/head) to manage the document-head out of the box. You can use it directly in your pages/components.
+We ship [`@unhead/vue`](https://unhead.harlanzw.com/integrations/vue/setup) to manage the document-head out of the box. You can use it directly in your pages/components.
 For example:
 
 ```html
@@ -83,7 +83,7 @@ For example:
 </template>
 
 <script setup>
-import { useHead } from '@vueuse/head'
+import { useHead } from '@unhead/vue'
 
 useHead({
   title: 'Website Title',
@@ -99,7 +99,7 @@ useHead({
 
 That's all! No configuration is needed. Vite SSG will automatically handle the server-side rendering and merging.
 
-See [`@vueuse/head`'s docs](https://github.com/vueuse/head) for more usage information about `useHead`.
+See [`@unhead/vue`'s docs](https://unhead.harlanzw.com/integrations/vue/setup) for more usage information about `useHead`.
 
 ## Critical CSS
 

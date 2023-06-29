@@ -1,5 +1,5 @@
 <script lang="ts">
-import { useHead } from '@vueuse/head'
+import { useHead } from '@unhead/vue'
 
 export default {
   setup() {
