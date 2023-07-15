@@ -27,8 +27,9 @@ function DefaultIncludedRoutes(paths: string[], _routes: Readonly<RouteRecordRaw
 }
 
 export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig: InlineConfig = {}) {
-  const mode = process.env.MODE || process.env.NODE_ENV || ssgOptions.mode || 'production'
-  const config = await resolveConfig(viteConfig, 'build', mode, mode)
+  const nodeEnv = process.env.NODE_ENV || 'production'
+  const mode = ssgOptions.mode || process.env.MODE || nodeEnv
+  const config = await resolveConfig(viteConfig, 'build', mode, nodeEnv)
 
   const cwd = process.cwd()
   const root = config.root || cwd
@@ -51,6 +52,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
     format = 'esm',
     concurrency = 20,
     rootContainerId = 'app',
+    base,
   }: ViteSSGOptions = Object.assign({}, config.ssgOptions || {}, ssgOptions)
 
   if (fs.existsSync(ssgOut))
@@ -59,6 +61,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
   // client
   buildLog('Build for client...')
   await viteBuild(mergeConfig(viteConfig, {
+    base,
     build: {
       ssrManifest: true,
       rollupOptions: {
@@ -82,6 +85,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
   process.env.VITE_SSG = 'true'
   const ssrEntry = await resolveAlias(config, entry)
   await viteBuild(mergeConfig(viteConfig, {
+    base,
     build: {
       ssr: ssrEntry,
       outDir: ssgOut,

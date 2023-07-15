@@ -45,6 +45,11 @@ export interface ViteSSGOptions {
   mode?: string
 
   /**
+   * Vite public base path.
+   */
+  base?: string
+
+  /**
    * Directory style of the output directory.
    *
    * flat: `/foo` -> `/foo.html`
