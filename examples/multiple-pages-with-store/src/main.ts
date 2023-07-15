@@ -7,7 +7,10 @@ import routes from '~pages'
 
 export const createApp = ViteSSG(
   App,
-  { routes },
+  {
+    base: import.meta.env.BASE_URL,
+    routes,
+  },
   ({ app, router, initialState }) => {
     const pinia = createPinia()
     app.use(pinia)
