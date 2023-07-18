@@ -3,8 +3,8 @@
   "private": true,
   "scripts": {
     "dev": "cross-env DEBUG=vite-ssg:* vite",
-    "build": "cross-env DEBUG=vite-ssg:* vite-ssg build",
-    "serve": "vite preview"
+    "build": "cross-env DEBUG=vite-ssg:* vite-ssg build --base /ssg-base/ --mode ssg",
+    "serve": "vite preview --base /ssg-base/"
   },
   "dependencies": {
     "@unhead/vue": "^1.1.28",
