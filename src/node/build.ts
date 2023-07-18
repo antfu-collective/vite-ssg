@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import { dirname, isAbsolute, join, parse } from 'node:path'
+import process from 'node:process'
 import { createRequire } from 'node:module'
 import PQueue from 'p-queue'
 import { blue, cyan, dim, gray, green, red, yellow } from 'kolorist'

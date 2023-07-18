@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-expressions */
+import process from 'node:process'
 import { bold, gray, red, reset, underline } from 'kolorist'
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'

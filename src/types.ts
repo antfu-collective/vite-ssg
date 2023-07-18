@@ -131,7 +131,7 @@ export interface ViteSSGContext<HasRouter extends boolean = true> {
   initialState: Record<string, any>
   head: VueHeadClient<MergeHead> | undefined
   isClient: boolean
-  onSSRAppRendered(cb: Function): void
+  onSSRAppRendered(cb: () => void): void
   triggerOnSSRAppRendered(route: string, appHTML: string, appCtx: ViteSSGContext): Promise<unknown[]>
   transformState?(state: any): any
   /**

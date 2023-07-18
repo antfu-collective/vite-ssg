@@ -48,10 +48,10 @@ export function ViteSSG(
     if (registerComponents)
       app.component('ClientOnly', ClientOnly)
 
-    const appRenderCallbacks: Function[] = []
+    const appRenderCallbacks: (() => void)[] = []
     const onSSRAppRendered = client
       ? () => {}
-      : (cb: Function) => appRenderCallbacks.push(cb)
+      : (cb: () => void) => appRenderCallbacks.push(cb)
     const triggerOnSSRAppRendered = () => {
       return Promise.all(appRenderCallbacks.map(cb => cb()))
     }
