@@ -11,13 +11,13 @@
     "vue": "^3.3.4"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.2.3",
+    "@vitejs/plugin-vue": "^4.3.4",
     "cross-env": "^7.0.3",
-    "typescript": "^5.1.6",
-    "unplugin-vue-components": "^0.25.1",
-    "vite": "^4.4.4",
+    "typescript": "^5.2.2",
+    "unplugin-vue-components": "^0.25.2",
+    "vite": "^4.4.9",
     "vite-plugin-pages": "^0.31.0",
-    "vite-plugin-vue-markdown": "^0.23.5",
+    "vite-plugin-vue-markdown": "^0.23.8",
     "vite-ssg": "workspace:*",
     "vue-router": "^4.2.4"
   }
