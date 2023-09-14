@@ -83,7 +83,6 @@
     "release": "bumpp && npm publish"
   },
   "peerDependencies": {
-    "@unhead/vue": "^1.1.26",
     "critters": "^0.0.16",
     "vite": "^2.0.0 || ^3.0.0 || ^4.0.0",
     "vue": "^3.2.10",
@@ -98,8 +97,8 @@
     }
   },
   "dependencies": {
-    "@unhead/dom": "^1.1.32",
-    "@unhead/vue": "^1.1.32",
+    "@unhead/dom": "^1.7.3",
+    "@unhead/vue": "^1.7.3",
     "fs-extra": "^11.1.1",
     "html-minifier": "^4.0.0",
     "html5parser": "^2.0.2",
