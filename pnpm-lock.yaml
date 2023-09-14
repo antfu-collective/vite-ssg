@@ -106,8 +106,8 @@ importers:
   examples/multiple-pages:
     dependencies:
       '@unhead/vue':
-        specifier: ^1.1.32
-        version: 1.1.32(vue@3.3.4)
+        specifier: ^1.7.3
+        version: 1.7.3(vue@3.3.4)
       vue:
         specifier: ^3.3.4
         version: 3.3.4
@@ -143,8 +143,8 @@ importers:
   examples/multiple-pages-pwa:
     dependencies:
       '@unhead/vue':
-        specifier: ^1.1.32
-        version: 1.1.32(vue@3.3.4)
+        specifier: ^1.7.3
+        version: 1.7.3(vue@3.3.4)
       vue:
         specifier: ^3.3.4
         version: 3.3.4
@@ -180,8 +180,8 @@ importers:
   examples/multiple-pages-with-store:
     dependencies:
       '@unhead/vue':
-        specifier: ^1.1.32
-        version: 1.1.32(vue@3.3.4)
+        specifier: ^1.7.3
+        version: 1.7.3(vue@3.3.4)
       pinia:
         specifier: ^2.1.4
         version: 2.1.4(typescript@5.1.6)(vue@3.3.4)
@@ -648,6 +648,7 @@ packages:
   /@babel/highlight@7.18.6:
     resolution: {integrity: sha512-u7stbOuYjaPezCuLj29hNW1v64M2Md2qupEKP1fHc7WdOA3DgLh37suiSrZYY7haUB7iBeQZ9P1uiRF359do3g==}
     engines: {node: '>=6.9.0'}
+    requiresBuild: true
     dependencies:
       '@babel/helper-validator-identifier': 7.22.5
       chalk: 2.4.2
@@ -2631,25 +2632,11 @@ packages:
       eslint-visitor-keys: 3.4.1
     dev: true
 
-  /@unhead/dom@1.1.32:
-    resolution: {integrity: sha512-AMpHlKEKcm1dxSAvm6GPXhjoZHzXh7ZeR8DAnXVH7Sd9a48xaJhQjmxETweFAcNBSnAn9e7TxTPZVrUcW0ej2w==}
-    dependencies:
-      '@unhead/schema': 1.1.32
-      '@unhead/shared': 1.1.32
-    dev: false
-
   /@unhead/dom@1.7.3:
     resolution: {integrity: sha512-igJ2ZxU5x4CQQQ3iM+CPOPHdjpam/Q89xIvDSE0crK11TU00WOl0bWl1yQp/EI0pyza1G3ZQ1JyDmi7OcCM9eQ==}
     dependencies:
       '@unhead/schema': 1.7.3
       '@unhead/shared': 1.7.3
-    dev: false
-
-  /@unhead/schema@1.1.32:
-    resolution: {integrity: sha512-XxrNazZEO9T+r1ORduy6gnKA9rDzRgxr/p5UEPRM+TZVuM8ZEFzYr2/aE5bMgTCXp20z0pjv/2rewpVSXp4pFQ==}
-    dependencies:
-      hookable: 5.5.3
-      zhead: 2.0.9
     dev: false
 
   /@unhead/schema@1.7.3:
@@ -2659,28 +2646,10 @@ packages:
       zhead: 2.1.1
     dev: false
 
-  /@unhead/shared@1.1.32:
-    resolution: {integrity: sha512-oguyfbwbG4+wNphXQjQ3YrEe4NzabocpTQKNCKdTUPtpK9HYNiI+dffEoSiM3tWcwlG3iYrXj5WvREq3FoACWQ==}
-    dependencies:
-      '@unhead/schema': 1.1.32
-    dev: false
-
   /@unhead/shared@1.7.3:
     resolution: {integrity: sha512-eqAn3n+T6WMecDUzdqGyedpZwT0u04pZwHEvD0bxmVen1FU6VHiL49azyv1W7MCiCHNFNAcR1py2Eolsr6+E7g==}
     dependencies:
       '@unhead/schema': 1.7.3
-    dev: false
-
-  /@unhead/vue@1.1.32(vue@3.3.4):
-    resolution: {integrity: sha512-rpQVxgI/crwlC+z8GnfPV6EwVN/kyeVSvEfzJO9VMIdrWMrh6vAV0WNv3v+BFd0bVLiRyNzhvbY76yhmAX4Zvw==}
-    peerDependencies:
-      vue: '>=2.7 || >=3'
-    dependencies:
-      '@unhead/schema': 1.1.32
-      '@unhead/shared': 1.1.32
-      hookable: 5.5.3
-      unhead: 1.1.32
-      vue: 3.3.4
     dev: false
 
   /@unhead/vue@1.7.3(vue@3.3.4):
@@ -2921,6 +2890,7 @@ packages:
   /ansi-styles@3.2.1:
     resolution: {integrity: sha512-VT0ZI6kZRdTh8YyJw3SMbYm/u+NqfsAxEpWO0Pf9sq8/e94WxxOpPKx9FR1FlyCtOVDNOQ+8ntlqFxiRc+r5qA==}
     engines: {node: '>=4'}
+    requiresBuild: true
     dependencies:
       color-convert: 1.9.3
     dev: true
@@ -3183,6 +3153,7 @@ packages:
   /chalk@2.4.2:
     resolution: {integrity: sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ==}
     engines: {node: '>=4'}
+    requiresBuild: true
     dependencies:
       ansi-styles: 3.2.1
       escape-string-regexp: 1.0.5
@@ -3268,6 +3239,7 @@ packages:
 
   /color-convert@1.9.3:
     resolution: {integrity: sha512-QfAUtd+vFdAtFQcC8CCyYt1fYWxSqAiK2cSD6zDB8N3cpsEBAvRxp9zOGg6G/SHHJYAT88/az/IuDGALsNVbGg==}
+    requiresBuild: true
     dependencies:
       color-name: 1.1.3
     dev: true
@@ -3280,6 +3252,7 @@ packages:
 
   /color-name@1.1.3:
     resolution: {integrity: sha512-72fSenhMw2HZMTVHeCA9KCmpEIbzWiQsjN+BHcBbS9vr1mtt+vJjPdksIBNUmKAW8TFUDPJK5SUU3QhE9NEXDw==}
+    requiresBuild: true
     dev: true
 
   /color-name@1.1.4:
@@ -4484,6 +4457,7 @@ packages:
   /has-flag@3.0.0:
     resolution: {integrity: sha512-sKJf1+ceQBr4SMkvQnBDNDtf4TXpVhVGateu0t918bl30FnbE2m4vNLX+VWe/dpjlb+HugGYzW7uQXH98HPEYw==}
     engines: {node: '>=4'}
+    requiresBuild: true
     dev: true
 
   /has-flag@4.0.0:
@@ -4905,6 +4879,7 @@ packages:
 
   /js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
+    requiresBuild: true
     dev: true
 
   /js-yaml@3.14.1:
@@ -5362,7 +5337,7 @@ packages:
     resolution: {integrity: sha512-/5CMN3T0R4XTj4DcGaexo+roZSdSFW/0AOOTROrjxzCG1wrWXEsGbRKevjlIL+ZDE4sZlJr5ED4YW0yqmkK+eA==}
     dependencies:
       hosted-git-info: 2.8.9
-      resolve: 1.22.2
+      resolve: 1.22.3
       semver: 5.7.1
       validate-npm-package-license: 3.0.4
     dev: true
@@ -6225,6 +6200,7 @@ packages:
   /supports-color@5.5.0:
     resolution: {integrity: sha512-QjVjwdXIt408MIiAqCX4oUKsgU2EqAGzs2Ppkm4aQYbjm+ZEWEcW4SfFNTr4uMNZma0ey4f5lgLrkB0aX0QMow==}
     engines: {node: '>=4'}
+    requiresBuild: true
     dependencies:
       has-flag: 3.0.0
     dev: true
@@ -6529,15 +6505,6 @@ packages:
       - sass
       - supports-color
     dev: true
-
-  /unhead@1.1.32:
-    resolution: {integrity: sha512-WO1NTmljMZZzZjzmkcgZpYKpbEGGB3HC+2DIJxAZd0++WCPT9jD6o0MIgpA71UvueOCqLhIlyfGsa9Hgn0Gnog==}
-    dependencies:
-      '@unhead/dom': 1.1.32
-      '@unhead/schema': 1.1.32
-      '@unhead/shared': 1.1.32
-      hookable: 5.5.3
-    dev: false
 
   /unhead@1.7.3:
     resolution: {integrity: sha512-6LbBOVgsr+JCmeWH9okxlBtMtFHGIECX93ySWBnposnOqzSUtnUsEgB0nVB8Qa7uozfHlmJfSBJMUeTztzPfSQ==}
@@ -7285,10 +7252,6 @@ packages:
     resolution: {integrity: sha512-9bnSc/HEW2uRy67wc+T8UwauLuPJVn28jb+GtJY16iiKWyvmYJRXVT4UamsAEGQfPohgr2q4Tq0sQbQlxTfi1g==}
     engines: {node: '>=12.20'}
     dev: true
-
-  /zhead@2.0.9:
-    resolution: {integrity: sha512-Y3g6EegQc6PVrYXPq2OS7/s27UGVS5Y6NY6SY3XGH4Hg+yQWbQTtWsjCgmpR8kZnYrv8auB54sz+x5FEDrvqzQ==}
-    dev: false
 
   /zhead@2.1.1:
     resolution: {integrity: sha512-FRmjAFioi07R+bmL+fqbkXF/pCbC9PwcKQ8RDluC5xTaVbNBgYRQ4eKuS1C8c7Sil//UIxet/AGp7D6royoHhA==}

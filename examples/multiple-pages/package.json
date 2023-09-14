@@ -7,7 +7,7 @@
     "serve": "vite preview --base /ssg-base/"
   },
   "dependencies": {
-    "@unhead/vue": "^1.1.32",
+    "@unhead/vue": "^1.7.3",
     "vue": "^3.3.4"
   },
   "devDependencies": {
