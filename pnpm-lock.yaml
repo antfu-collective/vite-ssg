@@ -51,6 +51,9 @@ importers:
       '@types/yargs':
         specifier: ^17.0.24
         version: 17.0.24
+      '@vueuse/head':
+        specifier: ^2.0.0
+        version: 2.0.0(vue@3.3.4)
       bumpp:
         specifier: ^9.2.0
         version: 9.2.0
@@ -2656,20 +2659,24 @@ packages:
     dependencies:
       '@unhead/schema': 1.7.4
       '@unhead/shared': 1.7.4
-    dev: false
 
   /@unhead/schema@1.7.4:
     resolution: {integrity: sha512-wUL4CK0NSEm3KH4kYsiqVYQw5xBk1hpBi5tiNj0BTZgpQVrRufICdK5EHA9Fh7OIAR6tOTWwTvsf5+nK0BgQDA==}
     dependencies:
       hookable: 5.5.3
       zhead: 2.1.1
-    dev: false
 
   /@unhead/shared@1.7.4:
     resolution: {integrity: sha512-YUNA2UxAuDPnDps41BQ8aEIY5hdyvruSB1Vs3AALhRo07MxMivSq5DjNKfYr/JvRN6593RtfI1NHnP9x5M57xA==}
     dependencies:
       '@unhead/schema': 1.7.4
-    dev: false
+
+  /@unhead/ssr@1.7.4:
+    resolution: {integrity: sha512-2QqaHdC48XJGP9Pd0F2fblPv9/6G4IU04iZ5qLRAs6MFFmFEzrdvoooFlcwdcoH/WDGRnpYBmo+Us2nzQz1MMQ==}
+    dependencies:
+      '@unhead/schema': 1.7.4
+      '@unhead/shared': 1.7.4
+    dev: true
 
   /@unhead/vue@1.7.4(vue@3.3.4):
     resolution: {integrity: sha512-ZfgzOhg1Bxo9xwp3upawqerw4134hc9Lhz6t005ixcBwPX+39Wpgc9dC3lf+owFQEVuWkf8F+eAwK2sghVBK4A==}
@@ -2681,7 +2688,6 @@ packages:
       hookable: 5.5.3
       unhead: 1.7.4
       vue: 3.3.4
-    dev: false
 
   /@vitejs/plugin-vue@4.3.4(vite@4.4.9)(vue@3.3.4):
     resolution: {integrity: sha512-ciXNIHKPriERBisHFBvnTbfKa6r9SAesOYXeGDzgegcvy9Q4xdScSHAmKbNT0M3O0S9LKhIf5/G+UYG4NnnzYw==}
@@ -2852,6 +2858,18 @@ packages:
       '@vue/language-core': 1.8.11(typescript@5.2.2)
     transitivePeerDependencies:
       - typescript
+    dev: true
+
+  /@vueuse/head@2.0.0(vue@3.3.4):
+    resolution: {integrity: sha512-ykdOxTGs95xjD4WXE4na/umxZea2Itl0GWBILas+O4oqS7eXIods38INvk3XkJKjqMdWPcpCyLX/DioLQxU1KA==}
+    peerDependencies:
+      vue: '>=2.7 || >=3'
+    dependencies:
+      '@unhead/dom': 1.7.4
+      '@unhead/schema': 1.7.4
+      '@unhead/ssr': 1.7.4
+      '@unhead/vue': 1.7.4(vue@3.3.4)
+      vue: 3.3.4
     dev: true
 
   /abab@2.0.6:
@@ -6632,7 +6650,6 @@ packages:
       '@unhead/schema': 1.7.4
       '@unhead/shared': 1.7.4
       hookable: 5.5.3
-    dev: false
 
   /unicode-canonical-property-names-ecmascript@2.0.0:
     resolution: {integrity: sha512-yY5PpDlfVIU5+y/BSCxAJRBIS1Zc2dDG3Ujq+sR0U+JjUevW2JhocOF+soROYDSaAezOzOKuyyixhD6mBknSmQ==}
@@ -7373,4 +7390,3 @@ packages:
 
   /zhead@2.1.1:
     resolution: {integrity: sha512-FRmjAFioi07R+bmL+fqbkXF/pCbC9PwcKQ8RDluC5xTaVbNBgYRQ4eKuS1C8c7Sil//UIxet/AGp7D6royoHhA==}
-    dev: false
