@@ -1,7 +1,7 @@
 {
   "name": "vite-ssg",
   "version": "0.23.2",
-  "packageManager": "pnpm@8.7.5",
+  "packageManager": "pnpm@8.7.6",
   "description": "Server-side generation for Vite",
   "author": "Anthony Fu <anthonyfu117@hotmail.com>",
   "license": "MIT",
@@ -22,18 +22,18 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.mjs"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
     },
     "./node": {
       "types": "./dist/node.d.ts",
-      "require": "./dist/node.cjs",
-      "import": "./dist/node.mjs"
+      "import": "./dist/node.mjs",
+      "require": "./dist/node.cjs"
     },
     "./single-page": {
       "types": "./dist/client/single-page.d.ts",
-      "require": "./dist/client/single-page.cjs",
-      "import": "./dist/client/single-page.mjs"
+      "import": "./dist/client/single-page.mjs",
+      "require": "./dist/client/single-page.cjs"
     }
   },
   "main": "dist/index.cjs",
@@ -97,22 +97,21 @@
     }
   },
   "dependencies": {
-    "@unhead/dom": "^1.7.3",
-    "@unhead/vue": "^1.7.3",
+    "@unhead/dom": "^1.7.4",
+    "@unhead/vue": "^1.7.4",
     "fs-extra": "^11.1.1",
     "html-minifier": "^4.0.0",
     "html5parser": "^2.0.2",
     "jsdom": "^22.1.0",
     "kolorist": "^1.8.0",
-    "prettier": "^2.8.8",
+    "prettier": "^3.0.3",
     "yargs": "^17.7.2"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^0.42.0",
-    "@types/fs-extra": "^11.0.1",
-    "@types/html-minifier": "^4.0.2",
-    "@types/jsdom": "^21.1.2",
-    "@types/prettier": "^2.7.3",
+    "@antfu/eslint-config": "^0.43.0",
+    "@types/fs-extra": "^11.0.2",
+    "@types/html-minifier": "^4.0.3",
+    "@types/jsdom": "^21.1.3",
     "@types/yargs": "^17.0.24",
     "bumpp": "^9.2.0",
     "critters": "^0.0.20",
@@ -120,7 +119,7 @@
     "esno": "^0.17.0",
     "fast-glob": "^3.3.1",
     "p-queue": "^7.4.1",
-    "rollup": "^3.29.1",
+    "rollup": "^3.29.2",
     "tsup": "^7.2.0",
     "typescript": "^5.2.2",
     "unbuild": "^2.0.0",

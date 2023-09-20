@@ -1,21 +1,12 @@
 {
   "compilerOptions": {
-    "module": "ESNext",
     "target": "es2020",
     "lib": [
       "ESNext",
       "DOM"
     ],
-    "esModuleInterop": true,
-    "strict": true,
-    "strictNullChecks": true,
+    "module": "ESNext",
     "moduleResolution": "Node",
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "types": [
-      "vite/client",
-      "vite-plugin-pages/client"
-    ],
     "paths": {
       "vite-ssg": [
         "./src/index.ts"
@@ -23,7 +14,16 @@
       "vite-ssg/single-page": [
         "./src/client/single-page.ts"
       ]
-    }
+    },
+    "types": [
+      "vite/client",
+      "vite-plugin-pages/client"
+    ],
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "skipLibCheck": true
   },
   "exclude": [
     "**/dist",

@@ -312,12 +312,8 @@ async function formatHtml(html: string, formatting: ViteSSGOptions['formatting']
     })
   }
   else if (formatting === 'prettify') {
-    // @ts-expect-error dynamic import
-    const prettier = (await import('prettier/esm/standalone.mjs')).default
-    // @ts-expect-error dynamic import
-    const parserHTML = (await import('prettier/esm/parser-html.mjs')).default
-
-    return prettier.format(html, { semi: false, parser: 'html', plugins: [parserHTML] })
+    const prettier = (await import('prettier')).default
+    return await prettier.format(html, { semi: false, parser: 'html' })
   }
   return html
 }

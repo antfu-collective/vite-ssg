@@ -7,7 +7,7 @@
     "serve": "vite preview --base /ssg-base/"
   },
   "dependencies": {
-    "@unhead/vue": "^1.7.3",
+    "@unhead/vue": "^1.7.4",
     "vue": "^3.3.4"
   },
   "devDependencies": {
@@ -15,9 +15,9 @@
     "cross-env": "^7.0.3",
     "typescript": "^5.2.2",
     "unplugin-vue-components": "^0.25.2",
+    "unplugin-vue-markdown": "^0.24.3",
     "vite": "^4.4.9",
     "vite-plugin-pages": "^0.31.0",
-    "vite-plugin-vue-markdown": "^0.23.8",
     "vite-ssg": "workspace:*",
     "vue-router": "^4.2.4"
   }

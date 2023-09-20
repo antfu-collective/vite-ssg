@@ -60,12 +60,12 @@ export interface ViteSSGOptions {
   dirStyle?: 'flat' | 'nested'
 
   /**
-    * Generate for all routes, including dynamic routes.
-    * If enabled, you will need to configure your server
-    * manually to handle dynamic routes properly.
-    *
-    * @default false
-    */
+   * Generate for all routes, including dynamic routes.
+   * If enabled, you will need to configure your server
+   * manually to handle dynamic routes properly.
+   *
+   * @default false
+   */
   includeAllRoutes?: boolean
 
   /**
