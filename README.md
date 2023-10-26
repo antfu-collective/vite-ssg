@@ -99,7 +99,7 @@ useHead({
 
 That's all! No configuration is needed. Vite SSG will automatically handle the server-side rendering and merging.
 
-See [`@unhead/vue`'s docs](https://unhead.harlanzw.com/integrations/vue/setup) for more usage information about `useHead`.
+See [`@unhead/vue`'s docs](https://unhead.unjs.io/setup/vue/installation) for more usage information about `useHead`.
 
 ## Critical CSS
 
