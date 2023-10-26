@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import fg from 'fast-glob'
 
 describe('multiple-pages', () => {
-  it('generates', async () => {
+  it('generates list', async () => {
     const files = await fg('**/*.html', {
       cwd: 'examples/multiple-pages/dist',
     })
@@ -17,7 +17,7 @@ describe('multiple-pages', () => {
     `)
   })
 
-  it('generates', async () => {
+  it('generates content', async () => {
     const file = await fs.readFile('examples/multiple-pages/dist/a.html', 'utf-8')
     expect(file).toContain('Page A')
   })

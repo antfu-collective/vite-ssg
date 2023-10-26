@@ -4,7 +4,7 @@ const envMode = import.meta.env.VITE_ENV_MODE
 
 <template>
   <main>
-    <router-view />
+    <RouterView />
     <pre>VITE_ENV_MODE:{{ envMode }}</pre>
   </main>
 </template>

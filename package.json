@@ -53,9 +53,9 @@
     "vite-ssg": "bin/vite-ssg.js"
   },
   "files": [
-    "dist",
+    "*.d.ts",
     "bin",
-    "*.d.ts"
+    "dist"
   ],
   "engines": {
     "node": ">=14.0.0"
@@ -108,7 +108,7 @@
     "yargs": "^17.7.2"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^0.43.1",
+    "@antfu/eslint-config": "^1.0.0-beta.29",
     "@types/fs-extra": "^11.0.3",
     "@types/html-minifier": "^4.0.4",
     "@types/jsdom": "^21.1.4",

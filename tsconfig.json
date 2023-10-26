@@ -15,14 +15,14 @@
         "./src/client/single-page.ts"
       ]
     },
+    "resolveJsonModule": true,
     "types": [
       "vite/client",
       "vite-plugin-pages/client"
     ],
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
     "strict": true,
     "strictNullChecks": true,
+    "esModuleInterop": true,
     "skipLibCheck": true
   },
   "exclude": [

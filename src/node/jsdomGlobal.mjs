@@ -68,7 +68,6 @@ export function jsdomGlobal(html = defaultHtml, options = {}) {
     KEYS.push('$jsdom')
   }
 
-  // eslint-disable-next-line no-return-assign
   KEYS.forEach(key => global[key] = window[key])
 
   // setup document / window / window.console

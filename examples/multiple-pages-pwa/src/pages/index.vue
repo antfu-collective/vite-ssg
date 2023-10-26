@@ -11,10 +11,10 @@ export default {
 </script>
 
 <template>
-  <router-link to="/nested/deep/a">
+  <RouterLink to="/nested/deep/a">
     A
-  </router-link>
-  <router-link to="/b">
+  </RouterLink>
+  <RouterLink to="/b">
     B
-  </router-link>
+  </RouterLink>
 </template>
