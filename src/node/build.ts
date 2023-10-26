@@ -128,11 +128,20 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
 
   buildLog('Rendering Pages...', routesPaths.length)
 
-  const critters = crittersOptions !== false ? await getCritters(outDir, crittersOptions) : undefined
+  const critters = crittersOptions !== false
+    ? await getCritters(outDir, crittersOptions)
+    : undefined
   if (critters)
     console.log(`${gray('[vite-ssg]')} ${blue('Critical CSS generation enabled via `critters`')}`)
 
-  const ssrManifest: Manifest = JSON.parse(await fs.readFile(join(out, 'ssr-manifest.json'), 'utf-8'))
+  const {
+    path: _ssrManifestPath,
+    content: ssrManifestRaw,
+  } = await readFiles(
+    join(out, '.vite', 'ssr-manifest.json'), // Vite 5
+    join(out, 'ssr-manifest.json'), // Vite 4 and below
+  )
+  const ssrManifest: Manifest = JSON.parse(ssrManifestRaw)
   let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
   indexHTML = rewriteScripts(indexHTML, script)
 
@@ -316,4 +325,16 @@ async function formatHtml(html: string, formatting: ViteSSGOptions['formatting']
     return await prettier.format(html, { semi: false, parser: 'html' })
   }
   return html
+}
+
+async function readFiles(...paths: string[]) {
+  for (const path of paths) {
+    if (fs.existsSync(path)) {
+      return {
+        path,
+        content: await fs.readFile(path, 'utf-8'),
+      }
+    }
+  }
+  throw new Error(`Could not find any of the following files: ${paths.join(', ')}`)
 }
