@@ -7,13 +7,13 @@
     "serve": "vite preview"
   },
   "dependencies": {
-    "@unhead/vue": "^1.7.4",
+    "@unhead/vue": "^1.8.3",
     "pinia": "^2.1.7",
-    "vue": "^3.3.7"
+    "vue": "^3.3.8"
   },
   "devDependencies": {
     "@nuxt/devalue": "^2.0.2",
-    "@vitejs/plugin-vue": "^4.4.0",
+    "@vitejs/plugin-vue": "^4.4.1",
     "cross-env": "^7.0.3",
     "typescript": "^5.2.2",
     "unplugin-vue-components": "^0.25.2",

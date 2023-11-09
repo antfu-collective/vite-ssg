@@ -7,17 +7,17 @@
     "serve": "vite preview"
   },
   "dependencies": {
-    "@unhead/vue": "^1.7.4",
-    "vue": "^3.3.7"
+    "@unhead/vue": "^1.8.3",
+    "vue": "^3.3.8"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.4.0",
+    "@vitejs/plugin-vue": "^4.4.1",
     "cross-env": "^7.0.3",
     "typescript": "^5.2.2",
     "unplugin-vue-markdown": "^0.24.3",
     "vite": "^4.5.0",
     "vite-plugin-pages": "^0.31.0",
-    "vite-plugin-pwa": "^0.16.5",
+    "vite-plugin-pwa": "^0.16.7",
     "vite-ssg": "workspace:*",
     "vue-router": "^4.2.5"
   }

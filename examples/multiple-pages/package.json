@@ -7,11 +7,11 @@
     "serve": "vite preview --base /ssg-base/"
   },
   "dependencies": {
-    "@unhead/vue": "^1.7.4",
-    "vue": "^3.3.7"
+    "@unhead/vue": "^1.8.3",
+    "vue": "^3.3.8"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.4.0",
+    "@vitejs/plugin-vue": "^4.4.1",
     "cross-env": "^7.0.3",
     "typescript": "^5.2.2",
     "unplugin-vue-components": "^0.25.2",
