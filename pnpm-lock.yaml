@@ -125,8 +125,8 @@ importers:
         specifier: ^0.25.2
         version: 0.25.2(rollup@4.3.0)(vue@3.3.8)
       unplugin-vue-markdown:
-        specifier: ^0.24.3
-        version: 0.24.3(rollup@4.3.0)(vite@5.0.0-beta.12)
+        specifier: ^0.25.0
+        version: 0.25.0(rollup@4.3.0)(vite@5.0.0-beta.12)
       vite:
         specifier: ^5.0.0-beta.12
         version: 5.0.0-beta.12(@types/node@20.6.0)
@@ -159,8 +159,8 @@ importers:
         specifier: ^5.2.2
         version: 5.2.2
       unplugin-vue-markdown:
-        specifier: ^0.24.3
-        version: 0.24.3(rollup@2.79.1)(vite@5.0.0-beta.12)
+        specifier: ^0.25.0
+        version: 0.25.0(rollup@2.79.1)(vite@5.0.0-beta.12)
       vite:
         specifier: ^5.0.0-beta.12
         version: 5.0.0-beta.12(@types/node@20.6.0)
@@ -205,8 +205,8 @@ importers:
         specifier: ^0.25.2
         version: 0.25.2(rollup@4.3.0)(vue@3.3.8)
       unplugin-vue-markdown:
-        specifier: ^0.24.3
-        version: 0.24.3(rollup@4.3.0)(vite@5.0.0-beta.12)
+        specifier: ^0.25.0
+        version: 0.25.0(rollup@4.3.0)(vite@5.0.0-beta.12)
       vite:
         specifier: ^5.0.0-beta.12
         version: 5.0.0-beta.12(@types/node@20.6.0)
@@ -2014,24 +2014,24 @@ packages:
       type-detect: 4.0.8
     dev: true
 
-  /@mdit-vue/plugin-component@0.12.1:
-    resolution: {integrity: sha512-L3elbvuKUufXwPLHrmJGd/ijd/QKxfcHXy3kRy4O+P7UIV7HSWePpfB0k+wWee+by3MviYYxjVAi392z+DGy3Q==}
+  /@mdit-vue/plugin-component@1.0.0:
+    resolution: {integrity: sha512-ZXsJwxkG5yyTHARIYbR74cT4AZ0SfMokFFjiHYCbypHIeYWgJhso4+CZ8+3V9EWFG3EHlGoKNGqKp9chHnqntQ==}
     dependencies:
-      '@types/markdown-it': 13.0.1
-      markdown-it: 13.0.1
+      '@types/markdown-it': 13.0.6
+      markdown-it: 13.0.2
     dev: true
 
-  /@mdit-vue/plugin-frontmatter@0.12.1:
-    resolution: {integrity: sha512-C6ycNjrJ+T4JgbVxwo9cUkfLacOO841Yl8ogqd5PJmAVpc5cM2OLBkqqkZxNRXos3g9xM1VvIQ7gK/047UNADg==}
+  /@mdit-vue/plugin-frontmatter@1.0.0:
+    resolution: {integrity: sha512-MMA7Ny+YPZA7eDOY1t4E+rKuEWO39mzDdP/M68fKdXJU6VfcGkPr7gnpnJfW2QBJ5qIvMrK/3lDAA2JBy5TfpA==}
     dependencies:
-      '@mdit-vue/types': 0.12.0
-      '@types/markdown-it': 13.0.1
+      '@mdit-vue/types': 1.0.0
+      '@types/markdown-it': 13.0.6
       gray-matter: 4.0.3
-      markdown-it: 13.0.1
+      markdown-it: 13.0.2
     dev: true
 
-  /@mdit-vue/types@0.12.0:
-    resolution: {integrity: sha512-mrC4y8n88BYvgcgzq9bvTlDgFyi2zuvzmPilRvRc3Uz1iIvq8mDhxJ0rHKFUNzPEScpDvJdIujqiDrulMqiudA==}
+  /@mdit-vue/types@1.0.0:
+    resolution: {integrity: sha512-xeF5+sHLzRNF7plbksywKCph4qli20l72of2fMlZQQ7RECvXYrRkE9+bjRFQCyULC7B8ydUYbpbkux5xJlVWyw==}
     dev: true
 
   /@nodelib/fs.scandir@2.1.5:
@@ -2189,21 +2189,6 @@ packages:
       rollup: 2.79.1
     dev: true
 
-  /@rollup/pluginutils@5.0.4(rollup@2.79.1):
-    resolution: {integrity: sha512-0KJnIoRI8A+a1dqOYLxH8vBf8bphDmty5QvIm2hqm7oFCFYKCAZWWd2hXgMibaPsNDhI0AtpYfQZJG47pt/k4g==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      rollup: ^1.20.0||^2.0.0||^3.0.0
-    peerDependenciesMeta:
-      rollup:
-        optional: true
-    dependencies:
-      '@types/estree': 1.0.1
-      estree-walker: 2.0.2
-      picomatch: 2.3.1
-      rollup: 2.79.1
-    dev: true
-
   /@rollup/pluginutils@5.0.4(rollup@3.29.2):
     resolution: {integrity: sha512-0KJnIoRI8A+a1dqOYLxH8vBf8bphDmty5QvIm2hqm7oFCFYKCAZWWd2hXgMibaPsNDhI0AtpYfQZJG47pt/k4g==}
     engines: {node: '>=14.0.0'}
@@ -2224,6 +2209,36 @@ packages:
     engines: {node: '>=14.0.0'}
     peerDependencies:
       rollup: ^1.20.0||^2.0.0||^3.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+    dependencies:
+      '@types/estree': 1.0.1
+      estree-walker: 2.0.2
+      picomatch: 2.3.1
+      rollup: 4.3.0
+    dev: true
+
+  /@rollup/pluginutils@5.0.5(rollup@2.79.1):
+    resolution: {integrity: sha512-6aEYR910NyP73oHiJglti74iRyOwgFU4x3meH/H8OJx6Ry0j6cOVZ5X/wTvub7G7Ao6qaHBEaNsV3GLJkSsF+Q==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+    dependencies:
+      '@types/estree': 1.0.1
+      estree-walker: 2.0.2
+      picomatch: 2.3.1
+      rollup: 2.79.1
+    dev: true
+
+  /@rollup/pluginutils@5.0.5(rollup@4.3.0):
+    resolution: {integrity: sha512-6aEYR910NyP73oHiJglti74iRyOwgFU4x3meH/H8OJx6Ry0j6cOVZ5X/wTvub7G7Ao6qaHBEaNsV3GLJkSsF+Q==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
     peerDependenciesMeta:
       rollup:
         optional: true
@@ -2468,8 +2483,8 @@ packages:
     resolution: {integrity: sha512-HZQYqbiFVWufzCwexrvh694SOim8z2d+xJl5UNamcvQFejLY/2YUtzXHYi3cHdI7PMlS8ejH2slRAOJQ32aNbA==}
     dev: true
 
-  /@types/markdown-it@13.0.1:
-    resolution: {integrity: sha512-SUEb8Frsxs3D5Gg9xek6i6EG6XQ5s+O+ZdQzIPESZVZw3Pv3CPQfjCJBI+RgqZd1IBeu18S0Rn600qpPnEK37w==}
+  /@types/markdown-it@13.0.6:
+    resolution: {integrity: sha512-0VqpvusJn1/lwRegCxcHVdmLfF+wIsprsKMC9xW8UPcTxhFcQtoN/fBU1zMe8pH7D/RuueMh2CaBaNv+GrLqTw==}
     dependencies:
       '@types/linkify-it': 3.0.2
       '@types/mdurl': 1.0.2
@@ -5261,8 +5276,8 @@ packages:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.4.15
 
-  /markdown-it@13.0.1:
-    resolution: {integrity: sha512-lTlxriVoy2criHP0JKRhO2VDG9c2ypWCsT237eDiLqi09rmbKoUetyGHq2uOIRoRS//kfoJckS0eUzzkDR+k2Q==}
+  /markdown-it@13.0.2:
+    resolution: {integrity: sha512-FtwnEuuK+2yVU7goGn/MJ0WBZMM9ZPgU9spqlFs7/A/pDIUNSOQZhUgOqYCficIuR2QaFnrt8LHqBWsbTAoI5w==}
     hasBin: true
     dependencies:
       argparse: 2.0.1
@@ -6768,35 +6783,35 @@ packages:
       - supports-color
     dev: true
 
-  /unplugin-vue-markdown@0.24.3(rollup@2.79.1)(vite@5.0.0-beta.12):
-    resolution: {integrity: sha512-v9fNupSfGnQTYrzpDO51DTppR6IsR/ufNdKycBe7HK0nApuXYiLzo5i5ejG63NSnMauTDFZB1kYOlUjJZ5auvQ==}
+  /unplugin-vue-markdown@0.25.0(rollup@2.79.1)(vite@5.0.0-beta.12):
+    resolution: {integrity: sha512-X0G6E1drAM59HKnSEMVZ6WMzfM8IFZvBjd0nlCx988MRFNEj/Pn67aKs2bvHx53O2AyLN0PxnfRqLxGbP2pZ1Q==}
     peerDependencies:
       vite: ^5.0.0-beta.12
     dependencies:
-      '@mdit-vue/plugin-component': 0.12.1
-      '@mdit-vue/plugin-frontmatter': 0.12.1
-      '@mdit-vue/types': 0.12.0
-      '@rollup/pluginutils': 5.0.4(rollup@2.79.1)
-      '@types/markdown-it': 13.0.1
-      markdown-it: 13.0.1
-      unplugin: 1.4.0
+      '@mdit-vue/plugin-component': 1.0.0
+      '@mdit-vue/plugin-frontmatter': 1.0.0
+      '@mdit-vue/types': 1.0.0
+      '@rollup/pluginutils': 5.0.5(rollup@2.79.1)
+      '@types/markdown-it': 13.0.6
+      markdown-it: 13.0.2
+      unplugin: 1.5.0
       vite: 5.0.0-beta.12(@types/node@20.6.0)
     transitivePeerDependencies:
       - rollup
     dev: true
 
-  /unplugin-vue-markdown@0.24.3(rollup@4.3.0)(vite@5.0.0-beta.12):
-    resolution: {integrity: sha512-v9fNupSfGnQTYrzpDO51DTppR6IsR/ufNdKycBe7HK0nApuXYiLzo5i5ejG63NSnMauTDFZB1kYOlUjJZ5auvQ==}
+  /unplugin-vue-markdown@0.25.0(rollup@4.3.0)(vite@5.0.0-beta.12):
+    resolution: {integrity: sha512-X0G6E1drAM59HKnSEMVZ6WMzfM8IFZvBjd0nlCx988MRFNEj/Pn67aKs2bvHx53O2AyLN0PxnfRqLxGbP2pZ1Q==}
     peerDependencies:
       vite: ^5.0.0-beta.12
     dependencies:
-      '@mdit-vue/plugin-component': 0.12.1
-      '@mdit-vue/plugin-frontmatter': 0.12.1
-      '@mdit-vue/types': 0.12.0
-      '@rollup/pluginutils': 5.0.4(rollup@4.3.0)
-      '@types/markdown-it': 13.0.1
-      markdown-it: 13.0.1
-      unplugin: 1.4.0
+      '@mdit-vue/plugin-component': 1.0.0
+      '@mdit-vue/plugin-frontmatter': 1.0.0
+      '@mdit-vue/types': 1.0.0
+      '@rollup/pluginutils': 5.0.5(rollup@4.3.0)
+      '@types/markdown-it': 13.0.6
+      markdown-it: 13.0.2
+      unplugin: 1.5.0
       vite: 5.0.0-beta.12(@types/node@20.6.0)
     transitivePeerDependencies:
       - rollup
@@ -6804,6 +6819,15 @@ packages:
 
   /unplugin@1.4.0:
     resolution: {integrity: sha512-5x4eIEL6WgbzqGtF9UV8VEC/ehKptPXDS6L2b0mv4FRMkJxRtjaJfOWDd6a8+kYbqsjklix7yWP0N3SUepjXcg==}
+    dependencies:
+      acorn: 8.11.2
+      chokidar: 3.5.3
+      webpack-sources: 3.2.3
+      webpack-virtual-modules: 0.5.0
+    dev: true
+
+  /unplugin@1.5.0:
+    resolution: {integrity: sha512-9ZdRwbh/4gcm1JTOkp9lAkIDrtOyOxgHmY7cjuwI8L/2RTikMcVG25GsZwNAgRuap3iDw2jeq7eoqtAsz5rW3A==}
     dependencies:
       acorn: 8.11.2
       chokidar: 3.5.3
