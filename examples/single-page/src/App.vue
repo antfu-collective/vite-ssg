@@ -15,6 +15,8 @@ const store = useRootStore()
 
   <h3>Initial State:</h3>
   <pre>{{ store.user }}</pre>
+  
+  <a href="https://github.com/antfu/vite-ssg" aria-label="Permalink to &quot;Usage `^`, `$`&quot;"></a>
 </template>
 
 <style>
