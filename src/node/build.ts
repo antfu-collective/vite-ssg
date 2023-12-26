@@ -279,7 +279,7 @@ async function renderHTML({
     return indexHTML
       .replace(
         container,
-        `<div id="${rootContainerId}" data-server-rendered="true">${appHTML}</div>${stateScript}`,
+        () => `<div id="${rootContainerId}" data-server-rendered="true">${appHTML}</div>${stateScript}`,
       )
   }
 
