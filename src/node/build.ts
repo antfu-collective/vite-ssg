@@ -113,7 +113,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
 
   const _require = createRequire(import.meta.url)
 
-  const { createApp, includedRoutes: serverEntryIncludedRoutes }: { createApp: CreateAppFactory; includedRoutes: ViteSSGOptions['includedRoutes'] } = format === 'esm'
+  const { createApp, includedRoutes: serverEntryIncludedRoutes }: { createApp: CreateAppFactory, includedRoutes: ViteSSGOptions['includedRoutes'] } = format === 'esm'
     ? await import(serverEntry)
     : _require(serverEntry)
   const includedRoutes = serverEntryIncludedRoutes || configIncludedRoutes
@@ -290,10 +290,10 @@ async function renderHTML({
   html5Parser.walk(ast, {
     enter: (node) => {
       if (!renderedOutput
-          && node?.type === html5Parser.SyntaxKind.Tag
-          && Array.isArray(node.attributes)
-          && node.attributes.length > 0
-          && node.attributes.some(attr => attr.name.value === 'id' && attr.value?.value === rootContainerId)
+        && node?.type === html5Parser.SyntaxKind.Tag
+        && Array.isArray(node.attributes)
+        && node.attributes.length > 0
+        && node.attributes.some(attr => attr.name.value === 'id' && attr.value?.value === rootContainerId)
       ) {
         const attributesStringified = [...node.attributes.map(({ name: { value: name }, value }) => `${name}="${value!.value}"`)].join(' ')
         const indexHTMLBefore = indexHTML.slice(0, node.start)

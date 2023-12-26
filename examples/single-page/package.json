@@ -8,13 +8,13 @@
   },
   "dependencies": {
     "pinia": "^2.1.7",
-    "vue": "^3.3.8"
+    "vue": "^3.3.13"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.4.1",
+    "@vitejs/plugin-vue": "^5.0.0",
     "cross-env": "^7.0.3",
-    "typescript": "^5.2.2",
-    "vite": "^4.5.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.10",
     "vite-ssg": "workspace:*"
   }
 }

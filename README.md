@@ -127,7 +127,6 @@ export default defineConfig({
 })
 ```
 
-
 ## Initial State
 
 The initial state comprises data that is serialized with your server-side generated HTML and is hydrated in
