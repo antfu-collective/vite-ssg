@@ -131,9 +131,9 @@ export interface ViteSSGContext<HasRouter extends boolean = true> {
   initialState: Record<string, any>
   head: VueHeadClient<MergeHead> | undefined
   isClient: boolean
-  onSSRAppRendered(cb: () => void): void
-  triggerOnSSRAppRendered(route: string, appHTML: string, appCtx: ViteSSGContext): Promise<unknown[]>
-  transformState?(state: any): any
+  onSSRAppRendered: (cb: () => void) => void
+  triggerOnSSRAppRendered: (route: string, appHTML: string, appCtx: ViteSSGContext) => Promise<unknown[]>
+  transformState?: (state: any) => any
   /**
    * Current router path on SSG, `undefined` on client side.
    */
