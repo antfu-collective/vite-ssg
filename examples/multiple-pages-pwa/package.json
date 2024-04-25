@@ -7,18 +7,18 @@
     "serve": "vite preview"
   },
   "dependencies": {
-    "@unhead/vue": "^1.8.9",
-    "vue": "^3.3.13"
+    "@unhead/vue": "^1.9.7",
+    "vue": "^3.4.25"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.0.0",
+    "@vitejs/plugin-vue": "^5.0.4",
     "cross-env": "^7.0.3",
-    "typescript": "^5.3.3",
-    "unplugin-vue-markdown": "^0.25.2",
-    "vite": "^5.0.10",
-    "vite-plugin-pages": "^0.32.0",
-    "vite-plugin-pwa": "^0.17.4",
+    "typescript": "^5.4.5",
+    "unplugin-vue-markdown": "^0.26.2",
+    "vite": "^5.2.10",
+    "vite-plugin-pages": "^0.32.1",
+    "vite-plugin-pwa": "^0.19.8",
     "vite-ssg": "workspace:*",
-    "vue-router": "^4.2.5"
+    "vue-router": "^4.3.2"
   }
 }
