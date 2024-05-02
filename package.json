@@ -83,7 +83,7 @@
     "release": "bumpp && npm publish"
   },
   "peerDependencies": {
-    "critters": "^0.0.20",
+    "critters": "^0.0.22",
     "vite": "^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0-0",
     "vue": "^3.2.10",
     "vue-router": "^4.0.1"
