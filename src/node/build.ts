@@ -316,8 +316,8 @@ async function renderHTML({
 
 async function formatHtml(html: string, formatting: ViteSSGOptions['formatting']) {
   if (formatting === 'minify') {
-    const htmlMinifier = await import('html-minifier')
-    return htmlMinifier.minify(html, {
+    const htmlMinifier = await import('html-minifier-terser')
+    return await htmlMinifier.minify(html, {
       collapseWhitespace: true,
       caseSensitive: true,
       collapseInlineTagWhitespace: false,
