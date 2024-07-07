@@ -100,7 +100,7 @@
     "@unhead/dom": "^1.9.7",
     "@unhead/vue": "^1.9.7",
     "fs-extra": "^11.2.0",
-    "html-minifier": "^4.0.0",
+    "html-minifier-terser": "^7.2.0",
     "html5parser": "^2.0.2",
     "jsdom": "^24.0.0",
     "kolorist": "^1.8.0",
@@ -110,7 +110,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^2.15.0",
     "@types/fs-extra": "^11.0.4",
-    "@types/html-minifier": "^4.0.5",
+    "@types/html-minifier-terser": "^7.0.2",
     "@types/jsdom": "^21.1.6",
     "@types/yargs": "^17.0.32",
     "bumpp": "^9.4.0",
