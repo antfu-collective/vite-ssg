@@ -14,7 +14,7 @@ export async function getCritters(outDir: string, options: Options = {}): Promis
       ...options,
     })
   }
-  catch (e) {
+  catch {
     return undefined
   }
 }

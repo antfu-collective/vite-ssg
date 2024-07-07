@@ -241,7 +241,8 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
 
 async function detectEntry(root: string) {
   // pick the first script tag of type module as the entry
-  const scriptSrcReg = /<script(?:.*?)src=["'](.+?)["'](?!<)(?:.*)\>(?:[\n\r\s]*?)(?:<\/script>)/img
+  // eslint-disable-next-line regexp/no-super-linear-backtracking
+  const scriptSrcReg = /<script.*?src=["'](.+?)["'](?!<).*>\s*<\/script>/gi
   const html = await fs.readFile(join(root, 'index.html'), 'utf-8')
   const scripts = [...html.matchAll(scriptSrcReg)] || []
   const [, entry] = scripts.find((matchResult) => {

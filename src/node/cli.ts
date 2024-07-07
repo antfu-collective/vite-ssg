@@ -1,10 +1,10 @@
-/* eslint-disable no-unused-expressions */
 import process from 'node:process'
 import { bold, gray, red, reset, underline } from 'kolorist'
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 import { build } from './build'
 
+// eslint-disable-next-line ts/no-unused-expressions
 yargs(hideBin(process.argv))
   .scriptName('vite-ssg')
   .usage('$0 [args]')

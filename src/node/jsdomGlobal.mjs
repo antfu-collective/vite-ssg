@@ -42,8 +42,9 @@ export function jsdomGlobal(html = defaultHtml, options = {}) {
     && global.navigator.userAgent
     && global.navigator.userAgent.includes('Node.js')
     && global.document
-    && typeof global.document.destroy === 'function')
+    && typeof global.document.destroy === 'function') {
     return global.document.destroy
+  }
 
   // set a default url if we don't get one - otherwise things explode when we copy localstorage keys
   if (!('url' in options))
