@@ -19,6 +19,14 @@ export interface ViteSSGOptions {
   format?: 'esm' | 'cjs'
 
   /**
+   * output directory of SSG server files
+   */
+  ssgOut?: string
+
+  
+  
+
+  /**
    * The path of the main entry file (relative to the project root).
    *
    * @default 'src/main.ts'
@@ -104,6 +112,15 @@ export interface ViteSSGOptions {
    * The returned value will be used as the HTML of the route.
    */
   onPageRendered?: (route: string, renderedHTML: string, appCtx: ViteSSGContext<true>) => Promise<string | null | undefined> | string | null | undefined
+
+/**
+   * Callback to be called on every rendered page.
+   *
+   * It's useful to debug memory leaks 
+   *
+   */
+  onDonePageRender?: (route: string, renderedHTML: string, appCtx: ViteSSGContext<true>) => Promise< void> | void
+
 
   onFinished?: () => Promise<void> | void
 

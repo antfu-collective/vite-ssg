@@ -27,40 +27,15 @@ function DefaultIncludedRoutes(paths: string[], _routes: Readonly<RouteRecordRaw
   return paths.filter(i => !i.includes(':') && !i.includes('*'))
 }
 
-export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig: InlineConfig = {}) {
-  const nodeEnv = process.env.NODE_ENV || 'production'
-  const mode = process.env.MODE || ssgOptions.mode || nodeEnv
-  const config = await resolveConfig(viteConfig, 'build', mode, nodeEnv)
-
+function getRoot(config: ResolvedConfig) {
   const cwd = process.cwd()
-  const root = config.root || cwd
-  const ssgOut = join(root, '.vite-ssg-temp', Math.random().toString(36).substring(2, 12))
-  const outDir = config.build.outDir || 'dist'
-  const out = isAbsolute(outDir) ? outDir : join(root, outDir)
+  return config.root || cwd
+}
 
-  const {
-    script = 'sync',
-    mock = false,
-    entry = await detectEntry(root),
-    formatting = 'none',
-    crittersOptions = {},
-    includedRoutes: configIncludedRoutes = DefaultIncludedRoutes,
-    onBeforePageRender,
-    onPageRendered,
-    onFinished,
-    dirStyle = 'flat',
-    includeAllRoutes = false,
-    format = 'esm',
-    concurrency = 20,
-    rootContainerId = 'app',
-    base,
-  }: ViteSSGOptions = Object.assign({}, config.ssgOptions || {}, ssgOptions)
-
-  if (fs.existsSync(ssgOut))
-    await fs.remove(ssgOut)
-
-  // client
+async function buildClient(config: ResolvedConfig, viteConfig: InlineConfig): Promise<void> {
+  const root = getRoot(config)
   buildLog('Build for client...')
+  const { base } = config
   await viteBuild(mergeConfig(viteConfig, {
     base,
     build: {
@@ -73,18 +48,13 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
     },
     mode: config.mode,
   }))
+}
 
-  // load jsdom before building the SSR and so jsdom will be available
-  if (mock) {
-    // @ts-expect-error just ignore it
-    const { jsdomGlobal }: { jsdomGlobal: () => void } = await import('./jsdomGlobal.mjs')
-    jsdomGlobal()
-  }
-
-  // server
+async function buildServer(config: ResolvedConfig, viteConfig: InlineConfig, { ssrEntry, ssgOut, format }: { ssrEntry: string, ssgOut: string, format: ViteSSGOptions['format'] }): Promise<void> {
   buildLog('Build for server...')
   process.env.VITE_SSG = 'true'
-  const ssrEntry = await resolveAlias(config, entry)
+  const { base } = config
+
   await viteBuild(mergeConfig(viteConfig, {
     base,
     build: {
@@ -106,6 +76,61 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
     },
     mode: config.mode,
   }))
+}
+
+export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?: boolean }> = {}, viteConfig: InlineConfig = {}) {
+  const nodeEnv = process.env.NODE_ENV || 'production'
+  const mode = process.env.MODE || ssgOptions.mode || nodeEnv
+  const config = await resolveConfig(viteConfig, 'build', mode, nodeEnv)
+
+  const root = getRoot(config)
+  const outDir = config.build.outDir || 'dist'
+  const out = isAbsolute(outDir) ? outDir : join(root, outDir)
+
+  const {
+    script = 'sync',
+    mock = false,
+    entry = await detectEntry(root),
+    ssgOut: _ssgOutDir = join(root, '.vite-ssg-temp', Math.random().toString(36).substring(2, 12)),
+    formatting = 'none',
+    crittersOptions = {},
+    includedRoutes: configIncludedRoutes = DefaultIncludedRoutes,
+    onBeforePageRender,
+    onPageRendered,
+    onDonePageRender,
+    onFinished,
+    dirStyle = 'flat',
+    includeAllRoutes = false,
+    format = 'esm',
+    concurrency = 20,
+    rootContainerId = 'app',
+  }: ViteSSGOptions = Object.assign({}, config.ssgOptions || {}, ssgOptions)
+
+  const ssgOut = isAbsolute(_ssgOutDir) ? _ssgOutDir : join(root, _ssgOutDir)
+
+  let willRunBuild: boolean = true
+  if (fs.existsSync(ssgOut)) {
+    willRunBuild = !ssgOptions['skip-build']
+    if (willRunBuild) {
+      await fs.remove(ssgOut)
+    }
+  }
+
+  // client
+  if (willRunBuild)
+    await buildClient(config, viteConfig)
+
+  // load jsdom before building the SSR and so jsdom will be available
+  if (mock) {
+    // @ts-expect-error just ignore it
+    const { jsdomGlobal }: { jsdomGlobal: () => void } = await import('./jsdomGlobal.mjs')
+    jsdomGlobal()
+  }
+
+  // server
+  const ssrEntry = await resolveAlias(config, entry)
+  if (willRunBuild)
+    await buildServer(config, viteConfig, { ssrEntry, ssgOut, format })
 
   const prefix = (format === 'esm' && process.platform === 'win32') ? 'file://' : ''
   const ext = format === 'esm' ? '.mjs' : '.cjs'
@@ -155,63 +180,73 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
   const queue = new PQueue({ concurrency })
 
   for (const route of routesPaths) {
+    await queue.onSizeLessThan(concurrency + 5) // avoid grow the number of tasks in queue
     queue.add(async () => {
-      try {
-        const appCtx = await createApp(false, route) as ViteSSGContext<true>
-        const { app, router, head, initialState, triggerOnSSRAppRendered, transformState = serializeState } = appCtx
+      const executeTaskFn = async () => {
+        try {
+          const appCtx = await createApp(false, route) as ViteSSGContext<true>
+          const { app, router, head, initialState, triggerOnSSRAppRendered, transformState = serializeState } = appCtx
 
-        if (router) {
-          await router.push(route)
-          await router.isReady()
+          if (router) {
+            await router.push(route)
+            await router.isReady()
+          }
+
+          const transformedIndexHTML = (await onBeforePageRender?.(route, indexHTML, appCtx)) || indexHTML
+
+          const ctx: SSRContext = {}
+          const appHTML = await renderToString(app, ctx)
+          await triggerOnSSRAppRendered?.(route, appHTML, appCtx)
+          // need to resolve assets so render content first
+          const renderedHTML = await renderHTML({
+            rootContainerId,
+            indexHTML: transformedIndexHTML,
+            appHTML,
+            initialState: transformState(initialState),
+          })
+
+          // create jsdom from renderedHTML
+          const jsdom = new JSDOM(renderedHTML)
+
+          // render current page's preloadLinks
+          renderPreloadLinks(jsdom.window.document, ctx.modules || new Set<string>(), ssrManifest)
+
+          // render head
+          if (head)
+            await renderDOMHead(head, { document: jsdom.window.document })
+
+          const html = jsdom.serialize()
+          jsdom.window.close()
+          await new Promise(r => setImmediate(r))
+
+          let transformed = (await onPageRendered?.(route, html, appCtx)) || html
+          if (critters)
+            transformed = await critters.process(transformed)
+
+          const formatted = await formatHtml(transformed, formatting)
+
+          const relativeRouteFile = `${(route.endsWith('/')
+            ? `${route}index`
+            : route).replace(/^\//g, '')}.html`
+
+          const filename = dirStyle === 'nested'
+            ? join(route.replace(/^\//g, ''), 'index.html')
+            : relativeRouteFile
+
+          await fs.ensureDir(join(out, dirname(filename)))
+          await fs.writeFile(join(out, filename), formatted, 'utf-8')
+
+          config.logger.info(
+            `${dim(`${outDir}/`)}${cyan(filename.padEnd(15, ' '))}  ${dim(getSize(formatted))}`,
+          )
+          return { route, html, appCtx }
         }
-
-        const transformedIndexHTML = (await onBeforePageRender?.(route, indexHTML, appCtx)) || indexHTML
-
-        const ctx: SSRContext = {}
-        const appHTML = await renderToString(app, ctx)
-        await triggerOnSSRAppRendered?.(route, appHTML, appCtx)
-        // need to resolve assets so render content first
-        const renderedHTML = await renderHTML({
-          rootContainerId,
-          indexHTML: transformedIndexHTML,
-          appHTML,
-          initialState: transformState(initialState),
-        })
-
-        // create jsdom from renderedHTML
-        const jsdom = new JSDOM(renderedHTML)
-
-        // render current page's preloadLinks
-        renderPreloadLinks(jsdom.window.document, ctx.modules || new Set<string>(), ssrManifest)
-
-        // render head
-        if (head)
-          await renderDOMHead(head, { document: jsdom.window.document })
-
-        const html = jsdom.serialize()
-        let transformed = (await onPageRendered?.(route, html, appCtx)) || html
-        if (critters)
-          transformed = await critters.process(transformed)
-
-        const formatted = await formatHtml(transformed, formatting)
-
-        const relativeRouteFile = `${(route.endsWith('/')
-          ? `${route}index`
-          : route).replace(/^\//g, '')}.html`
-
-        const filename = dirStyle === 'nested'
-          ? join(route.replace(/^\//g, ''), 'index.html')
-          : relativeRouteFile
-
-        await fs.ensureDir(join(out, dirname(filename)))
-        await fs.writeFile(join(out, filename), formatted, 'utf-8')
-        config.logger.info(
-          `${dim(`${outDir}/`)}${cyan(filename.padEnd(15, ' '))}  ${dim(getSize(formatted))}`,
-        )
+        catch (err: any) {
+          throw new Error(`${gray('[vite-ssg]')} ${red(`Error on page: ${cyan(route)}`)}\n${err.stack}`)
+        }
       }
-      catch (err: any) {
-        throw new Error(`${gray('[vite-ssg]')} ${red(`Error on page: ${cyan(route)}`)}\n${err.stack}`)
-      }
+      const taskPromise = executeTaskFn()
+      await taskPromise.then(({ route, html, appCtx }) => onDonePageRender?.(route, html, appCtx))
     })
   }
 
@@ -244,7 +279,7 @@ async function detectEntry(root: string) {
   // eslint-disable-next-line regexp/no-super-linear-backtracking
   const scriptSrcReg = /<script.*?src=["'](.+?)["'](?!<).*>\s*<\/script>/gi
   const html = await fs.readFile(join(root, 'index.html'), 'utf-8')
-  const scripts = [...html.matchAll(scriptSrcReg)] || []
+  const scripts = [...html.matchAll(scriptSrcReg)]
   const [, entry] = scripts.find((matchResult) => {
     const [script] = matchResult
     const [, scriptType] = script.match(/.*\stype=(?:'|")?([^>'"\s]+)/i) || []
