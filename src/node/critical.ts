@@ -1,6 +1,6 @@
-import type Critters from 'critters'
 import type Beasties from 'beasties'
 import type { Options } from 'beasties'
+import type Critters from 'critters'
 
 export async function getBeastiesOrCritters(outDir: string, options: Options = {}): Promise<Critters | Beasties | undefined> {
   try {

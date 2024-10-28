@@ -1,9 +1,9 @@
 import devalue from '@nuxt/devalue'
-import { ViteSSG } from 'vite-ssg'
-import { createPinia } from 'pinia'
-import { useRootStore } from './store/root'
-import App from './App.vue'
 import routes from '~pages'
+import { createPinia } from 'pinia'
+import { ViteSSG } from 'vite-ssg'
+import App from './App.vue'
+import { useRootStore } from './store/root'
 
 export const createApp = ViteSSG(
   App,

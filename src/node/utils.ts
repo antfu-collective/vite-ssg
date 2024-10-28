@@ -1,5 +1,5 @@
-import { blue, gray, yellow } from 'kolorist'
 import type { RouteRecordRaw } from 'vue-router'
+import { blue, gray, yellow } from 'kolorist'
 
 export function buildLog(text: string, count?: number) {
   // eslint-disable-next-line no-console

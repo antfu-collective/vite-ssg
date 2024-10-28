@@ -174,14 +174,14 @@ Following [Pinia's guide](https://pinia.esm.dev/ssr), you will to adapt your `ma
 like this:
 
 ```ts
-// main.ts
-import { ViteSSG } from 'vite-ssg'
 import { createPinia } from 'pinia'
 import routes from 'virtual:generated-pages'
+// main.ts
+import { ViteSSG } from 'vite-ssg'
 
+import App from './App.vue'
 // use any store you configured that you need data from on start-up
 import { useRootStore } from './store/root'
-import App from './App.vue'
 
 export const createApp = ViteSSG(
   App,
@@ -211,9 +211,9 @@ export const createApp = ViteSSG(
 <p>
 
 ```ts
+import routes from 'virtual:generated-pages'
 // main.ts
 import { ViteSSG } from 'vite-ssg'
-import routes from 'virtual:generated-pages'
 import { createStore } from 'vuex'
 import App from './App.vue'
 
