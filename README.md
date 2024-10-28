@@ -103,25 +103,25 @@ See [`@unhead/vue`'s docs](https://unhead.unjs.io/setup/vue/installation) for mo
 
 ## Critical CSS
 
-Vite SSG has built-in support for generating [Critical CSS](https://web.dev/extract-critical-css/) inlined in the HTML via the [`critters`](https://github.com/GoogleChromeLabs/critters) package.
+Vite SSG has built-in support for generating [Critical CSS](https://web.dev/extract-critical-css/) inlined in the HTML via the [`beasties`](https://github.com/danielroe/beasties) package.
 Install it with:
 
 ```bash
-npm i -D critters
+npm i -D beasties
 ```
 
 Critical CSS generation will automatically be enabled for you.
 
-To configure `critters`, pass [its options](https://github.com/GoogleChromeLabs/critters#usage) into `ssgOptions.crittersOptions` in `vite.config.ts`:
+To configure `beasties`, pass [its options](https://github.com/danielroe/beasties#usage) into `ssgOptions.beastiesOptions` in `vite.config.ts`:
 
 ```ts
 // vite.config.ts
 export default defineConfig({
   ssgOptions: {
-    crittersOptions: {
+    beastiesOptions: {
       // E.g., change the preload strategy
       preload: 'media',
-      // Other options: https://github.com/GoogleChromeLabs/critters#usage
+      // Other options: https://github.com/danielroe/beasties#usage
     },
   },
 })

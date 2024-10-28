@@ -16,7 +16,7 @@ import type { ViteSSGContext, ViteSSGOptions } from '../types'
 import { serializeState } from '../utils/state'
 import { renderPreloadLinks } from './preload-links'
 import { buildLog, getSize, routesToPaths } from './utils'
-import { getCritters } from './critical'
+import { getBeastiesOrCritters } from './critical'
 
 export type Manifest = Record<string, string[]>
 
@@ -38,12 +38,12 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
   const outDir = config.build.outDir || 'dist'
   const out = isAbsolute(outDir) ? outDir : join(root, outDir)
 
+  const mergedOptions = Object.assign({}, config.ssgOptions || {}, ssgOptions)
   const {
     script = 'sync',
     mock = false,
     entry = await detectEntry(root),
     formatting = 'none',
-    crittersOptions = {},
     includedRoutes: configIncludedRoutes = DefaultIncludedRoutes,
     onBeforePageRender,
     onPageRendered,
@@ -54,7 +54,9 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
     concurrency = 20,
     rootContainerId = 'app',
     base,
-  }: ViteSSGOptions = Object.assign({}, config.ssgOptions || {}, ssgOptions)
+  }: ViteSSGOptions = mergedOptions
+
+  const beastiesOptions = mergedOptions.beastiesOptions ?? mergedOptions.crittersOptions ?? {}
 
   if (fs.existsSync(ssgOut))
     await fs.remove(ssgOut)
@@ -133,11 +135,11 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
 
   buildLog('Rendering Pages...', routesPaths.length)
 
-  const critters = crittersOptions !== false
-    ? await getCritters(outDir, crittersOptions)
+  const beasties = beastiesOptions !== false
+    ? await getBeastiesOrCritters(outDir, beastiesOptions)
     : undefined
-  if (critters)
-    console.log(`${gray('[vite-ssg]')} ${blue('Critical CSS generation enabled via `critters`')}`)
+  if (beasties)
+    console.log(`${gray('[vite-ssg]')} ${blue('Critical CSS generation enabled via `beasties`')}`)
 
   const {
     path: _ssrManifestPath,
@@ -190,8 +192,8 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
 
         const html = jsdom.serialize()
         let transformed = (await onPageRendered?.(route, html, appCtx)) || html
-        if (critters)
-          transformed = await critters.process(transformed)
+        if (beasties)
+          transformed = await beasties.process(transformed)
 
         const formatted = await formatHtml(transformed, formatting)
 
@@ -244,7 +246,7 @@ async function detectEntry(root: string) {
   // eslint-disable-next-line regexp/no-super-linear-backtracking
   const scriptSrcReg = /<script.*?src=["'](.+?)["'](?!<).*>\s*<\/script>/gi
   const html = await fs.readFile(join(root, 'index.html'), 'utf-8')
-  const scripts = [...html.matchAll(scriptSrcReg)] || []
+  const scripts = [...html.matchAll(scriptSrcReg)]
   const [, entry] = scripts.find((matchResult) => {
     const [script] = matchResult
     const [, scriptType] = script.match(/.*\stype=(?:'|")?([^>'"\s]+)/i) || []

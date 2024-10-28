@@ -2,6 +2,7 @@ import type { App } from 'vue'
 import type { RouteRecordRaw, Router, RouterOptions as VueRouterOptions } from 'vue-router'
 import type { MergeHead, VueHeadClient } from '@unhead/vue'
 import type { Options as CrittersOptions } from 'critters'
+import type { Options as BeastiesOptions } from 'beasties'
 
 export interface ViteSSGOptions {
   /**
@@ -71,9 +72,17 @@ export interface ViteSSGOptions {
   /**
    * Options for the critters package.
    *
+   * @deprecated Use `beastiesOptions` instead.
    * @see https://github.com/GoogleChromeLabs/critters
    */
   crittersOptions?: CrittersOptions | false
+
+  /**
+   * Options for the beasties package.
+   *
+   * @see https://github.com/danielroe/beasties
+   */
+  beastiesOptions?: BeastiesOptions | false
 
   /**
    * Custom function to modify the routes to do the SSG.
