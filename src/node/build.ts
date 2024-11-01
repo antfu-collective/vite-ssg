@@ -34,7 +34,8 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
 
   const cwd = process.cwd()
   const root = config.root || cwd
-  const ssgOut = join(root, '.vite-ssg-temp', Math.random().toString(36).substring(2, 12))
+  const ssgOutTempFolder = join(root, '.vite-ssg-temp')
+  const ssgOut = join(ssgOutTempFolder, Math.random().toString(36).substring(2, 12))
   const outDir = config.build.outDir || 'dist'
   const out = isAbsolute(outDir) ? outDir : join(root, outDir)
 
@@ -58,8 +59,8 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
 
   const beastiesOptions = mergedOptions.beastiesOptions ?? mergedOptions.crittersOptions ?? {}
 
-  if (fs.existsSync(ssgOut))
-    await fs.remove(ssgOut)
+  if (fs.existsSync(ssgOutTempFolder))
+    await fs.remove(ssgOutTempFolder)
 
   // client
   buildLog('Build for client...')
@@ -219,7 +220,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
 
   await queue.start().onIdle()
 
-  await fs.remove(ssgOut)
+  await fs.remove(ssgOutTempFolder)
 
   // when `vite-plugin-pwa` is presented, use it to regenerate SW after rendering
   const pwaPlugin: VitePluginPWAAPI = config.plugins.find(i => i.name === 'vite-plugin-pwa')?.api
