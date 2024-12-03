@@ -7,14 +7,14 @@
     "serve": "vite preview"
   },
   "dependencies": {
-    "pinia": "^2.2.8",
-    "vue": "^3.5.13"
+    "pinia": "catalog:",
+    "vue": "catalog:"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.2.1",
-    "cross-env": "^7.0.3",
-    "typescript": "5.6.3",
-    "vite": "^6.0.2",
+    "@vitejs/plugin-vue": "catalog:",
+    "cross-env": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
     "vite-ssg": "workspace:*"
   }
 }

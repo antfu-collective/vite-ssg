@@ -4,6 +4,120 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@antfu/eslint-config':
+      specifier: ^3.11.2
+      version: 3.11.2
+    '@nuxt/devalue':
+      specifier: ^2.0.2
+      version: 2.0.2
+    '@types/fs-extra':
+      specifier: ^11.0.4
+      version: 11.0.4
+    '@types/html-minifier-terser':
+      specifier: ^7.0.2
+      version: 7.0.2
+    '@types/jsdom':
+      specifier: ^21.1.7
+      version: 21.1.7
+    '@types/yargs':
+      specifier: ^17.0.33
+      version: 17.0.33
+    '@unhead/dom':
+      specifier: ^1.11.13
+      version: 1.11.13
+    '@unhead/vue':
+      specifier: ^1.11.13
+      version: 1.11.13
+    '@vitejs/plugin-vue':
+      specifier: ^5.2.1
+      version: 5.2.1
+    beasties:
+      specifier: ^0.1.0
+      version: 0.1.0
+    bumpp:
+      specifier: ^9.8.1
+      version: 9.8.1
+    critters:
+      specifier: ^0.0.25
+      version: 0.0.25
+    cross-env:
+      specifier: ^7.0.3
+      version: 7.0.3
+    eslint:
+      specifier: ^9.16.0
+      version: 9.16.0
+    esno:
+      specifier: ^4.8.0
+      version: 4.8.0
+    fast-glob:
+      specifier: ^3.3.2
+      version: 3.3.2
+    fs-extra:
+      specifier: ^11.2.0
+      version: 11.2.0
+    html-minifier-terser:
+      specifier: ^7.2.0
+      version: 7.2.0
+    html5parser:
+      specifier: ^2.0.2
+      version: 2.0.2
+    jsdom:
+      specifier: ^25.0.1
+      version: 25.0.1
+    kolorist:
+      specifier: ^1.8.0
+      version: 1.8.0
+    p-queue:
+      specifier: ^8.0.1
+      version: 8.0.1
+    pinia:
+      specifier: ^2.2.8
+      version: 2.2.8
+    prettier:
+      specifier: ^3.4.1
+      version: 3.4.1
+    rollup:
+      specifier: ^4.28.0
+      version: 4.28.0
+    tsup:
+      specifier: ^8.3.5
+      version: 8.3.5
+    typescript:
+      specifier: 5.6.3
+      version: 5.6.3
+    unbuild:
+      specifier: ^2.0.0
+      version: 2.0.0
+    unplugin-vue-components:
+      specifier: ^0.27.5
+      version: 0.27.5
+    unplugin-vue-markdown:
+      specifier: ^0.27.1
+      version: 0.27.1
+    vite-plugin-pages:
+      specifier: ^0.32.4
+      version: 0.32.4
+    vite-plugin-pwa:
+      specifier: ^0.21.1
+      version: 0.21.1
+    vitest:
+      specifier: ^2.1.8
+      version: 2.1.8
+    vue:
+      specifier: ^3.5.13
+      version: 3.5.13
+    vue-router:
+      specifier: ^4.5.0
+      version: 4.5.0
+    vue-tsc:
+      specifier: ^2.1.10
+      version: 2.1.10
+    yargs:
+      specifier: ^17.7.2
+      version: 17.7.2
+
 overrides:
   vite: ^6.0.2
 
@@ -12,234 +126,234 @@ importers:
   .:
     dependencies:
       '@unhead/dom':
-        specifier: ^1.11.13
+        specifier: 'catalog:'
         version: 1.11.13
       '@unhead/vue':
-        specifier: ^1.11.13
+        specifier: 'catalog:'
         version: 1.11.13(vue@3.5.13(typescript@5.6.3))
       fs-extra:
-        specifier: ^11.2.0
+        specifier: 'catalog:'
         version: 11.2.0
       html-minifier-terser:
-        specifier: ^7.2.0
+        specifier: 'catalog:'
         version: 7.2.0
       html5parser:
-        specifier: ^2.0.2
+        specifier: 'catalog:'
         version: 2.0.2
       jsdom:
-        specifier: ^25.0.1
+        specifier: 'catalog:'
         version: 25.0.1
       kolorist:
-        specifier: ^1.8.0
+        specifier: 'catalog:'
         version: 1.8.0
       prettier:
-        specifier: ^3.4.1
+        specifier: 'catalog:'
         version: 3.4.1
       yargs:
-        specifier: ^17.7.2
+        specifier: 'catalog:'
         version: 17.7.2
     devDependencies:
       '@antfu/eslint-config':
-        specifier: ^3.11.2
+        specifier: 'catalog:'
         version: 3.11.2(@typescript-eslint/utils@8.16.0(eslint@9.16.0(jiti@1.21.6))(typescript@5.6.3))(@vue/compiler-sfc@3.5.13)(eslint@9.16.0(jiti@1.21.6))(typescript@5.6.3)(vitest@2.1.8(@types/node@20.6.0)(jiti@1.21.6)(jsdom@25.0.1)(terser@5.19.4)(tsx@4.19.2)(yaml@2.6.1))
       '@types/fs-extra':
-        specifier: ^11.0.4
+        specifier: 'catalog:'
         version: 11.0.4
       '@types/html-minifier-terser':
-        specifier: ^7.0.2
+        specifier: 'catalog:'
         version: 7.0.2
       '@types/jsdom':
-        specifier: ^21.1.7
+        specifier: 'catalog:'
         version: 21.1.7
       '@types/yargs':
-        specifier: ^17.0.33
+        specifier: 'catalog:'
         version: 17.0.33
       beasties:
-        specifier: ^0.1.0
+        specifier: 'catalog:'
         version: 0.1.0
       bumpp:
-        specifier: ^9.8.1
+        specifier: 'catalog:'
         version: 9.8.1
       critters:
-        specifier: ^0.0.25
+        specifier: 'catalog:'
         version: 0.0.25
       eslint:
-        specifier: ^9.16.0
+        specifier: 'catalog:'
         version: 9.16.0(jiti@1.21.6)
       esno:
-        specifier: ^4.8.0
+        specifier: 'catalog:'
         version: 4.8.0
       fast-glob:
-        specifier: ^3.3.2
+        specifier: 'catalog:'
         version: 3.3.2
       p-queue:
-        specifier: ^8.0.1
+        specifier: 'catalog:'
         version: 8.0.1
       rollup:
-        specifier: ^4.28.0
+        specifier: 'catalog:'
         version: 4.28.0
       tsup:
-        specifier: ^8.3.5
+        specifier: 'catalog:'
         version: 8.3.5(jiti@1.21.6)(postcss@8.4.49)(tsx@4.19.2)(typescript@5.6.3)(yaml@2.6.1)
       typescript:
-        specifier: 5.6.3
+        specifier: 'catalog:'
         version: 5.6.3
       unbuild:
-        specifier: ^2.0.0
+        specifier: 'catalog:'
         version: 2.0.0(typescript@5.6.3)
       vite:
         specifier: ^6.0.2
         version: 6.0.2(@types/node@20.6.0)(jiti@1.21.6)(terser@5.19.4)(tsx@4.19.2)(yaml@2.6.1)
       vite-plugin-pwa:
-        specifier: ^0.21.1
+        specifier: 'catalog:'
         version: 0.21.1(vite@6.0.2(@types/node@20.6.0)(jiti@1.21.6)(terser@5.19.4)(tsx@4.19.2)(yaml@2.6.1))(workbox-build@7.0.0)(workbox-window@7.0.0)
       vitest:
-        specifier: ^2.1.8
+        specifier: 'catalog:'
         version: 2.1.8(@types/node@20.6.0)(jiti@1.21.6)(jsdom@25.0.1)(terser@5.19.4)(tsx@4.19.2)(yaml@2.6.1)
       vue:
-        specifier: ^3.5.13
+        specifier: 'catalog:'
         version: 3.5.13(typescript@5.6.3)
       vue-router:
-        specifier: ^4.5.0
+        specifier: 'catalog:'
         version: 4.5.0(vue@3.5.13(typescript@5.6.3))
       vue-tsc:
-        specifier: ^2.1.10
+        specifier: 'catalog:'
         version: 2.1.10(typescript@5.6.3)
 
   examples/multiple-pages:
     dependencies:
       '@unhead/vue':
-        specifier: ^1.11.13
+        specifier: 'catalog:'
         version: 1.11.13(vue@3.5.13(typescript@5.6.3))
       vue:
-        specifier: ^3.5.13
+        specifier: 'catalog:'
         version: 3.5.13(typescript@5.6.3)
     devDependencies:
       '@vitejs/plugin-vue':
-        specifier: ^5.2.1
+        specifier: 'catalog:'
         version: 5.2.1(vite@6.0.2(@types/node@20.6.0)(jiti@1.21.6)(terser@5.19.4)(tsx@4.19.2)(yaml@2.6.1))(vue@3.5.13(typescript@5.6.3))
       cross-env:
-        specifier: ^7.0.3
+        specifier: 'catalog:'
         version: 7.0.3
       typescript:
-        specifier: 5.6.3
+        specifier: 'catalog:'
         version: 5.6.3
       unplugin-vue-components:
-        specifier: ^0.27.5
+        specifier: 'catalog:'
         version: 0.27.5(@babel/parser@7.25.8)(rollup@4.28.0)(vue@3.5.13(typescript@5.6.3))
       unplugin-vue-markdown:
-        specifier: ^0.27.1
+        specifier: 'catalog:'
         version: 0.27.1(rollup@4.28.0)(vite@6.0.2(@types/node@20.6.0)(jiti@1.21.6)(terser@5.19.4)(tsx@4.19.2)(yaml@2.6.1))
       vite:
         specifier: ^6.0.2
         version: 6.0.2(@types/node@20.6.0)(jiti@1.21.6)(terser@5.19.4)(tsx@4.19.2)(yaml@2.6.1)
       vite-plugin-pages:
-        specifier: ^0.32.4
+        specifier: 'catalog:'
         version: 0.32.4(@vue/compiler-sfc@3.5.13)(vite@6.0.2(@types/node@20.6.0)(jiti@1.21.6)(terser@5.19.4)(tsx@4.19.2)(yaml@2.6.1))(vue-router@4.5.0(vue@3.5.13(typescript@5.6.3)))
       vite-ssg:
         specifier: workspace:*
         version: link:../..
       vue-router:
-        specifier: ^4.5.0
+        specifier: 'catalog:'
         version: 4.5.0(vue@3.5.13(typescript@5.6.3))
 
   examples/multiple-pages-pwa:
     dependencies:
       '@unhead/vue':
-        specifier: ^1.11.13
+        specifier: 'catalog:'
         version: 1.11.13(vue@3.5.13(typescript@5.6.3))
       vue:
-        specifier: ^3.5.13
+        specifier: 'catalog:'
         version: 3.5.13(typescript@5.6.3)
     devDependencies:
       '@vitejs/plugin-vue':
-        specifier: ^5.2.1
+        specifier: 'catalog:'
         version: 5.2.1(vite@6.0.2(@types/node@20.6.0)(jiti@1.21.6)(terser@5.19.4)(tsx@4.19.2)(yaml@2.6.1))(vue@3.5.13(typescript@5.6.3))
       cross-env:
-        specifier: ^7.0.3
+        specifier: 'catalog:'
         version: 7.0.3
       typescript:
-        specifier: 5.6.3
+        specifier: 'catalog:'
         version: 5.6.3
       unplugin-vue-markdown:
-        specifier: ^0.27.1
+        specifier: 'catalog:'
         version: 0.27.1(rollup@2.79.1)(vite@6.0.2(@types/node@20.6.0)(jiti@1.21.6)(terser@5.19.4)(tsx@4.19.2)(yaml@2.6.1))
       vite:
         specifier: ^6.0.2
         version: 6.0.2(@types/node@20.6.0)(jiti@1.21.6)(terser@5.19.4)(tsx@4.19.2)(yaml@2.6.1)
       vite-plugin-pages:
-        specifier: ^0.32.4
+        specifier: 'catalog:'
         version: 0.32.4(@vue/compiler-sfc@3.5.13)(vite@6.0.2(@types/node@20.6.0)(jiti@1.21.6)(terser@5.19.4)(tsx@4.19.2)(yaml@2.6.1))(vue-router@4.5.0(vue@3.5.13(typescript@5.6.3)))
       vite-plugin-pwa:
-        specifier: ^0.21.1
+        specifier: 'catalog:'
         version: 0.21.1(vite@6.0.2(@types/node@20.6.0)(jiti@1.21.6)(terser@5.19.4)(tsx@4.19.2)(yaml@2.6.1))(workbox-build@7.0.0)(workbox-window@7.0.0)
       vite-ssg:
         specifier: workspace:*
         version: link:../..
       vue-router:
-        specifier: ^4.5.0
+        specifier: 'catalog:'
         version: 4.5.0(vue@3.5.13(typescript@5.6.3))
 
   examples/multiple-pages-with-store:
     dependencies:
       '@unhead/vue':
-        specifier: ^1.11.13
+        specifier: 'catalog:'
         version: 1.11.13(vue@3.5.13(typescript@5.6.3))
       pinia:
-        specifier: ^2.2.8
+        specifier: 'catalog:'
         version: 2.2.8(typescript@5.6.3)(vue@3.5.13(typescript@5.6.3))
       vue:
-        specifier: ^3.5.13
+        specifier: 'catalog:'
         version: 3.5.13(typescript@5.6.3)
     devDependencies:
       '@nuxt/devalue':
-        specifier: ^2.0.2
+        specifier: 'catalog:'
         version: 2.0.2
       '@vitejs/plugin-vue':
-        specifier: ^5.2.1
+        specifier: 'catalog:'
         version: 5.2.1(vite@6.0.2(@types/node@20.6.0)(jiti@1.21.6)(terser@5.19.4)(tsx@4.19.2)(yaml@2.6.1))(vue@3.5.13(typescript@5.6.3))
       cross-env:
-        specifier: ^7.0.3
+        specifier: 'catalog:'
         version: 7.0.3
       typescript:
-        specifier: 5.6.3
+        specifier: 'catalog:'
         version: 5.6.3
       unplugin-vue-components:
-        specifier: ^0.27.5
+        specifier: 'catalog:'
         version: 0.27.5(@babel/parser@7.25.8)(rollup@4.28.0)(vue@3.5.13(typescript@5.6.3))
       unplugin-vue-markdown:
-        specifier: ^0.27.1
+        specifier: 'catalog:'
         version: 0.27.1(rollup@4.28.0)(vite@6.0.2(@types/node@20.6.0)(jiti@1.21.6)(terser@5.19.4)(tsx@4.19.2)(yaml@2.6.1))
       vite:
         specifier: ^6.0.2
         version: 6.0.2(@types/node@20.6.0)(jiti@1.21.6)(terser@5.19.4)(tsx@4.19.2)(yaml@2.6.1)
       vite-plugin-pages:
-        specifier: ^0.32.4
+        specifier: 'catalog:'
         version: 0.32.4(@vue/compiler-sfc@3.5.13)(vite@6.0.2(@types/node@20.6.0)(jiti@1.21.6)(terser@5.19.4)(tsx@4.19.2)(yaml@2.6.1))(vue-router@4.5.0(vue@3.5.13(typescript@5.6.3)))
       vite-ssg:
         specifier: workspace:*
         version: link:../..
       vue-router:
-        specifier: ^4.5.0
+        specifier: 'catalog:'
         version: 4.5.0(vue@3.5.13(typescript@5.6.3))
 
   examples/single-page:
     dependencies:
       pinia:
-        specifier: ^2.2.8
+        specifier: 'catalog:'
         version: 2.2.8(typescript@5.6.3)(vue@3.5.13(typescript@5.6.3))
       vue:
-        specifier: ^3.5.13
+        specifier: 'catalog:'
         version: 3.5.13(typescript@5.6.3)
     devDependencies:
       '@vitejs/plugin-vue':
-        specifier: ^5.2.1
+        specifier: 'catalog:'
         version: 5.2.1(vite@6.0.2(@types/node@20.6.0)(jiti@1.21.6)(terser@5.19.4)(tsx@4.19.2)(yaml@2.6.1))(vue@3.5.13(typescript@5.6.3))
       cross-env:
-        specifier: ^7.0.3
+        specifier: 'catalog:'
         version: 7.0.3
       typescript:
-        specifier: 5.6.3
+        specifier: 'catalog:'
         version: 5.6.3
       vite:
         specifier: ^6.0.2
