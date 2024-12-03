@@ -21,17 +21,14 @@
   "sideEffects": false,
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     },
     "./node": {
-      "types": "./dist/node.d.ts",
       "import": "./dist/node.mjs",
       "require": "./dist/node.cjs"
     },
     "./single-page": {
-      "types": "./dist/client/single-page.d.ts",
       "import": "./dist/client/single-page.mjs",
       "require": "./dist/client/single-page.cjs"
     }
