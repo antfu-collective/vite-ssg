@@ -1,7 +1,7 @@
 import type { InlineConfig, ResolvedConfig } from 'vite'
 import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
-import type { SSRContext } from 'vue/server-renderer'
 import type { RouteRecordRaw } from 'vue-router'
+import type { SSRContext } from 'vue/server-renderer'
 import type { ViteSSGContext, ViteSSGOptions } from '../types'
 import { createRequire } from 'node:module'
 /* eslint-disable no-console */
