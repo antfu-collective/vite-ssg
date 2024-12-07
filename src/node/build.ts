@@ -11,12 +11,15 @@ import type { SSRContext } from 'vue/server-renderer'
 import { JSDOM } from 'jsdom'
 import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
 import type { RouteRecordRaw } from 'vue-router'
+//@ts-ignore
 import { renderDOMHead } from '@unhead/dom'
+import { renderSSRHead } from '@unhead/ssr'
 import type { ViteSSGContext, ViteSSGOptions } from '../types'
 import { serializeState } from '../utils/state'
 import { renderPreloadLinks } from './preload-links'
-import { buildLog, getSize, routesToPaths } from './utils'
+import { buildLog, getSize, injectInHtml, routesToPaths } from './utils'
 import { getCritters } from './critical'
+
 
 export type Manifest = Record<string, string[]>
 
@@ -204,20 +207,34 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
             appHTML,
             initialState: transformState(initialState),
           })
+          
+
+          /** replace slower jsdom to use unhead/ssr and injectInHtml utils */
+          // render current page's preloadLinks
+          const htmlTransport = { html: renderedHTML }
+          renderPreloadLinks(htmlTransport, ctx.modules || new Set<string>(), ssrManifest)
+          let { html } = htmlTransport
+
+          if (head) {
+            const ssrHead = await renderSSRHead(head as any)
+            html = injectInHtml(html, 'html', {attrs: ssrHead.htmlAttrs})
+            html = injectInHtml(html, 'head', {prepend: ssrHead.headTags})
+            html = injectInHtml(html, 'body', {attrs: ssrHead.bodyAttrs, prepend: ssrHead.bodyTagsOpen, append: ssrHead.bodyTags})
+          }
+          
 
           // create jsdom from renderedHTML
-          const jsdom = new JSDOM(renderedHTML)
+          // const {jsdom, dispose} = await createJSDOM(renderedHTML)
 
-          // render current page's preloadLinks
-          renderPreloadLinks(jsdom.window.document, ctx.modules || new Set<string>(), ssrManifest)
+          // // render current page's preloadLinks
+          // renderPreloadLinks(jsdom.window.document, ctx.modules || new Set<string>(), ssrManifest)
 
-          // render head
-          if (head)
-            await renderDOMHead(head, { document: jsdom.window.document })
+          // // render head
+          // if (head)
+          //   await renderDOMHead(head, { document: jsdom.window.document })
 
-          const html = jsdom.serialize()
-          jsdom.window.close()
-          await new Promise(r => setImmediate(r))
+          // html = jsdom.serialize()
+          // await dispose()
 
           let transformed = (await onPageRendered?.(route, html, appCtx)) || html
           if (critters)
@@ -272,6 +289,18 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
     process.exit(0)
   }, waitInSeconds * 1000)
   timeout.unref() // don't wait for timeout
+}
+
+
+//@ts-ignore
+async function createJSDOM(renderedHTML: string) {    
+  const jsdom = new JSDOM(renderedHTML, {'runScripts' : 'dangerously'})     
+  async function dispose () {
+    const { window } = jsdom;          
+    window.close();    
+    await new Promise(res => setImmediate(res))        
+  };
+  return {jsdom, dispose}
 }
 
 async function detectEntry(root: string) {

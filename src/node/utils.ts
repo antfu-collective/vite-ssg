@@ -38,3 +38,22 @@ export function routesToPaths(routes?: Readonly<RouteRecordRaw[]>) {
   getPaths(routes)
   return Array.from(paths)
 }
+
+
+
+export function injectInHtml(html: string, inTag: string, opts: {attrs?: string, prepend?:string, append?: string}): string {
+  const tagOpen= `<${inTag}`
+  let tagStart = html.indexOf(`${tagOpen}>`)
+  tagStart = tagStart > -1 ? tagStart : html.indexOf(`${tagOpen} `)
+  tagStart = html.indexOf('>', tagStart)
+  const {attrs='' , prepend='', append} = opts
+
+  html = !(prepend.length || attrs.length) ? html : `${html.substring(0, tagStart)} ${attrs.trim()}>${prepend}${html.substring(tagStart + 1)}`                
+  if (!append?.length) {
+    return html
+  }
+  const tagClose= `</${inTag}`
+  let tagEnd = html.lastIndexOf(`${tagClose}>`) 
+  tagEnd = tagEnd > -1 ? tagEnd : html.lastIndexOf(`${tagClose} `)
+  return `${html.substring(0, tagEnd)}${append}${html.substring(tagEnd)}`
+}

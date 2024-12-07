@@ -99,6 +99,7 @@
   "dependencies": {
     "@unhead/dom": "^1.9.15",
     "@unhead/vue": "^1.9.15",
+    "@unhead/ssr": "~1.11.13",
     "fs-extra": "^11.2.0",
     "html-minifier-terser": "^7.2.0",
     "html5parser": "^2.0.2",

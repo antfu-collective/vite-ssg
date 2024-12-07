@@ -1,6 +1,10 @@
 import type { Manifest } from './build'
+import { injectInHtml } from './utils'
 
-export function renderPreloadLinks(document: Document, modules: Set<string>, ssrManifest: Manifest) {
+
+type PreloadLinkTransport = Document | { html:string }
+
+export function renderPreloadLinks(document: PreloadLinkTransport, modules: Set<string>, ssrManifest: Manifest) {
   const seen = new Set()
 
   const preloadLinks: string[] = []
@@ -24,7 +28,7 @@ export function renderPreloadLinks(document: Document, modules: Set<string>, ssr
   }
 }
 
-function renderPreloadLink(document: Document, file: string) {
+function renderPreloadLink(document: PreloadLinkTransport, file: string) {
   if (file.endsWith('.js')) {
     appendLink(document, {
       rel: 'modulepreload',
@@ -50,7 +54,15 @@ function setAttrs(el: Element, attrs: Record<string, any>) {
     el.setAttribute(key, attrs[key])
 }
 
-function appendLink(document: Document, attrs: Record<string, any>) {
+function appendLink(document: PreloadLinkTransport, attrs: Record<string, any>) {
+  if(!('querySelector' in document)){
+    const regex = new RegExp(`<link[^>]*href\s*=\s*["']${attrs.href}["'][^>]*>`,'m')
+    const exits = regex.test(document.html)
+    if(exits) return ;
+    const crossOrigin = attrs.crossOrigin !== undefined ? `crossorigin='${attrs.crossOrigin}'` : ''    
+    document.html = injectInHtml(document.html, 'head' , {prepend: `<link rel='${attrs.rel}' href='${attrs.href}' ${crossOrigin}>`} )
+    return 
+  }
   const exits = document.head.querySelector(`link[href='${attrs.file}']`)
   if (exits)
     return
