@@ -12,14 +12,14 @@ import { JSDOM } from 'jsdom'
 import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
 import type { RouteRecordRaw } from 'vue-router'
 
-
-import { renderSSRHead, SSRHeadPayload } from '@unhead/ssr'
+import type { SSRHeadPayload } from '@unhead/ssr'
+import { renderSSRHead } from '@unhead/ssr'
 import type { ViteSSGContext, ViteSSGOptions } from '../types'
 import { serializeState } from '../utils/state'
 import { buildPreloadLinks } from './preload-links'
+import type { InjectOptions } from './utils'
 import { buildLog, getSize, injectInHtml, routesToPaths } from './utils'
 import { getCritters } from './critical'
-
 
 export type Manifest = Record<string, string[]>
 
@@ -201,32 +201,30 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
           const appHTML = await renderToString(app, ctx)
           await triggerOnSSRAppRendered?.(route, appHTML, appCtx)
           // need to resolve assets so render content first
-          
-          
 
           /** replace slower jsdom to use unhead/ssr and injectInHtml utils */
-          // render current page's preloadLinks          
-          const preloads = buildPreloadLinks({ html:transformedIndexHTML }, ctx.modules || new Set<string>(), ssrManifest)          
+          // render current page's preloadLinks
+          const preloads = buildPreloadLinks({ html: transformedIndexHTML }, ctx.modules || new Set<string>(), ssrManifest)
           let ssrHead = {
-            headTags: preloads.join("\n"),
+            headTags: preloads.join('\n'),
             bodyAttrs: '',
             htmlAttrs: '',
             bodyTagsOpen: '',
-            bodyTags: ''
+            bodyTags: '',
           }
           if (head) {
             const tmpSSrHead = await renderSSRHead(head as any)
             ssrHead = Object.assign(tmpSSrHead, {
-              headTags: `${tmpSSrHead.headTags.trim()}${ssrHead.headTags}`
-            }) 
+              headTags: `${tmpSSrHead.headTags.trim()}${ssrHead.headTags}`,
+            })
           }
-          
+
           const html = await renderHTML({
             rootContainerId,
             indexHTML: transformedIndexHTML,
             appHTML,
             initialState: transformState(initialState),
-            ssrHead
+            ssrHead,
           })
 
           let transformed = (await onPageRendered?.(route, html, appCtx)) || html
@@ -262,7 +260,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
 
   await queue.start().onIdle()
 
-  ssgOptions["skip-build"] || await fs.remove(ssgOut)
+  ssgOptions['skip-build'] || await fs.remove(ssgOut)
 
   // when `vite-plugin-pwa` is presented, use it to regenerate SW after rendering
   const pwaPlugin: VitePluginPWAAPI = config.plugins.find(i => i.name === 'vite-plugin-pwa')?.api
@@ -284,16 +282,15 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
   timeout.unref() // don't wait for timeout
 }
 
-
-//@ts-ignore
-async function createJSDOM(renderedHTML: string) {    
-  const jsdom = new JSDOM(renderedHTML, {'runScripts' : 'dangerously'})     
-  async function dispose () {
-    const { window } = jsdom;          
-    window.close();    
-    await new Promise(res => setImmediate(res))        
+// @ts-ignore
+async function createJSDOM(renderedHTML: string) {
+  const jsdom = new JSDOM(renderedHTML, { runScripts: 'dangerously' })
+  async function dispose() {
+    const { window } = jsdom
+    window.close()
+    await new Promise(res => setImmediate(res))
   };
-  return {jsdom, dispose}
+  return { jsdom, dispose }
 }
 
 async function detectEntry(root: string) {
@@ -327,36 +324,42 @@ async function renderHTML({
   indexHTML,
   appHTML,
   initialState,
-  ssrHead  
+  ssrHead,
 }: {
   rootContainerId: string
   indexHTML: string
   appHTML: string
-  initialState: any,
+  initialState: any
   ssrHead: SSRHeadPayload
 },
 ) {
-  const regex = new RegExp(`<\\w+(?:[-\\w])?\\s*id\\s*=\\s*("|')${rootContainerId}\\1`)  
-  if (!regex.test(indexHTML)) {    
-    throw new Error(`Could not find a tag with id="${rootContainerId}" to replace it with server-side rendered HTML`);
-  }
+  // const regex = new RegExp(`<\\w+(?:[-\\w])?\\s*id\\s*=\\s*("|')${rootContainerId}\\1`)
+  // if (!regex.test(indexHTML)) {
+  //   throw new Error(`Could not find a tag with id="${rootContainerId}" to replace it with server-side rendered HTML`)
+  // }
 
-  const stateScript = initialState ? `\n<script>window.__INITIAL_STATE__=${initialState}<\/script>\n` : "";
-  const injectOptions = [
-    {match: {tag: 'html'}, attrs: ssrHead.htmlAttrs},
-    {match: {tag: 'head'}, prepend: ssrHead.headTags},
-    {match: {tag: 'body'}, attrs: ssrHead.bodyAttrs, prepend: ssrHead.bodyTagsOpen, append: ssrHead.bodyTags},
+  const stateScript = initialState ? `\n<script>window.__INITIAL_STATE__=${initialState}<\/script>\n` : ''
+  const injectOptions: InjectOptions[] = [
+    { match: { tag: 'html' }, attrs: ssrHead.htmlAttrs },
+    { match: { tag: 'head' }, prepend: ssrHead.headTags },
+    { match: { tag: 'body' }, attrs: ssrHead.bodyAttrs, prepend: ssrHead.bodyTagsOpen, append: ssrHead.bodyTags },
     {
       match: {
-        tag: 'div', 
-        attr: {'id' : rootContainerId}
+        attr: { id: rootContainerId },
       },
+      throwException: true,
       attrs: 'data-server-rendered="true"',
       append: appHTML,
-      after: stateScript
-    }
-  ]  
-  return injectInHtml(indexHTML, injectOptions)
+      after: stateScript,
+    },
+  ]
+
+  try {
+    return injectInHtml(indexHTML, injectOptions)
+  }
+  catch (_e: any) {
+    throw new Error(`Could not find a tag with id="${rootContainerId}" to replace it with server-side rendered HTML ${_e.toString()}`)
+  }
 }
 
 async function formatHtml(html: string, formatting: ViteSSGOptions['formatting']) {
