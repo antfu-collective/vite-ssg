@@ -59,14 +59,17 @@ export function routesToPaths(routes?: Readonly<RouteRecordRaw[]>) {
   return Array.from(paths)
 }
 
-function isMatchOption(node: ITag, opts: InjectOptions) {
+export function isMatchOption(node: ITag, opts: InjectOptions) {
   if (opts.match.tag && !(node.name === opts.match.tag)) {
     return false
   }
-  if (opts.match.attr && !(Array.isArray(node.attributes) && node.attributes.length > 0 && node.attributes.every(attr => opts.match.attr?.[attr.name.value] === attr.value?.value))) {
+  if (opts.match.attr && !(
+    Array.isArray(node.attributes) && node.attributes.length > 0
+    && Object.entries(opts.match.attr).every(([attrName, attrValue]) => node.attributes.find(attr => attr.name.value === attrName && `${attr.value?.value ?? ''}`.match(attrValue))))
+  ) {
     return false
   }
-  return true
+  return !!opts.match.tag || !!opts.match.attr // only match if have tag or attribute
 }
 
 export function injectInHtml(html: string, options: InjectOptions | InjectOptions[]): string {

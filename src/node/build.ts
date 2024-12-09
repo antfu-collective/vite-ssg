@@ -8,7 +8,7 @@ import fs from 'fs-extra'
 import type { InlineConfig, ResolvedConfig } from 'vite'
 import { mergeConfig, resolveConfig, build as viteBuild } from 'vite'
 import type { SSRContext } from 'vue/server-renderer'
-import { JSDOM } from 'jsdom'
+// import { JSDOM } from 'jsdom'
 import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
 import type { RouteRecordRaw } from 'vue-router'
 
@@ -260,7 +260,9 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
 
   await queue.start().onIdle()
 
-  ssgOptions['skip-build'] || await fs.remove(ssgOut)
+  if (!ssgOptions['skip-build']) {
+    await fs.remove(ssgOut)
+  }
 
   // when `vite-plugin-pwa` is presented, use it to regenerate SW after rendering
   const pwaPlugin: VitePluginPWAAPI = config.plugins.find(i => i.name === 'vite-plugin-pwa')?.api
@@ -282,16 +284,15 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
   timeout.unref() // don't wait for timeout
 }
 
-// @ts-ignore
-async function createJSDOM(renderedHTML: string) {
-  const jsdom = new JSDOM(renderedHTML, { runScripts: 'dangerously' })
-  async function dispose() {
-    const { window } = jsdom
-    window.close()
-    await new Promise(res => setImmediate(res))
-  };
-  return { jsdom, dispose }
-}
+// async function createJSDOM(renderedHTML: string) {
+//   const jsdom = new JSDOM(renderedHTML, { runScripts: 'dangerously' })
+//   async function dispose() {
+//     const { window } = jsdom
+//     window.close()
+//     await new Promise(res => setImmediate(res))
+//   };
+//   return { jsdom, dispose }
+// }
 
 async function detectEntry(root: string) {
   // pick the first script tag of type module as the entry

@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
+import html5Parser from 'html5parser'
 import type { InjectOptions } from '../utils'
-import { injectInHtml } from '../utils'
+import { injectInHtml, isMatchOption } from '../utils'
 
-const html = `<html id='myid'>
+const html = `<!doctype html>
+<html id='myid'>
 <head>
   <link rel="stylesheet" href="..."/>
   <title id="myTitle">My Title</title>
@@ -16,6 +18,34 @@ const html = `<html id='myid'>
 </html>`
 
 describe('injectInHtml', () => {
+  it('should to matchOption work as expected', () => {
+    const docType = html5Parser.parse('<!doctype html>')[0]
+    expect(isMatchOption(docType as any, { match: { attr: { id: 'app' } } })).not.toBeTruthy()
+    expect(isMatchOption(docType as any, { match: { attr: { html: '' } } })).toBeTruthy()
+    expect(isMatchOption(docType as any, { match: { tag: 'div' } })).not.toBeTruthy()
+
+    const divApp = html5Parser.parse('<div id="app">')[0]
+    expect(isMatchOption(divApp as any, { match: { attr: { id: 'app' } } })).toBeTruthy()
+    expect(isMatchOption(divApp as any, { match: { tag: 'div' } })).toBeTruthy()
+  })
+  it('should match only by attribute without tag', () => {
+    const stateScript = '__STATE__=true'
+    const appHTML = 'My App'
+    const rootContainerId = 'app'
+    const injectOpts: InjectOptions = {
+      match: {
+
+        attr: { id: rootContainerId },
+      },
+      throwException: true,
+      attrs: 'data-server-rendered="true"',
+      append: appHTML,
+      after: stateScript,
+    }
+
+    const result = injectInHtml(html, injectOpts)
+    expect(result).toContain(`<div id="app" data-server-rendered="true">${appHTML}</div>${stateScript}`)
+  })
   it('should delete title', () => {
     const injectOpts: InjectOptions = { match: { tag: 'head' }, removeChildren: { tag: 'title', attr: { id: 'myTitle' } } }
     const result = injectInHtml(html, injectOpts)
