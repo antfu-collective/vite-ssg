@@ -1,7 +1,7 @@
 import { createPinia } from 'pinia'
 import { ViteSSG } from 'vite-ssg/single-page'
-import { useRootStore } from './store/root'
 import App from './App.vue'
+import { useRootStore } from './store/root'
 
 export const createApp = ViteSSG(
   App,

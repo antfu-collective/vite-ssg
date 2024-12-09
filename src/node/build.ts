@@ -1,25 +1,27 @@
 /* eslint-disable no-console */
+import { createRequire } from 'node:module'
 import { dirname, isAbsolute, join, parse } from 'node:path'
 import process from 'node:process'
-import { createRequire } from 'node:module'
-import PQueue from 'p-queue'
-import { blue, cyan, dim, gray, green, red, yellow } from 'kolorist'
-import fs from 'fs-extra'
-import type { InlineConfig, ResolvedConfig } from 'vite'
-import { mergeConfig, resolveConfig, build as viteBuild } from 'vite'
 import type { SSRContext } from 'vue/server-renderer'
-// import { JSDOM } from 'jsdom'
-import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
 import type { RouteRecordRaw } from 'vue-router'
-
-import type { SSRHeadPayload } from '@unhead/ssr'
+import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
+import type { InlineConfig, ResolvedConfig } from 'vite'
 import { renderSSRHead } from '@unhead/ssr'
+// import { renderDOMHead } from '@unhead/dom'
+import fs from 'fs-extra'
+// import { JSDOM } from 'jsdom'
+import { blue, cyan, dim, gray, green, red, yellow } from 'kolorist'
+import PQueue from 'p-queue'
+import { mergeConfig, resolveConfig, build as viteBuild } from 'vite'
+import type { SSRHeadPayload } from '@unhead/ssr'
 import type { ViteSSGContext, ViteSSGOptions } from '../types'
+
 import { serializeState } from '../utils/state'
+import { getBeastiesOrCritters } from './critical'
 import { buildPreloadLinks } from './preload-links'
-import type { InjectOptions } from './utils'
-import { buildLog, getSize, injectInHtml, routesToPaths } from './utils'
-import { getCritters } from './critical'
+import { buildLog, getSize, routesToPaths } from './utils'
+import type { InjectOptions } from './injection'
+import { injectInHtml } from './injection'
 
 export type Manifest = Record<string, string[]>
 
@@ -97,6 +99,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
     ssgOut: _ssgOutDir = join(root, '.vite-ssg-temp', Math.random().toString(36).substring(2, 12)),
     formatting = 'none',
     crittersOptions = {},
+    beastiesOptions = {},
     includedRoutes: configIncludedRoutes = DefaultIncludedRoutes,
     onBeforePageRender,
     onPageRendered,
@@ -161,11 +164,11 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
 
   buildLog('Rendering Pages...', routesPaths.length)
 
-  const critters = crittersOptions !== false
-    ? await getCritters(outDir, crittersOptions)
+  const beasties = beastiesOptions !== false
+    ? await getBeastiesOrCritters(outDir, beastiesOptions)
     : undefined
-  if (critters)
-    console.log(`${gray('[vite-ssg]')} ${blue('Critical CSS generation enabled via `critters`')}`)
+  if (beasties)
+    console.log(`${gray('[vite-ssg]')} ${blue('Critical CSS generation enabled via `beasties`')}`)
 
   const {
     path: _ssrManifestPath,
@@ -228,8 +231,8 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
           })
 
           let transformed = (await onPageRendered?.(route, html, appCtx)) || html
-          if (critters)
-            transformed = await critters.process(transformed)
+          if (beasties)
+            transformed = await beasties.process(transformed)
 
           const formatted = await formatHtml(transformed, formatting)
 

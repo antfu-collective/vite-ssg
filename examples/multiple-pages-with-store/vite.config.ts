@@ -1,8 +1,8 @@
 import type { UserConfig } from 'vite'
+import Vue from '@vitejs/plugin-vue'
+import Components from 'unplugin-vue-components/vite'
 import Markdown from 'unplugin-vue-markdown/vite'
 import Pages from 'vite-plugin-pages'
-import Components from 'unplugin-vue-components/vite'
-import Vue from '@vitejs/plugin-vue'
 import 'vite-ssg'
 
 const config: UserConfig = {

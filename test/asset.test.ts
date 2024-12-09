@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises'
-import { describe, expect, it } from 'vitest'
 import fg from 'fast-glob'
+import { describe, expect, it } from 'vitest'
 
 describe('multiple-pages', () => {
   it('generates list', async () => {

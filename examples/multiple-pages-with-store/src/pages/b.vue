@@ -1,6 +1,6 @@
 <script lang="ts">
-import { computed } from 'vue'
 import { useHead } from '@unhead/vue'
+import { computed } from 'vue'
 import { useRootStore } from '../store/root'
 
 export default {

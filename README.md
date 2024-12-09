@@ -103,25 +103,25 @@ See [`@unhead/vue`'s docs](https://unhead.unjs.io/setup/vue/installation) for mo
 
 ## Critical CSS
 
-Vite SSG has built-in support for generating [Critical CSS](https://web.dev/extract-critical-css/) inlined in the HTML via the [`critters`](https://github.com/GoogleChromeLabs/critters) package.
+Vite SSG has built-in support for generating [Critical CSS](https://web.dev/extract-critical-css/) inlined in the HTML via the [`beasties`](https://github.com/danielroe/beasties) package.
 Install it with:
 
 ```bash
-npm i -D critters
+npm i -D beasties
 ```
 
 Critical CSS generation will automatically be enabled for you.
 
-To configure `critters`, pass [its options](https://github.com/GoogleChromeLabs/critters#usage) into `ssgOptions.crittersOptions` in `vite.config.ts`:
+To configure `beasties`, pass [its options](https://github.com/danielroe/beasties#usage) into `ssgOptions.beastiesOptions` in `vite.config.ts`:
 
 ```ts
 // vite.config.ts
 export default defineConfig({
   ssgOptions: {
-    crittersOptions: {
+    beastiesOptions: {
       // E.g., change the preload strategy
       preload: 'media',
-      // Other options: https://github.com/GoogleChromeLabs/critters#usage
+      // Other options: https://github.com/danielroe/beasties#usage
     },
   },
 })
@@ -174,14 +174,14 @@ Following [Pinia's guide](https://pinia.esm.dev/ssr), you will to adapt your `ma
 like this:
 
 ```ts
-// main.ts
-import { ViteSSG } from 'vite-ssg'
 import { createPinia } from 'pinia'
 import routes from 'virtual:generated-pages'
+// main.ts
+import { ViteSSG } from 'vite-ssg'
 
+import App from './App.vue'
 // use any store you configured that you need data from on start-up
 import { useRootStore } from './store/root'
-import App from './App.vue'
 
 export const createApp = ViteSSG(
   App,
@@ -211,9 +211,9 @@ export const createApp = ViteSSG(
 <p>
 
 ```ts
+import routes from 'virtual:generated-pages'
 // main.ts
 import { ViteSSG } from 'vite-ssg'
-import routes from 'virtual:generated-pages'
 import { createStore } from 'vuex'
 import App from './App.vue'
 

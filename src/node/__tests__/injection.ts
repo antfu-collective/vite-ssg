@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import html5Parser from 'html5parser'
-import type { InjectOptions } from '../utils'
-import { injectInHtml, isMatchOption } from '../utils'
+import type { InjectOptions } from '../injection'
+import { injectInHtml, isMatchOption } from '../injection'
 
 const html = `<!doctype html>
 <html id='myid'>

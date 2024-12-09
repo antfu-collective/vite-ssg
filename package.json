@@ -1,7 +1,7 @@
 {
   "name": "vite-ssg",
-  "version": "0.23.8",
-  "packageManager": "pnpm@9.4.0",
+  "version": "0.24.2",
+  "packageManager": "pnpm@9.14.4",
   "description": "Server-side generation for Vite",
   "author": "Anthony Fu <anthonyfu117@hotmail.com>",
   "license": "MIT",
@@ -21,17 +21,14 @@
   "sideEffects": false,
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     },
     "./node": {
-      "types": "./dist/node.d.ts",
       "import": "./dist/node.mjs",
       "require": "./dist/node.cjs"
     },
     "./single-page": {
-      "types": "./dist/client/single-page.d.ts",
       "import": "./dist/client/single-page.mjs",
       "require": "./dist/client/single-page.cjs"
     }
@@ -80,15 +77,19 @@
     "build": "unbuild",
     "prepublishOnly": "npm run build",
     "typecheck": "vue-tsc --noEmit",
-    "release": "bumpp && npm publish"
+    "release": "bumpp && pnpm publish"
   },
   "peerDependencies": {
+    "beasties": "^0.1.0",
     "critters": "^0.0.24",
-    "vite": "^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0-0",
+    "vite": "^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0-0 || ^6.0.0",
     "vue": "^3.2.10",
     "vue-router": "^4.0.1"
   },
   "peerDependenciesMeta": {
+    "beasties": {
+      "optional": true
+    },
     "critters": {
       "optional": true
     },
@@ -97,41 +98,42 @@
     }
   },
   "dependencies": {
-    "@unhead/dom": "^1.9.15",
-    "@unhead/vue": "^1.9.15",
-    "@unhead/ssr": "~1.11.13",
-    "fs-extra": "^11.2.0",
-    "html-minifier-terser": "^7.2.0",
-    "html5parser": "^2.0.2",
-    "jsdom": "^24.1.0",
-    "kolorist": "^1.8.0",
-    "prettier": "^3.3.2",
-    "yargs": "^17.7.2"
+    "@unhead/dom": "catalog:",
+    "@unhead/ssr": "catalog:",
+    "@unhead/vue": "catalog:",
+    "fs-extra": "catalog:",
+    "html-minifier-terser": "catalog:",
+    "html5parser": "catalog:",
+    "jsdom": "catalog:",
+    "kolorist": "catalog:",
+    "prettier": "catalog:",
+    "yargs": "catalog:"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^2.22.0-beta.1",
-    "@types/fs-extra": "^11.0.4",
-    "@types/html-minifier-terser": "^7.0.2",
-    "@types/jsdom": "^21.1.7",
-    "@types/yargs": "^17.0.32",
-    "bumpp": "^9.4.1",
-    "critters": "^0.0.22",
-    "eslint": "^9.6.0",
-    "esno": "^4.7.0",
-    "fast-glob": "^3.3.2",
-    "p-queue": "^8.0.1",
-    "rollup": "^4.18.0",
-    "tsup": "^8.1.0",
-    "typescript": "^5.5.3",
-    "unbuild": "^2.0.0",
-    "vite": "^5.3.3",
-    "vite-plugin-pwa": "^0.20.0",
-    "vitest": "^1.6.0",
-    "vue": "^3.4.31",
-    "vue-router": "^4.4.0",
-    "vue-tsc": "^2.0.26"
+    "@antfu/eslint-config": "catalog:",
+    "@types/fs-extra": "catalog:",
+    "@types/html-minifier-terser": "catalog:",
+    "@types/jsdom": "catalog:",
+    "@types/yargs": "catalog:",
+    "beasties": "catalog:",
+    "bumpp": "catalog:",
+    "critters": "catalog:",
+    "eslint": "catalog:",
+    "esno": "catalog:",
+    "fast-glob": "catalog:",
+    "p-queue": "catalog:",
+    "rollup": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "unbuild": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-pwa": "catalog:",
+    "vitest": "catalog:",
+    "vue": "catalog:",
+    "vue-router": "catalog:",
+    "vue-tsc": "catalog:"
   },
   "resolutions": {
-    "vite": "^5.3.3"
+    "vite": "^6.0.2"
   }
 }
