@@ -4,7 +4,11 @@ import { injectInHtml } from './utils'
 
 type PreloadLinkTransport = Document | { html:string }
 
-export function renderPreloadLinks(document: PreloadLinkTransport, modules: Set<string>, ssrManifest: Manifest) {
+export function buildPreloadLinks<
+  T extends PreloadLinkTransport, 
+  R = T extends Document ? HTMLLinkElement : string 
+  >(document: PreloadLinkTransport, modules: Set<string>, ssrManifest: Manifest): R[] 
+  {
   const seen = new Set()
 
   const preloadLinks: string[] = []
@@ -19,33 +23,38 @@ export function renderPreloadLinks(document: PreloadLinkTransport, modules: Set<
   })
 
   if (preloadLinks) {
-    preloadLinks.forEach((file) => {
+    preloadLinks.map((file) => {
       if (!seen.has(file)) {
         seen.add(file)
-        renderPreloadLink(document, file)
+        return buildPreloadLink(document, file) as R
       }
-    })
+    }).filter((file) => !!file)
   }
+  return []
 }
 
-function renderPreloadLink(document: PreloadLinkTransport, file: string) {
+function buildPreloadLink(document: PreloadLinkTransport, file: string) {
   if (file.endsWith('.js')) {
-    appendLink(document, {
+    return buildLink(document, {
       rel: 'modulepreload',
       crossOrigin: '',
       href: file,
     })
   }
   else if (file.endsWith('.css')) {
-    appendLink(document, {
+    return buildLink(document, {
       rel: 'stylesheet',
       href: file,
     })
   }
 }
 
-function createLink(document: Document) {
-  return document.createElement('link')
+function createLink(document: Document, attrs?: Record<string, string>) {
+  const link =  document.createElement('link')
+  if (attrs) {
+    setAttrs(link, attrs)
+  }
+  return link
 }
 
 function setAttrs(el: Element, attrs: Record<string, any>) {
@@ -54,19 +63,22 @@ function setAttrs(el: Element, attrs: Record<string, any>) {
     el.setAttribute(key, attrs[key])
 }
 
-function appendLink(document: PreloadLinkTransport, attrs: Record<string, any>) {
+function buildLink<
+  T extends PreloadLinkTransport, 
+  R = T extends Document ? HTMLLinkElement : string 
+>(document: T, attrs: Record<string, any>): R|undefined {
   if(!('querySelector' in document)){
-    const regex = new RegExp(`<link[^>]*href\s*=\s*["']${attrs.href}["'][^>]*>`,'m')
+    const regex = new RegExp(`<link[^>]*href\s*=\s*("|')${attrs.href}\\1[^>]*>`,'m')
     const exits = regex.test(document.html)
     if(exits) return ;
-    const crossOrigin = attrs.crossOrigin !== undefined ? `crossorigin='${attrs.crossOrigin}'` : ''    
-    document.html = injectInHtml(document.html, 'head' , {prepend: `<link rel='${attrs.rel}' href='${attrs.href}' ${crossOrigin}>`} )
-    return 
-  }
+    const crossOrigin = attrs.crossOrigin !== undefined ? `crossorigin='${attrs.crossOrigin}'` : ''
+    const base = process.env.BASE_ASSETS_URL ?? ''    
+    return `<link rel='${attrs.rel}' href='${base}${attrs.href}' ${crossOrigin}>` as R
+  }  
   const exits = document.head.querySelector(`link[href='${attrs.file}']`)
   if (exits)
     return
-  const link = createLink(document)
-  setAttrs(link, attrs)
-  document.head.appendChild(link)
+  return createLink(document, attrs) as R
+  
+  
 }

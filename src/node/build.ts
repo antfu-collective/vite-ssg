@@ -11,12 +11,12 @@ import type { SSRContext } from 'vue/server-renderer'
 import { JSDOM } from 'jsdom'
 import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
 import type { RouteRecordRaw } from 'vue-router'
-//@ts-ignore
-import { renderDOMHead } from '@unhead/dom'
-import { renderSSRHead } from '@unhead/ssr'
+
+
+import { renderSSRHead, SSRHeadPayload } from '@unhead/ssr'
 import type { ViteSSGContext, ViteSSGOptions } from '../types'
 import { serializeState } from '../utils/state'
-import { renderPreloadLinks } from './preload-links'
+import { buildPreloadLinks } from './preload-links'
 import { buildLog, getSize, injectInHtml, routesToPaths } from './utils'
 import { getCritters } from './critical'
 
@@ -201,40 +201,33 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
           const appHTML = await renderToString(app, ctx)
           await triggerOnSSRAppRendered?.(route, appHTML, appCtx)
           // need to resolve assets so render content first
-          const renderedHTML = await renderHTML({
+          
+          
+
+          /** replace slower jsdom to use unhead/ssr and injectInHtml utils */
+          // render current page's preloadLinks          
+          const preloads = buildPreloadLinks({ html:transformedIndexHTML }, ctx.modules || new Set<string>(), ssrManifest)          
+          let ssrHead = {
+            headTags: preloads.join("\n"),
+            bodyAttrs: '',
+            htmlAttrs: '',
+            bodyTagsOpen: '',
+            bodyTags: ''
+          }
+          if (head) {
+            const tmpSSrHead = await renderSSRHead(head as any)
+            ssrHead = Object.assign(tmpSSrHead, {
+              headTags: `${tmpSSrHead.headTags.trim()}${ssrHead.headTags}`
+            }) 
+          }
+          
+          const html = await renderHTML({
             rootContainerId,
             indexHTML: transformedIndexHTML,
             appHTML,
             initialState: transformState(initialState),
+            ssrHead
           })
-          
-
-          /** replace slower jsdom to use unhead/ssr and injectInHtml utils */
-          // render current page's preloadLinks
-          const htmlTransport = { html: renderedHTML }
-          renderPreloadLinks(htmlTransport, ctx.modules || new Set<string>(), ssrManifest)
-          let { html } = htmlTransport
-
-          if (head) {
-            const ssrHead = await renderSSRHead(head as any)
-            html = injectInHtml(html, 'html', {attrs: ssrHead.htmlAttrs})
-            html = injectInHtml(html, 'head', {prepend: ssrHead.headTags})
-            html = injectInHtml(html, 'body', {attrs: ssrHead.bodyAttrs, prepend: ssrHead.bodyTagsOpen, append: ssrHead.bodyTags})
-          }
-          
-
-          // create jsdom from renderedHTML
-          // const {jsdom, dispose} = await createJSDOM(renderedHTML)
-
-          // // render current page's preloadLinks
-          // renderPreloadLinks(jsdom.window.document, ctx.modules || new Set<string>(), ssrManifest)
-
-          // // render head
-          // if (head)
-          //   await renderDOMHead(head, { document: jsdom.window.document })
-
-          // html = jsdom.serialize()
-          // await dispose()
 
           let transformed = (await onPageRendered?.(route, html, appCtx)) || html
           if (critters)
@@ -269,7 +262,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
 
   await queue.start().onIdle()
 
-  await fs.remove(ssgOut)
+  ssgOptions["skip-build"] || await fs.remove(ssgOut)
 
   // when `vite-plugin-pwa` is presented, use it to regenerate SW after rendering
   const pwaPlugin: VitePluginPWAAPI = config.plugins.find(i => i.name === 'vite-plugin-pwa')?.api
@@ -334,49 +327,36 @@ async function renderHTML({
   indexHTML,
   appHTML,
   initialState,
+  ssrHead  
 }: {
   rootContainerId: string
   indexHTML: string
   appHTML: string
-  initialState: any
+  initialState: any,
+  ssrHead: SSRHeadPayload
 },
 ) {
-  const stateScript = initialState
-    ? `\n<script>window.__INITIAL_STATE__=${initialState}</script>`
-    : ''
-  const container = `<div id="${rootContainerId}"></div>`
-  if (indexHTML.includes(container)) {
-    return indexHTML
-      .replace(
-        container,
-        () => `<div id="${rootContainerId}" data-server-rendered="true">${appHTML}</div>${stateScript}`,
-      )
+  const regex = new RegExp(`<\\w+(?:[-\\w])?\\s*id\\s*=\\s*("|')${rootContainerId}\\1`)  
+  if (!regex.test(indexHTML)) {    
+    throw new Error(`Could not find a tag with id="${rootContainerId}" to replace it with server-side rendered HTML`);
   }
 
-  const html5Parser = await import('html5parser')
-  const ast = html5Parser.parse(indexHTML)
-  let renderedOutput: string | undefined
-
-  html5Parser.walk(ast, {
-    enter: (node) => {
-      if (!renderedOutput
-        && node?.type === html5Parser.SyntaxKind.Tag
-        && Array.isArray(node.attributes)
-        && node.attributes.length > 0
-        && node.attributes.some(attr => attr.name.value === 'id' && attr.value?.value === rootContainerId)
-      ) {
-        const attributesStringified = [...node.attributes.map(({ name: { value: name }, value }) => `${name}="${value!.value}"`)].join(' ')
-        const indexHTMLBefore = indexHTML.slice(0, node.start)
-        const indexHTMLAfter = indexHTML.slice(node.end)
-        renderedOutput = `${indexHTMLBefore}<${node.name} ${attributesStringified} data-server-rendered="true">${appHTML}</${node.name}>${stateScript}${indexHTMLAfter}`
-      }
-    },
-  })
-
-  if (!renderedOutput)
-    throw new Error(`Could not find a tag with id="${rootContainerId}" to replace it with server-side rendered HTML`)
-
-  return renderedOutput
+  const stateScript = initialState ? `\n<script>window.__INITIAL_STATE__=${initialState}<\/script>\n` : "";
+  const injectOptions = [
+    {match: {tag: 'html'}, attrs: ssrHead.htmlAttrs},
+    {match: {tag: 'head'}, prepend: ssrHead.headTags},
+    {match: {tag: 'body'}, attrs: ssrHead.bodyAttrs, prepend: ssrHead.bodyTagsOpen, append: ssrHead.bodyTags},
+    {
+      match: {
+        tag: 'div', 
+        attr: {'id' : rootContainerId}
+      },
+      attrs: 'data-server-rendered="true"',
+      append: appHTML,
+      after: stateScript
+    }
+  ]  
+  return injectInHtml(indexHTML, injectOptions)
 }
 
 async function formatHtml(html: string, formatting: ViteSSGOptions['formatting']) {
