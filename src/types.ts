@@ -159,6 +159,7 @@ export interface ViteSSGClientOptions {
    * @default `#app`
    */
   rootContainer?: string | Element
+  isHydrate?: boolean
 }
 
 export type RouterOptions = PartialKeys<VueRouterOptions, 'history'> & { base?: string }
