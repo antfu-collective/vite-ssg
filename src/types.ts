@@ -159,6 +159,11 @@ export interface ViteSSGClientOptions {
    * @default `#app`
    */
   rootContainer?: string | Element
+  /**
+   * Enable Vue hydration on client side
+   * @default false
+   */
+  isHydrate?: boolean
 }
 
 export type RouterOptions = PartialKeys<VueRouterOptions, 'history'> & { base?: string }
