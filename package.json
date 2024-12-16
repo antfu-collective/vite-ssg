@@ -80,7 +80,7 @@
     "release": "bumpp && pnpm publish"
   },
   "peerDependencies": {
-    "beasties": "^0.1.0",
+    "beasties": "^0.2.0",
     "critters": "^0.0.24",
     "vite": "^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0-0 || ^6.0.0",
     "vue": "^3.2.10",
@@ -133,6 +133,6 @@
     "vue-tsc": "catalog:"
   },
   "resolutions": {
-    "vite": "^6.0.2"
+    "vite": "^6.0.3"
   }
 }

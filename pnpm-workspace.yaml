@@ -1,20 +1,20 @@
 packages:
   - examples/*
 catalog:
-  '@antfu/eslint-config': ^3.11.2
+  '@antfu/eslint-config': ^3.12.0
   '@nuxt/devalue': ^2.0.2
   '@types/fs-extra': ^11.0.4
   '@types/html-minifier-terser': ^7.0.2
   '@types/jsdom': ^21.1.7
   '@types/yargs': ^17.0.33
-  '@unhead/dom': ^1.11.13
-  '@unhead/vue': ^1.11.13
+  '@unhead/dom': ^1.11.14
+  '@unhead/vue': ^1.11.14
   '@vitejs/plugin-vue': ^5.2.1
-  beasties: ^0.1.0
-  bumpp: ^9.8.1
+  beasties: ^0.2.0
+  bumpp: ^9.9.1
   critters: ^0.0.25
   cross-env: ^7.0.3
-  eslint: ^9.16.0
+  eslint: ^9.17.0
   esno: ^4.8.0
   fast-glob: ^3.3.2
   fs-extra: ^11.2.0
@@ -23,15 +23,15 @@ catalog:
   jsdom: ^25.0.1
   kolorist: ^1.8.0
   p-queue: ^8.0.1
-  pinia: ^2.2.8
-  prettier: ^3.4.1
-  rollup: ^4.28.0
+  pinia: ^2.3.0
+  prettier: ^3.4.2
+  rollup: ^4.28.1
   tsup: ^8.3.5
   typescript: 5.6.3
-  unbuild: ^2.0.0
+  unbuild: ^3.0.1
   unplugin-vue-components: ^0.27.5
-  unplugin-vue-markdown: ^0.27.1
-  vite: ^6.0.2
+  unplugin-vue-markdown: ^0.28.0
+  vite: ^6.0.3
   vite-plugin-pages: ^0.32.4
   vite-plugin-pwa: ^0.21.1
   vitest: ^2.1.8
