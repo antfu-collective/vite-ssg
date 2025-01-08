@@ -1,7 +1,7 @@
 {
   "name": "vite-ssg",
   "version": "0.24.3",
-  "packageManager": "pnpm@9.14.4",
+  "packageManager": "pnpm@9.15.3",
   "description": "Server-side generation for Vite",
   "author": "Anthony Fu <anthonyfu117@hotmail.com>",
   "license": "MIT",
@@ -133,6 +133,6 @@
     "vue-tsc": "catalog:"
   },
   "resolutions": {
-    "vite": "^6.0.3"
+    "vite": "^6.0.7"
   }
 }
