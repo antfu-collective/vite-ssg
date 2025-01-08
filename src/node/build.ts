@@ -14,7 +14,7 @@ import { blue, cyan, dim, gray, green, red, yellow } from 'kolorist'
 import PQueue from 'p-queue'
 import { mergeConfig, resolveConfig, build as viteBuild } from 'vite'
 import { serializeState } from '../utils/state'
-import { getBeastiesOrCritters } from './critical'
+import { getBeasties } from './critical'
 import { renderPreloadLinks } from './preload-links'
 import { buildLog, getSize, routesToPaths } from './utils'
 
@@ -57,7 +57,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
     base,
   }: ViteSSGOptions = mergedOptions
 
-  const beastiesOptions = mergedOptions.beastiesOptions ?? mergedOptions.crittersOptions ?? {}
+  const beastiesOptions = mergedOptions.beastiesOptions ?? {}
 
   if (fs.existsSync(ssgOutTempFolder))
     await fs.remove(ssgOutTempFolder)
@@ -137,8 +137,9 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
   buildLog('Rendering Pages...', routesPaths.length)
 
   const beasties = beastiesOptions !== false
-    ? await getBeastiesOrCritters(outDir, beastiesOptions)
+    ? await getBeasties(outDir, beastiesOptions)
     : undefined
+
   if (beasties)
     console.log(`${gray('[vite-ssg]')} ${blue('Critical CSS generation enabled via `beasties`')}`)
 

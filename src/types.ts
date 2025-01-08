@@ -1,6 +1,5 @@
 import type { MergeHead, VueHeadClient } from '@unhead/vue'
 import type { Options as BeastiesOptions } from 'beasties'
-import type { Options as CrittersOptions } from 'critters'
 import type { App } from 'vue'
 import type { Router, RouteRecordRaw, RouterOptions as VueRouterOptions } from 'vue-router'
 
@@ -68,14 +67,6 @@ export interface ViteSSGOptions {
    * @default false
    */
   includeAllRoutes?: boolean
-
-  /**
-   * Options for the critters package.
-   *
-   * @deprecated Use `beastiesOptions` instead.
-   * @see https://github.com/GoogleChromeLabs/critters
-   */
-  crittersOptions?: CrittersOptions | false
 
   /**
    * Options for the beasties package.

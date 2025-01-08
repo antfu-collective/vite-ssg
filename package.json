@@ -81,16 +81,12 @@
   },
   "peerDependencies": {
     "beasties": "^0.2.0",
-    "critters": "^0.0.24",
     "vite": "^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0-0 || ^6.0.0",
     "vue": "^3.2.10",
     "vue-router": "^4.0.1"
   },
   "peerDependenciesMeta": {
     "beasties": {
-      "optional": true
-    },
-    "critters": {
       "optional": true
     },
     "vue-router": {
@@ -116,7 +112,6 @@
     "@types/yargs": "catalog:",
     "beasties": "catalog:",
     "bumpp": "catalog:",
-    "critters": "catalog:",
     "eslint": "catalog:",
     "esno": "catalog:",
     "fast-glob": "catalog:",

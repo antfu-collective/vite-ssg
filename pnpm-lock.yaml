@@ -39,9 +39,6 @@ catalogs:
     bumpp:
       specifier: ^9.9.3
       version: 9.9.3
-    critters:
-      specifier: ^0.0.25
-      version: 0.0.25
     cross-env:
       specifier: ^7.0.3
       version: 7.0.3
@@ -174,9 +171,6 @@ importers:
       bumpp:
         specifier: 'catalog:'
         version: 9.9.3
-      critters:
-        specifier: 'catalog:'
-        version: 0.0.25
       eslint:
         specifier: 'catalog:'
         version: 9.17.0(jiti@2.4.2)
@@ -2127,10 +2121,6 @@ packages:
   core-js-compat@3.38.1:
     resolution: {integrity: sha512-JRH6gfXxGmrzF3tZ57lFx97YARxCXPaMzPo6jELZhv88pBH5VXpQ+y0znKGlFnzuaihqhLbefxSJxWJMPtfDzw==}
 
-  critters@0.0.25:
-    resolution: {integrity: sha512-ROF/tjJyyRdM8/6W0VqoN5Ql05xAGnkf5b7f3sTEl1bI5jTQQf8O918RD/V9tEb9pRY/TKcvJekDbJtniHyPtQ==}
-    deprecated: Ownership of Critters has moved to the Nuxt team, who will be maintaining the project going forward. If you'd like to keep using Critters, please switch to the actively-maintained fork at https://github.com/danielroe/beasties
-
   cross-env@7.0.3:
     resolution: {integrity: sha512-+/HKd6EgcQCJGh2PSjZuUitQBQynKor4wrFbRg4DtAgS1aWO+gU52xpH7M9ScGgXSYmAVS9bIJ8EzuaGw0oNAw==}
     engines: {node: '>=10.14', npm: '>=6', yarn: '>=1'}
@@ -2810,9 +2800,6 @@ packages:
 
   html5parser@2.0.2:
     resolution: {integrity: sha512-L0y+IdTVxHsovmye8MBtFgBvWZnq1C9WnI/SmJszxoQjmUH1psX2uzDk21O5k5et6udxdGjwxkbmT9eVRoG05w==}
-
-  htmlparser2@8.0.2:
-    resolution: {integrity: sha512-GYdjWKDkbRLkZ5geuHs5NY1puJ+PXwP7+fHPRz06Eirsb9ugf6d8kkXav6ADhcODhFFPMIXyxkxSuMf3D6NCFA==}
 
   htmlparser2@9.1.0:
     resolution: {integrity: sha512-5zfg6mHUoaer/97TxnGpxmbR7zJtPwIYFMZ/H5ucTlPZhKvtum05yiPK3Mgai3a0DyVxv7qYqoweaEd2nrYQzQ==}
@@ -6569,16 +6556,6 @@ snapshots:
     dependencies:
       browserslist: 4.24.0
 
-  critters@0.0.25:
-    dependencies:
-      chalk: 4.1.2
-      css-select: 5.1.0
-      dom-serializer: 2.0.0
-      domhandler: 5.0.3
-      htmlparser2: 8.0.2
-      postcss: 8.4.49
-      postcss-media-query-parser: 0.2.3
-
   cross-env@7.0.3:
     dependencies:
       cross-spawn: 7.0.6
@@ -7462,13 +7439,6 @@ snapshots:
   html5parser@2.0.2:
     dependencies:
       tslib: 2.7.0
-
-  htmlparser2@8.0.2:
-    dependencies:
-      domelementtype: 2.3.0
-      domhandler: 5.0.3
-      domutils: 3.1.0
-      entities: 4.5.0
 
   htmlparser2@9.1.0:
     dependencies:

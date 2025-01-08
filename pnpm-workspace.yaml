@@ -12,7 +12,6 @@ catalog:
   '@vitejs/plugin-vue': ^5.2.1
   beasties: ^0.2.0
   bumpp: ^9.9.3
-  critters: ^0.0.25
   cross-env: ^7.0.3
   eslint: ^9.17.0
   esno: ^4.8.0
