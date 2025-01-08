@@ -21,6 +21,7 @@ export async function getBeastiesOrCritters(outDir: string, options: Options = {
   try {
     const CrittersClass = (await import('critters')).default
     console.warn('`critters` is deprecated. Please use `beasties` instead.')
+    // @ts-expect-error critters is deprecated
     return new CrittersClass({
       path: outDir,
       logLevel: 'warn',
