@@ -21,11 +21,12 @@ export function ViteSSG(
     registerComponents = true,
     useHead = true,
     rootContainer = '#app',
+    isHydrate = false,
   } = options
   const isClient = typeof window !== 'undefined'
 
   async function createApp(client = false, routePath?: string) {
-    const app = client
+    const app = client && !isHydrate
       ? createClientApp(App)
       : createSSRApp(App)
 
