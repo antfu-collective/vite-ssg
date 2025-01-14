@@ -29,6 +29,10 @@ yargs(hideBin(process.argv))
         alias: 'b',
         type: 'string',
         describe: 'The base path to render',
+      })
+      .option('skip-build', {
+        type: 'boolean',
+        describe: 'Skip build if already have build in ssg-out dir',
       }),
     async (args) => {
       const { config: configFile = undefined, ...ssgOptions } = args

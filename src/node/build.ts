@@ -391,11 +391,13 @@ async function formatHtml(html: string, formatting: ViteSSGOptions['formatting']
   if (formatting === 'minify') {
     const htmlMinifier = await import('html-minifier-terser')
     return await htmlMinifier.minify(html, {
-      collapseWhitespace: false, //this breaks hydration
+      //this breaks hydration
+      collapseWhitespace: false,
       caseSensitive: true,
       collapseInlineTagWhitespace: false,
       minifyJS: true,
-      minifyCSS: false, //not necessary already minified with beasties
+      //not necessary already minified with beasties
+      minifyCSS: false,
     })
   }
   else if (formatting === 'prettify') {
