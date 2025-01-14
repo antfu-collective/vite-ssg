@@ -22,6 +22,7 @@ import { getBeastiesOrCritters } from './critical'
 import { injectInHtml } from './injection'
 import { buildPreloadLinks } from './preload-links'
 import { buildLog, getSize, routesToPaths } from './utils'
+import type { Options } from 'html-minifier-terser'
 
 export type Manifest = Record<string, string[]>
 
@@ -87,7 +88,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
   const nodeEnv = process.env.NODE_ENV || 'production'
   const mode = process.env.MODE || ssgOptions.mode || nodeEnv
   const config = await resolveConfig(viteConfig, 'build', mode, nodeEnv)
-  
+
 
   const root = getRoot(config)
   const outDir = config.build.outDir || 'dist'
@@ -212,7 +213,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
           // render current page's preloadLinks
           const preloads:string[] = buildPreloadLinks({ html: transformedIndexHTML }, ctx.modules || new Set<string>(), ssrManifest)
           let ssrHead = {
-            headTags: preloads.join(formatting === 'minify' ? '' : '\n'),
+            headTags: preloads.join("\n"),
             bodyAttrs: '',
             htmlAttrs: '',
             bodyTagsOpen: '',
@@ -221,7 +222,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
           if (head) {
             const tmpSSrHead = await renderSSRHead(head as any)
             ssrHead = Object.assign(tmpSSrHead, {
-              headTags: `${tmpSSrHead.headTags.trim()}${ssrHead.headTags}`,
+              headTags: [tmpSSrHead.headTags.trim(), ssrHead.headTags].filter(x => !!x).join("\n"),
             })
           }
 
@@ -238,7 +239,10 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
           if (beasties)
             transformed = await beasties.process(transformed)
 
-          const formatted = await formatHtml(transformed, formatting)
+          const formatted = await formatHtml(transformed, formatting, {
+            collapseWhitespace : false,
+            collapseInlineTagWhitespace : false,
+          })
 
           const relativeRouteFile = `${(route.endsWith('/')
             ? `${route}index`
@@ -390,17 +394,16 @@ async function renderHTML({
   }
 }
 
-async function formatHtml(html: string, formatting: ViteSSGOptions['formatting']) {
+async function formatHtml(html: string, formatting: ViteSSGOptions['formatting'], opts: Options = {}) {
   if (formatting === 'minify') {
     const htmlMinifier = await import('html-minifier-terser')
-    return await htmlMinifier.minify(html, {  
-      collapseBooleanAttributes: true,
-      conservativeCollapse: true,    
+    return await htmlMinifier.minify(html, {
       collapseWhitespace: true,
       caseSensitive: true,
-      collapseInlineTagWhitespace: true,
-      minifyJS: true,      
+      collapseInlineTagWhitespace: false,
+      minifyJS: true,
       minifyCSS: true,
+      ...opts,
     })
   }
   else if (formatting === 'prettify') {
