@@ -25,7 +25,8 @@ export function ViteSSG(
   const isClient = typeof window !== 'undefined'
 
   async function createApp(client = false, routePath?: string) {
-    const app = client
+    const isHydrationMode = isClient && document.querySelectorAll('[data-server-rendered]').length > 0
+    const app = client && !isHydrationMode
       ? createClientApp(App)
       : createSSRApp(App)
 

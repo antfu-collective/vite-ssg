@@ -1,27 +1,27 @@
 /* eslint-disable no-console */
+import type { SSRHeadPayload } from '@unhead/ssr'
+import type { InlineConfig, ResolvedConfig } from 'vite'
+import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
+import type { RouteRecordRaw } from 'vue-router'
+import type { SSRContext } from 'vue/server-renderer'
+import type { ViteSSGContext, ViteSSGOptions } from '../types'
+import type { InjectOptions } from './injection'
 import { createRequire } from 'node:module'
 import { dirname, isAbsolute, join, parse } from 'node:path'
 import process from 'node:process'
-import type { SSRContext } from 'vue/server-renderer'
-import type { RouteRecordRaw } from 'vue-router'
-import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
-import type { InlineConfig, ResolvedConfig } from 'vite'
 import { renderSSRHead } from '@unhead/ssr'
 // import { renderDOMHead } from '@unhead/dom'
 import fs from 'fs-extra'
 // import { JSDOM } from 'jsdom'
 import { blue, cyan, dim, gray, green, red, yellow } from 'kolorist'
 import PQueue from 'p-queue'
-import { mergeConfig, resolveConfig, build as viteBuild } from 'vite'
-import type { SSRHeadPayload } from '@unhead/ssr'
-import type { ViteSSGContext, ViteSSGOptions } from '../types'
 
+import { mergeConfig, resolveConfig, build as viteBuild } from 'vite'
 import { serializeState } from '../utils/state'
 import { getBeastiesOrCritters } from './critical'
+import { injectInHtml } from './injection'
 import { buildPreloadLinks } from './preload-links'
 import { buildLog, getSize, routesToPaths } from './utils'
-import type { InjectOptions } from './injection'
-import { injectInHtml } from './injection'
 
 export type Manifest = Record<string, string[]>
 
@@ -228,6 +228,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
             appHTML,
             initialState: transformState(initialState),
             ssrHead,
+            teleports: ctx.teleports,
           })
 
           let transformed = (await onPageRendered?.(route, html, appCtx)) || html
@@ -329,23 +330,43 @@ async function renderHTML({
   appHTML,
   initialState,
   ssrHead,
+  teleports,
 }: {
   rootContainerId: string
   indexHTML: string
   appHTML: string
   initialState: any
   ssrHead: SSRHeadPayload
+  teleports?: Record<string, string>
 },
 ) {
   // const regex = new RegExp(`<\\w+(?:[-\\w])?\\s*id\\s*=\\s*("|')${rootContainerId}\\1`)
   // if (!regex.test(indexHTML)) {
   //   throw new Error(`Could not find a tag with id="${rootContainerId}" to replace it with server-side rendered HTML`)
   // }
+  const teleportInjections: InjectOptions[] = Object.entries(teleports ?? {}).map(([sel, value]) => {
+    let match: any = {}
+    /** match id class and tag but only simple selectors */
+    const tagMatch = sel.match(/^[\w-]+/)
+    const idMatch = sel.match(/#([\w-]+)/)
+    const classMatch = sel.match(/\.([\w-]+)/)
+    if (tagMatch) {
+      match = { ...match, tag: tagMatch[0] }
+    }
+    if (idMatch) {
+      match = { ...match, attr: { id: idMatch[1] } }
+    }
+    if (classMatch) {
+      match = { ...match, attr: { class: new RegExp(`\b${classMatch[1]}\b`) } }
+    }
+    return { match, append: value }
+  })
 
   const stateScript = initialState ? `\n<script>window.__INITIAL_STATE__=${initialState}<\/script>\n` : ''
   const injectOptions: InjectOptions[] = [
     { match: { tag: 'html' }, attrs: ssrHead.htmlAttrs },
-    { match: { tag: 'head' }, prepend: ssrHead.headTags },
+    { match: { tag: 'head' }, prepend: ssrHead.headTags, removeChildren: [{ tag: 'title' }] },
+    ...teleportInjections,
     { match: { tag: 'body' }, attrs: ssrHead.bodyAttrs, prepend: ssrHead.bodyTagsOpen, append: ssrHead.bodyTags },
     {
       match: {
@@ -370,11 +391,11 @@ async function formatHtml(html: string, formatting: ViteSSGOptions['formatting']
   if (formatting === 'minify') {
     const htmlMinifier = await import('html-minifier-terser')
     return await htmlMinifier.minify(html, {
-      collapseWhitespace: true,
+      collapseWhitespace: false, //this breaks hydration
       caseSensitive: true,
       collapseInlineTagWhitespace: false,
       minifyJS: true,
-      minifyCSS: true,
+      minifyCSS: false, //not necessary already minified with beasties
     })
   }
   else if (formatting === 'prettify') {
