@@ -87,6 +87,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
   const nodeEnv = process.env.NODE_ENV || 'production'
   const mode = process.env.MODE || ssgOptions.mode || nodeEnv
   const config = await resolveConfig(viteConfig, 'build', mode, nodeEnv)
+  
 
   const root = getRoot(config)
   const outDir = config.build.outDir || 'dist'
@@ -180,6 +181,8 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
   const ssrManifest: Manifest = JSON.parse(ssrManifestRaw)
   let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
   indexHTML = rewriteScripts(indexHTML, script)
+  const IS_PROD = nodeEnv === 'production'
+  indexHTML = await formatHtml(indexHTML, IS_PROD ? 'minify' : formatting)
 
   const { renderToString }: typeof import('vue/server-renderer') = await import('vue/server-renderer')
 
@@ -207,9 +210,9 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
 
           /** replace slower jsdom to use unhead/ssr and injectInHtml utils */
           // render current page's preloadLinks
-          const preloads = buildPreloadLinks({ html: transformedIndexHTML }, ctx.modules || new Set<string>(), ssrManifest)
+          const preloads:string[] = buildPreloadLinks({ html: transformedIndexHTML }, ctx.modules || new Set<string>(), ssrManifest)
           let ssrHead = {
-            headTags: preloads.join('\n'),
+            headTags: preloads.join(formatting === 'minify' ? '' : '\n'),
             bodyAttrs: '',
             htmlAttrs: '',
             bodyTagsOpen: '',
@@ -390,14 +393,14 @@ async function renderHTML({
 async function formatHtml(html: string, formatting: ViteSSGOptions['formatting']) {
   if (formatting === 'minify') {
     const htmlMinifier = await import('html-minifier-terser')
-    return await htmlMinifier.minify(html, {
-      //this breaks hydration
-      collapseWhitespace: false,
+    return await htmlMinifier.minify(html, {  
+      collapseBooleanAttributes: true,
+      conservativeCollapse: true,    
+      collapseWhitespace: true,
       caseSensitive: true,
-      collapseInlineTagWhitespace: false,
-      minifyJS: true,
-      //not necessary already minified with beasties
-      minifyCSS: false,
+      collapseInlineTagWhitespace: true,
+      minifyJS: true,      
+      minifyCSS: true,
     })
   }
   else if (formatting === 'prettify') {

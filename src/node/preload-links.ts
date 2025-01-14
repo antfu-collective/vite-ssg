@@ -1,5 +1,5 @@
 import type { Manifest } from './build'
-import { injectInHtml } from './utils'
+// import { injectInHtml } from './utils'
 
 
 type PreloadLinkTransport = Document | { html:string }
