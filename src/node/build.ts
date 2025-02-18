@@ -3,14 +3,15 @@ import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
 import type { RouteRecordRaw } from 'vue-router'
 import type { SSRContext } from 'vue/server-renderer'
 import type { ViteSSGContext, ViteSSGOptions } from '../types'
-import { createRequire } from 'node:module'
+import { existsSync } from 'node:fs'
+import fs from 'node:fs/promises'
 /* eslint-disable no-console */
+import { createRequire } from 'node:module'
 import { dirname, isAbsolute, join, parse } from 'node:path'
 import process from 'node:process'
 import { renderDOMHead } from '@unhead/dom'
-import fs from 'fs-extra'
+import { blue, cyan, dim, gray, green, red, yellow } from 'ansis'
 import { JSDOM } from 'jsdom'
-import { blue, cyan, dim, gray, green, red, yellow } from 'kolorist'
 import PQueue from 'p-queue'
 import { mergeConfig, resolveConfig, build as viteBuild } from 'vite'
 import { serializeState } from '../utils/state'
@@ -59,8 +60,8 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
 
   const beastiesOptions = mergedOptions.beastiesOptions ?? {}
 
-  if (fs.existsSync(ssgOutTempFolder))
-    await fs.remove(ssgOutTempFolder)
+  if (existsSync(ssgOutTempFolder))
+    await fs.rm(ssgOutTempFolder, { recursive: true })
 
   // client
   buildLog('Build for client...')
@@ -207,7 +208,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
           ? join(route.replace(/^\//g, ''), 'index.html')
           : relativeRouteFile
 
-        await fs.ensureDir(join(out, dirname(filename)))
+        await fs.mkdir(join(out, dirname(filename)), { recursive: true })
         await fs.writeFile(join(out, filename), formatted, 'utf-8')
         config.logger.info(
           `${dim(`${outDir}/`)}${cyan(filename.padEnd(15, ' '))}  ${dim(getSize(formatted))}`,
@@ -221,7 +222,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
 
   await queue.start().onIdle()
 
-  await fs.remove(ssgOutTempFolder)
+  await fs.rm(ssgOutTempFolder, { recursive: true, force: true })
 
   // when `vite-plugin-pwa` is presented, use it to regenerate SW after rendering
   const pwaPlugin: VitePluginPWAAPI = config.plugins.find(i => i.name === 'vite-plugin-pwa')?.api
@@ -339,7 +340,7 @@ async function formatHtml(html: string, formatting: ViteSSGOptions['formatting']
 
 async function readFiles(...paths: string[]) {
   for (const path of paths) {
-    if (fs.existsSync(path)) {
+    if (existsSync(path)) {
       return {
         path,
         content: await fs.readFile(path, 'utf-8'),

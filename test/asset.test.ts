@@ -1,10 +1,10 @@
 import fs from 'node:fs/promises'
-import fg from 'fast-glob'
+import { glob } from 'tinyglobby'
 import { describe, expect, it } from 'vitest'
 
 describe('multiple-pages', () => {
   it('generates list', async () => {
-    const files = await fg('**/*.html', {
+    const files = await glob('**/*.html', {
       cwd: 'examples/multiple-pages/dist',
     })
     expect(files).toMatchInlineSnapshot(`

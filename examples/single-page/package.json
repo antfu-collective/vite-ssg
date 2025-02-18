@@ -2,8 +2,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "cross-env DEBUG=vite-ssg:* vite",
-    "build": "cross-env DEBUG=vite-ssg:* vite-ssg build",
+    "dev": "DEBUG='vite-ssg:*' vite",
+    "build": "DEBUG='vite-ssg:*' vite-ssg build",
     "serve": "vite preview"
   },
   "dependencies": {
@@ -12,7 +12,6 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "catalog:",
-    "cross-env": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-ssg": "workspace:*"
