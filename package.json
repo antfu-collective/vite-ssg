@@ -81,12 +81,16 @@
   },
   "peerDependencies": {
     "beasties": "^0.2.0",
+    "prettier": "^3.3.0",
     "vite": "^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0-0 || ^6.0.0",
     "vue": "^3.2.10",
     "vue-router": "^4.0.1"
   },
   "peerDependenciesMeta": {
     "beasties": {
+      "optional": true
+    },
+    "prettier": {
       "optional": true
     },
     "vue-router": {
@@ -100,8 +104,7 @@
     "cac": "catalog:",
     "html-minifier-terser": "catalog:",
     "html5parser": "catalog:",
-    "jsdom": "catalog:",
-    "prettier": "catalog:"
+    "jsdom": "catalog:"
   },
   "devDependencies": {
     "@antfu/eslint-config": "catalog:",
@@ -111,6 +114,7 @@
     "bumpp": "catalog:",
     "eslint": "catalog:",
     "p-queue": "catalog:",
+    "prettier": "catalog:",
     "rollup": "catalog:",
     "tinyglobby": "catalog:",
     "tsx": "catalog:",

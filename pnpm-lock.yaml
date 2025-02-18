@@ -128,9 +128,6 @@ importers:
       jsdom:
         specifier: 'catalog:'
         version: 26.0.0
-      prettier:
-        specifier: 'catalog:'
-        version: 3.5.1
     devDependencies:
       '@antfu/eslint-config':
         specifier: 'catalog:'
@@ -153,6 +150,9 @@ importers:
       p-queue:
         specifier: 'catalog:'
         version: 8.1.0
+      prettier:
+        specifier: 'catalog:'
+        version: 3.5.1
       rollup:
         specifier: 'catalog:'
         version: 4.34.8
