@@ -1,3 +1,4 @@
+import type { VueHeadClient } from '@unhead/vue'
 import type { Component } from 'vue'
 import type { ViteSSGClientOptions, ViteSSGContext } from '../types'
 import { createHead } from '@unhead/vue/client'
@@ -27,7 +28,7 @@ export function ViteSSG(
       ? createClientApp(App)
       : createSSRApp(App)
 
-    let head: ReturnType<typeof createHead> | undefined
+    let head: VueHeadClient | undefined
 
     if (useHead) {
       head = createHead()
