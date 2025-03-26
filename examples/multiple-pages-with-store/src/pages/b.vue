@@ -15,7 +15,7 @@ export default {
       ],
       style: [
         {
-          children: 'body {color: #567839}',
+          textContent: 'body {color: #567839}',
         },
       ],
     })

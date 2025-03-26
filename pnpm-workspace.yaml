@@ -5,8 +5,8 @@ catalog:
   '@nuxt/devalue': ^2.0.2
   '@types/html-minifier-terser': ^7.0.2
   '@types/jsdom': ^21.1.7
-  '@unhead/dom': ^1.11.19
-  '@unhead/vue': ^1.11.19
+  '@unhead/dom': ^2.0.1
+  '@unhead/vue': ^2.0.1
   '@vitejs/plugin-vue': ^5.2.1
   ansis: ^3.15.0
   beasties: ^0.2.0
@@ -23,7 +23,7 @@ catalog:
   tinyglobby: ^0.2.11
   tsx: ^4.19.2
   typescript: 5.6.3
-  unbuild: ^3.3.1
+  unbuild: ^3.5.0
   unplugin-vue-components: ^28.2.0
   unplugin-vue-markdown: ^28.3.0
   vite: ^6.1.0

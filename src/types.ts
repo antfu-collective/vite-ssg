@@ -1,4 +1,3 @@
-import type { MergeHead, VueHeadClient } from '@unhead/vue'
 import type { Options as BeastiesOptions } from 'beasties'
 import type { App } from 'vue'
 import type { Router, RouteRecordRaw, RouterOptions as VueRouterOptions } from 'vue-router'
@@ -129,7 +128,7 @@ export interface ViteSSGContext<HasRouter extends boolean = true> {
   router: HasRouter extends true ? Router : undefined
   routes: HasRouter extends true ? Readonly<RouteRecordRaw[]> : undefined
   initialState: Record<string, any>
-  head: VueHeadClient<MergeHead> | undefined
+  head: ReturnType<typeof import('@unhead/vue/client')['createHead']> | undefined
   isClient: boolean
   onSSRAppRendered: (cb: () => void) => void
   triggerOnSSRAppRendered: (route: string, appHTML: string, appCtx: ViteSSGContext) => Promise<unknown[]>
