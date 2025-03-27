@@ -1,7 +1,7 @@
 {
   "name": "vite-ssg",
   "version": "25.2.0",
-  "packageManager": "pnpm@10.6.5",
+  "packageManager": "pnpm@10.7.0",
   "description": "Server-side generation for Vite",
   "author": "Anthony Fu <anthonyfu117@hotmail.com>",
   "license": "MIT",
