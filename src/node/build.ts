@@ -76,6 +76,9 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
       },
     },
     mode: config.mode,
+    define: {
+      'import.meta.env.SSR': JSON.stringify(undefined),
+    },
   }))
 
   // load jsdom before building the SSR and so jsdom will be available
@@ -109,6 +112,9 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
       },
     },
     mode: config.mode,
+    define: {
+      'import.meta.env.SSR': 'true',
+    },
   }))
 
   const prefix = (format === 'esm' && process.platform === 'win32') ? 'file://' : ''
@@ -222,7 +228,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
 
   await queue.start().onIdle()
 
-  await fs.rm(ssgOutTempFolder, { recursive: true, force: true })
+  // await fs.rm(ssgOutTempFolder, { recursive: true, force: true })
 
   // when `vite-plugin-pwa` is presented, use it to regenerate SW after rendering
   const pwaPlugin: VitePluginPWAAPI = config.plugins.find(i => i.name === 'vite-plugin-pwa')?.api

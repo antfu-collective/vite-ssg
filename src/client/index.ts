@@ -24,26 +24,28 @@ export function ViteSSG(
     rootContainer = '#app',
     hydration = false,
   } = options
-  const isClient = typeof window !== 'undefined'
+  const isClient = !!import.meta.env.SSR
 
   async function createApp(client = false, routePath?: string) {
-    const app = client && !hydration
-      ? createClientApp(App)
-      : createSSRApp(App)
+    const app = import.meta.env.SSR
+      ? createSSRApp(App)
+      : client && !hydration
+        ? createClientApp(App)
+        : createSSRApp(App)
 
     let head: VueHeadClient | undefined
 
     if (useHead) {
-      if (client) {
-        app.use(head = createHead())
+      if (import.meta.env.SSR) {
+        app.use(head = createSSRHead())
       }
       else {
-        app.use(head = createSSRHead())
+        app.use(head = createHead())
       }
     }
 
     const router = createRouter({
-      history: client
+      history: !import.meta.env.SSR && client
         ? createWebHistory(routerOptions.base)
         : createMemoryHistory(routerOptions.base),
       ...routerOptions,
@@ -55,7 +57,7 @@ export function ViteSSG(
       app.component('ClientOnly', ClientOnly)
 
     const appRenderCallbacks: (() => void)[] = []
-    const onSSRAppRendered = client
+    const onSSRAppRendered = !import.meta.env.SSR && client
       ? () => {}
       : (cb: () => void) => appRenderCallbacks.push(cb)
     const triggerOnSSRAppRendered = () => {
@@ -74,7 +76,7 @@ export function ViteSSG(
       routePath,
     }
 
-    if (client) {
+    if (!import.meta.env.SSR && client) {
       await documentReady()
       // @ts-expect-error global variable
       context.initialState = transformState?.(window.__INITIAL_STATE__ || {}) || deserializeState(window.__INITIAL_STATE__)
@@ -97,7 +99,7 @@ export function ViteSSG(
       next()
     })
 
-    if (!client) {
+    if (import.meta.env.SSR && !client) {
       const route = context.routePath ?? '/'
       router.push(route)
 
@@ -113,7 +115,7 @@ export function ViteSSG(
     } as ViteSSGContext<true>
   }
 
-  if (isClient) {
+  if (!import.meta.env.SSR) {
     (async () => {
       const { app, router } = await createApp(true)
       // wait until page component is fetched before mounting
