@@ -1,15 +1,12 @@
 import type { VueHeadClient } from '@unhead/vue'
 import type { Component } from 'vue'
-import type { RouterOptions, ViteSSGClientOptions, ViteSSGContext } from '../types'
-import { createHead } from '@unhead/vue/client'
+import type { RouterOptions, ViteSSGClientOptions, ViteSSGContext } from '../../types'
 import { createHead as createSSRHead } from '@unhead/vue/server'
-import { createApp as createClientApp, createSSRApp } from 'vue'
+import { createSSRApp } from 'vue'
 import { createMemoryHistory, createRouter, createWebHistory } from 'vue-router'
-import { documentReady } from '../utils/document-ready'
-import { deserializeState } from '../utils/state'
 import { ClientOnly } from './components/ClientOnly'
 
-export * from '../types'
+export * from '../../types'
 
 export function ViteSSG(
   App: Component,
@@ -24,22 +21,14 @@ export function ViteSSG(
     rootContainer = '#app',
     hydration = false,
   } = options
-  const isClient = typeof window !== 'undefined'
 
   async function createApp(client = false, routePath?: string) {
-    const app = client && !hydration
-      ? createClientApp(App)
-      : createSSRApp(App)
+    const app = createSSRApp(App)
 
     let head: VueHeadClient | undefined
 
     if (useHead) {
-      if (client) {
-        app.use(head = createHead())
-      }
-      else {
-        app.use(head = createSSRHead())
-      }
+      app.use(head = createSSRHead())
     }
 
     const router = createRouter({
@@ -64,7 +53,7 @@ export function ViteSSG(
     const context: ViteSSGContext<true> = {
       app,
       head,
-      isClient,
+      isClient: false,
       router,
       routes,
       onSSRAppRendered,
@@ -72,12 +61,6 @@ export function ViteSSG(
       initialState: {},
       transformState,
       routePath,
-    }
-
-    if (client) {
-      await documentReady()
-      // @ts-expect-error global variable
-      context.initialState = transformState?.(window.__INITIAL_STATE__ || {}) || deserializeState(window.__INITIAL_STATE__)
     }
 
     await fn?.(context)
@@ -97,13 +80,11 @@ export function ViteSSG(
       next()
     })
 
-    if (!client) {
-      const route = context.routePath ?? '/'
-      router.push(route)
+    const route = context.routePath ?? '/'
+    router.push(route)
 
-      await router.isReady()
-      context.initialState = router.currentRoute.value.meta.state as Record<string, any> || {}
-    }
+    await router.isReady()
+    context.initialState = router.currentRoute.value.meta.state as Record<string, any> || {}
 
     const initialState = context.initialState
 
@@ -111,15 +92,6 @@ export function ViteSSG(
       ...context,
       initialState,
     } as ViteSSGContext<true>
-  }
-
-  if (isClient) {
-    (async () => {
-      const { app, router } = await createApp(true)
-      // wait until page component is fetched before mounting
-      await router.isReady()
-      app.mount(rootContainer, true)
-    })()
   }
 
   return createApp

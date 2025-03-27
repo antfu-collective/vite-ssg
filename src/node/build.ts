@@ -8,15 +8,16 @@ import fs from 'node:fs/promises'
 /* eslint-disable no-console */
 import { createRequire } from 'node:module'
 import { dirname, isAbsolute, join, parse } from 'node:path'
+import { resolve } from 'node:path'
 import process from 'node:process'
 import { renderDOMHead } from '@unhead/dom'
 import { blue, cyan, dim, gray, green, red, yellow } from 'ansis'
 import { JSDOM } from 'jsdom'
 import PQueue from 'p-queue'
 import { mergeConfig, resolveConfig, build as viteBuild } from 'vite'
-import { serializeState } from '../utils/state'
 import { getBeasties } from './critical'
 import { renderPreloadLinks } from './preload-links'
+import { serializeState } from './state'
 import { buildLog, getSize, routesToPaths } from './utils'
 
 export type Manifest = Record<string, string[]>
@@ -245,6 +246,9 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
 }
 
 async function detectEntry(root: string) {
+  if (existsSync(resolve(root, 'src/main.ts'))) {
+    return 'src/main.ts'
+  }
   // pick the first script tag of type module as the entry
   // eslint-disable-next-line regexp/no-super-linear-backtracking
   const scriptSrcReg = /<script.*?src=["'](.+?)["'](?!<).*>\s*<\/script>/gi
@@ -255,7 +259,7 @@ async function detectEntry(root: string) {
     const [, scriptType] = script.match(/.*\stype=(?:'|")?([^>'"\s]+)/i) || []
     return scriptType === 'module'
   }) || []
-  return entry || 'src/main.ts'
+  return entry
 }
 
 async function resolveAlias(config: ResolvedConfig, entry: string) {
