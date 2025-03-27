@@ -74,7 +74,7 @@ The `ClientOnly` component is registered globally when the app is created.
 
 ## Document head
 
-We ship [`@unhead/vue`](https://unhead.harlanzw.com/integrations/vue/setup) to manage the document-head out of the box. You can use it directly in your pages/components.
+We ship [`@unhead/vue v2`](https://unhead.unjs.io/docs/vue/head/guides/get-started/overview) to manage the document-head out of the box. You can use it directly in your pages/components.
 For example:
 
 ```html
@@ -99,7 +99,7 @@ useHead({
 
 That's all! No configuration is needed. Vite SSG will automatically handle the server-side rendering and merging.
 
-See [`@unhead/vue`'s docs](https://unhead.unjs.io/setup/vue/installation) for more usage information about `useHead`.
+See [`@unhead/vue v2`'s docs](https://unhead.unjs.io/docs/vue/head/api/composables/use-head) for more usage information about `useHead`.
 
 ## Critical CSS
 
