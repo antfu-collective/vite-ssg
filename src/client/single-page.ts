@@ -2,6 +2,7 @@ import type { VueHeadClient } from '@unhead/vue'
 import type { Component } from 'vue'
 import type { ViteSSGClientOptions, ViteSSGContext } from '../types'
 import { createHead } from '@unhead/vue/client'
+import { createHead as createSSRHead } from '@unhead/vue/server'
 import { createApp as createClientApp, createSSRApp } from 'vue'
 import { documentReady } from '../utils/document-ready'
 import { deserializeState } from '../utils/state'
@@ -31,8 +32,12 @@ export function ViteSSG(
     let head: VueHeadClient | undefined
 
     if (useHead) {
-      head = createHead()
-      app.use(head)
+      if (client) {
+        app.use(head = createHead())
+      }
+      else {
+        app.use(head = createSSRHead())
+      }
     }
 
     const appRenderCallbacks: (() => void)[] = []

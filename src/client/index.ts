@@ -2,6 +2,7 @@ import type { VueHeadClient } from '@unhead/vue'
 import type { Component } from 'vue'
 import type { RouterOptions, ViteSSGClientOptions, ViteSSGContext } from '../types'
 import { createHead } from '@unhead/vue/client'
+import { createHead as createSSRHead } from '@unhead/vue/server'
 import { createApp as createClientApp, createSSRApp } from 'vue'
 import { createMemoryHistory, createRouter, createWebHistory } from 'vue-router'
 import { documentReady } from '../utils/document-ready'
@@ -33,8 +34,12 @@ export function ViteSSG(
     let head: VueHeadClient | undefined
 
     if (useHead) {
-      head = createHead()
-      app.use(head)
+      if (client) {
+        app.use(head = createHead())
+      }
+      else {
+        app.use(head = createSSRHead())
+      }
     }
 
     const router = createRouter({
