@@ -1,4 +1,4 @@
-import { ViteSSG } from 'vite-ssg'
+import { ViteSSG } from 'vite-ssg/client'
 import routes from '~pages'
 import App from './App.vue'
 

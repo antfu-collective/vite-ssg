@@ -25,6 +25,7 @@ const config: UserConfig = {
     script: 'async',
     formatting: 'prettify',
   },
+  build: { minify: false },
 }
 
 export default config
