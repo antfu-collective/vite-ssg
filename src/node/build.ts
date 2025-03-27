@@ -280,8 +280,7 @@ async function renderHTML({
   indexHTML: string
   appHTML: string
   initialState: any
-},
-) {
+}) {
   const stateScript = initialState
     ? `\n<script>window.__INITIAL_STATE__=${initialState}</script>`
     : ''
