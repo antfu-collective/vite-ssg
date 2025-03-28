@@ -77,7 +77,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
     },
     mode: config.mode,
     define: {
-      'import.meta.env.SSR': JSON.stringify(undefined),
+      'process.env.VITE_SSG': JSON.stringify(undefined),
     },
   }))
 
@@ -113,7 +113,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
     },
     mode: config.mode,
     define: {
-      'import.meta.env.SSR': 'true',
+      'process.env.VITE_SSG': 'true',
     },
   }))
 

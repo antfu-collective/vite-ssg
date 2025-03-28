@@ -22,10 +22,12 @@ export function ViteSSG(
     rootContainer = '#app',
     hydration = false,
   } = options
-  const isClient = !!import.meta.env.SSR
+  // eslint-disable-next-line node/prefer-global/process
+  const isClient = !!process.env.VITE_SSG
 
   async function createApp(client = false) {
-    const app = import.meta.env.SSR
+    // eslint-disable-next-line node/prefer-global/process
+    const app = process.env.VITE_SSG
       ? createSSRApp(App)
       : client && !hydration
         ? createClientApp(App)
@@ -34,7 +36,8 @@ export function ViteSSG(
     let head: VueHeadClient | undefined
 
     if (useHead) {
-      if (import.meta.env.SSR) {
+      // eslint-disable-next-line node/prefer-global/process
+      if (process.env.VITE_SSG) {
         app.use(head = createSSRHead())
       }
       else {
@@ -43,7 +46,8 @@ export function ViteSSG(
     }
 
     const appRenderCallbacks: (() => void)[] = []
-    const onSSRAppRendered = !import.meta.env.SSR && client
+    // eslint-disable-next-line node/prefer-global/process
+    const onSSRAppRendered = !process.env.VITE_SSG && client
       ? () => {}
       : (cb: () => void) => appRenderCallbacks.push(cb)
     const triggerOnSSRAppRendered = () => {
@@ -54,7 +58,8 @@ export function ViteSSG(
     if (registerComponents)
       app.component('ClientOnly', ClientOnly)
 
-    if (!import.meta.env.SSR && client) {
+    // eslint-disable-next-line node/prefer-global/process
+    if (!process.env.VITE_SSG && client) {
       await documentReady()
       // @ts-expect-error global variable
       context.initialState = transformState?.(window.__INITIAL_STATE__ || {}) || deserializeState(window.__INITIAL_STATE__)
@@ -71,7 +76,8 @@ export function ViteSSG(
     } as ViteSSGContext<false>
   }
 
-  if (!import.meta.env.SSR) {
+  // eslint-disable-next-line node/prefer-global/process
+  if (!process.env.VITE_SSG) {
     (async () => {
       const { app } = await createApp(true)
       app.mount(rootContainer, true)
