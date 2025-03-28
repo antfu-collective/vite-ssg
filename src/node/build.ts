@@ -228,7 +228,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
 
   await queue.start().onIdle()
 
-  // await fs.rm(ssgOutTempFolder, { recursive: true, force: true })
+  await fs.rm(ssgOutTempFolder, { recursive: true, force: true })
 
   // when `vite-plugin-pwa` is presented, use it to regenerate SW after rendering
   const pwaPlugin: VitePluginPWAAPI = config.plugins.find(i => i.name === 'vite-plugin-pwa')?.api
