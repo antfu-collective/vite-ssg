@@ -22,9 +22,7 @@ export function ViteSSG(
     rootContainer = '#app',
     hydration = false,
   } = options
-  const isClient = !import.meta.env.SSR
-
-  async function createApp(_client = false) {
+  async function createApp() {
     const app = import.meta.env.SSR || hydration
       ? createSSRApp(App)
       : createClientApp(App)
@@ -47,7 +45,17 @@ export function ViteSSG(
     const triggerOnSSRAppRendered = () => {
       return Promise.all(appRenderCallbacks.map(cb => cb()))
     }
-    const context = { app, head, isClient, router: undefined, routes: undefined, initialState: {}, onSSRAppRendered, triggerOnSSRAppRendered, transformState }
+    const context = {
+      app,
+      head,
+      isClient: !import.meta.env.SSR,
+      router: undefined,
+      routes: undefined,
+      initialState: {},
+      onSSRAppRendered,
+      triggerOnSSRAppRendered,
+      transformState,
+    }
 
     if (registerComponents)
       app.component('ClientOnly', ClientOnly)
@@ -71,7 +79,7 @@ export function ViteSSG(
 
   if (!import.meta.env.SSR) {
     (async () => {
-      const { app } = await createApp(true)
+      const { app } = await createApp()
       app.mount(rootContainer, true)
     })()
   }

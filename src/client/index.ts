@@ -24,9 +24,8 @@ export function ViteSSG(
     rootContainer = '#app',
     hydration = false,
   } = options
-  const isClient = !import.meta.env.SSR
 
-  async function createApp(_client = false, routePath?: string) {
+  async function createApp(routePath?: string) {
     const app = import.meta.env.SSR || hydration
       ? createSSRApp(App)
       : createClientApp(App)
@@ -64,7 +63,7 @@ export function ViteSSG(
     const context: ViteSSGContext<true> = {
       app,
       head,
-      isClient,
+      isClient: !import.meta.env.SSR,
       router,
       routes,
       onSSRAppRendered,
@@ -115,7 +114,7 @@ export function ViteSSG(
 
   if (!import.meta.env.SSR) {
     (async () => {
-      const { app, router } = await createApp(true)
+      const { app, router } = await createApp()
       // wait until page component is fetched before mounting
       await router.isReady()
       app.mount(rootContainer, true)

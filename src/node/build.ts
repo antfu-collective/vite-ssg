@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import type { InlineConfig, ResolvedConfig } from 'vite'
 import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
 import type { RouteRecordRaw } from 'vue-router'
@@ -5,7 +6,6 @@ import type { SSRContext } from 'vue/server-renderer'
 import type { ViteSSGContext, ViteSSGOptions } from '../types'
 import { existsSync } from 'node:fs'
 import fs from 'node:fs/promises'
-/* eslint-disable no-console */
 import { createRequire } from 'node:module'
 import { dirname, isAbsolute, join, parse } from 'node:path'
 import process from 'node:process'
@@ -21,7 +21,7 @@ import { buildLog, getSize, routesToPaths } from './utils'
 
 export type Manifest = Record<string, string[]>
 
-export type CreateAppFactory = (client: boolean, routePath?: string) => Promise<ViteSSGContext<true> | ViteSSGContext<false>>
+export type CreateAppFactory = (routePath?: string) => Promise<ViteSSGContext<true> | ViteSSGContext<false>>
 
 function DefaultIncludedRoutes(paths: string[], _routes: Readonly<RouteRecordRaw[]>) {
   // ignore dynamic routes
@@ -109,6 +109,9 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
       },
     },
     mode: config.mode,
+    ssr: {
+      noExternal: ['vite-ssg'],
+    },
   }))
 
   const prefix = (format === 'esm' && process.platform === 'win32') ? 'file://' : ''
@@ -126,7 +129,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
     ? await import(serverEntry)
     : _require(serverEntry)
   const includedRoutes = serverEntryIncludedRoutes || configIncludedRoutes
-  const { routes } = await createApp(false)
+  const { routes } = await createApp()
 
   let routesPaths = includeAllRoutes
     ? routesToPaths(routes)
@@ -162,7 +165,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
   for (const route of routesPaths) {
     queue.add(async () => {
       try {
-        const appCtx = await createApp(false, route) as ViteSSGContext<true>
+        const appCtx = await createApp(route) as ViteSSGContext<true>
         const { app, router, head, initialState, triggerOnSSRAppRendered, transformState = serializeState } = appCtx
 
         if (router) {
