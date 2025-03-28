@@ -13,17 +13,17 @@ export * from '../types'
 export function ViteSSG(
   App: Component,
   fn?: (context: ViteSSGContext<false>) => Promise<void> | void,
-  options: ViteSSGClientOptions = {},
+  options?: ViteSSGClientOptions,
 ) {
   const {
     transformState,
     registerComponents = true,
     useHead = true,
     rootContainer = '#app',
-    hydration = false,
-  } = options
+  } = options ?? {}
+
   async function createApp(_client = false) {
-    const app = import.meta.env.SSR || hydration
+    const app = import.meta.env.SSR || options?.hydration
       ? createSSRApp(App)
       : createClientApp(App)
 

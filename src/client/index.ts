@@ -15,18 +15,17 @@ export function ViteSSG(
   App: Component,
   routerOptions: RouterOptions,
   fn?: (context: ViteSSGContext<true>) => Promise<void> | void,
-  options: ViteSSGClientOptions = {},
+  options?: ViteSSGClientOptions,
 ) {
   const {
     transformState,
     registerComponents = true,
     useHead = true,
     rootContainer = '#app',
-    hydration = false,
-  } = options
+  } = options ?? {}
 
   async function createApp(_client = false, routePath?: string) {
-    const app = import.meta.env.SSR || hydration
+    const app = import.meta.env.SSR || options?.hydration
       ? createSSRApp(App)
       : createClientApp(App)
 
