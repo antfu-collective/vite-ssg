@@ -25,7 +25,7 @@ export function ViteSSG(
     hydration = false,
   } = options
 
-  async function createApp(routePath?: string) {
+  async function createApp(_client = false, routePath?: string) {
     const app = import.meta.env.SSR || hydration
       ? createSSRApp(App)
       : createClientApp(App)

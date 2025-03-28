@@ -21,7 +21,7 @@ import { buildLog, getSize, routesToPaths } from './utils'
 
 export type Manifest = Record<string, string[]>
 
-export type CreateAppFactory = (routePath?: string) => Promise<ViteSSGContext<true> | ViteSSGContext<false>>
+export type CreateAppFactory = (client: boolean, routePath?: string) => Promise<ViteSSGContext<true> | ViteSSGContext<false>>
 
 function DefaultIncludedRoutes(paths: string[], _routes: Readonly<RouteRecordRaw[]>) {
   // ignore dynamic routes
@@ -129,7 +129,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
     ? await import(serverEntry)
     : _require(serverEntry)
   const includedRoutes = serverEntryIncludedRoutes || configIncludedRoutes
-  const { routes } = await createApp()
+  const { routes } = await createApp(false)
 
   let routesPaths = includeAllRoutes
     ? routesToPaths(routes)
@@ -165,7 +165,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
   for (const route of routesPaths) {
     queue.add(async () => {
       try {
-        const appCtx = await createApp(route) as ViteSSGContext<true>
+        const appCtx = await createApp(false, route) as ViteSSGContext<true>
         const { app, router, head, initialState, triggerOnSSRAppRendered, transformState = serializeState } = appCtx
 
         if (router) {
