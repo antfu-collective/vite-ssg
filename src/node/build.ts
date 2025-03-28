@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import type { InlineConfig, ResolvedConfig } from 'vite'
 import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
 import type { RouteRecordRaw } from 'vue-router'
@@ -5,7 +6,6 @@ import type { SSRContext } from 'vue/server-renderer'
 import type { ViteSSGContext, ViteSSGOptions } from '../types'
 import { existsSync } from 'node:fs'
 import fs from 'node:fs/promises'
-/* eslint-disable no-console */
 import { createRequire } from 'node:module'
 import { dirname, isAbsolute, join, parse } from 'node:path'
 import process from 'node:process'
@@ -76,9 +76,6 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
       },
     },
     mode: config.mode,
-    define: {
-      'process.env.VITE_SSG': JSON.stringify(undefined),
-    },
   }))
 
   // load jsdom before building the SSR and so jsdom will be available
@@ -112,8 +109,8 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
       },
     },
     mode: config.mode,
-    define: {
-      'process.env.VITE_SSG': 'true',
+    ssr: {
+      noExternal: ['vite-ssg'],
     },
   }))
 
