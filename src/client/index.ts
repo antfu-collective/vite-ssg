@@ -33,12 +33,7 @@ export function ViteSSG(
     let head: VueHeadClient | undefined
 
     if (useHead) {
-      if (import.meta.env.SSR) {
-        app.use(head = createSSRHead())
-      }
-      else {
-        app.use(head = createHead())
-      }
+      app.use(head = import.meta.env.SSR ? createSSRHead() : createHead())
     }
 
     const router = createRouter({
