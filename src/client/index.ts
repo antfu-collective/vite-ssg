@@ -26,10 +26,10 @@ export function ViteSSG(
   } = options
   const isClient = !import.meta.env.SSR
 
-  async function createApp(client = false, routePath?: string) {
-    const app = client && !hydration
-      ? createClientApp(App)
-      : createSSRApp(App)
+  async function createApp(_client = false, routePath?: string) {
+    const app = import.meta.env.SSR || hydration
+      ? createSSRApp(App)
+      : createClientApp(App)
 
     let head: VueHeadClient | undefined
 
@@ -43,9 +43,9 @@ export function ViteSSG(
     }
 
     const router = createRouter({
-      history: client
-        ? createWebHistory(routerOptions.base)
-        : createMemoryHistory(routerOptions.base),
+      history: import.meta.env.SSR
+        ? createMemoryHistory(routerOptions.base)
+        : createWebHistory(routerOptions.base),
       ...routerOptions,
     })
 
@@ -55,9 +55,9 @@ export function ViteSSG(
       app.component('ClientOnly', ClientOnly)
 
     const appRenderCallbacks: (() => void)[] = []
-    const onSSRAppRendered = client
-      ? () => {}
-      : (cb: () => void) => appRenderCallbacks.push(cb)
+    const onSSRAppRendered = import.meta.env.SSR
+      ? (cb: () => void) => appRenderCallbacks.push(cb)
+      : () => {}
     const triggerOnSSRAppRendered = () => {
       return Promise.all(appRenderCallbacks.map(cb => cb()))
     }
