@@ -76,9 +76,6 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
       },
     },
     mode: config.mode,
-    define: {
-      'process.env.VITE_SSG': JSON.stringify(undefined),
-    },
   }))
 
   // load jsdom before building the SSR and so jsdom will be available
@@ -112,9 +109,6 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
       },
     },
     mode: config.mode,
-    define: {
-      'process.env.VITE_SSG': 'true',
-    },
   }))
 
   const prefix = (format === 'esm' && process.platform === 'win32') ? 'file://' : ''

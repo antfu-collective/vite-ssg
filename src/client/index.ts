@@ -24,22 +24,17 @@ export function ViteSSG(
     rootContainer = '#app',
     hydration = false,
   } = options
-  // eslint-disable-next-line node/prefer-global/process
-  const isClient = !!process.env.VITE_SSG
+  const isClient = !import.meta.env.SSR
 
   async function createApp(client = false, routePath?: string) {
-    // eslint-disable-next-line node/prefer-global/process
-    const app = process.env.VITE_SSG
-      ? createSSRApp(App)
-      : client && !hydration
-        ? createClientApp(App)
-        : createSSRApp(App)
+    const app = client && !hydration
+      ? createClientApp(App)
+      : createSSRApp(App)
 
     let head: VueHeadClient | undefined
 
     if (useHead) {
-      // eslint-disable-next-line node/prefer-global/process
-      if (process.env.VITE_SSG) {
+      if (import.meta.env.SSR) {
         app.use(head = createSSRHead())
       }
       else {
@@ -48,8 +43,7 @@ export function ViteSSG(
     }
 
     const router = createRouter({
-      // eslint-disable-next-line node/prefer-global/process
-      history: !process.env.VITE_SSG && client
+      history: client
         ? createWebHistory(routerOptions.base)
         : createMemoryHistory(routerOptions.base),
       ...routerOptions,
@@ -61,8 +55,7 @@ export function ViteSSG(
       app.component('ClientOnly', ClientOnly)
 
     const appRenderCallbacks: (() => void)[] = []
-    // eslint-disable-next-line node/prefer-global/process
-    const onSSRAppRendered = !process.env.VITE_SSG && client
+    const onSSRAppRendered = client
       ? () => {}
       : (cb: () => void) => appRenderCallbacks.push(cb)
     const triggerOnSSRAppRendered = () => {
@@ -81,8 +74,7 @@ export function ViteSSG(
       routePath,
     }
 
-    // eslint-disable-next-line node/prefer-global/process
-    if (!process.env.VITE_SSG && client) {
+    if (!import.meta.env.SSR) {
       await documentReady()
       // @ts-expect-error global variable
       context.initialState = transformState?.(window.__INITIAL_STATE__ || {}) || deserializeState(window.__INITIAL_STATE__)
@@ -105,8 +97,7 @@ export function ViteSSG(
       next()
     })
 
-    // eslint-disable-next-line node/prefer-global/process
-    if (process.env.VITE_SSG && !client) {
+    if (!import.meta.env.SSR) {
       const route = context.routePath ?? '/'
       router.push(route)
 
@@ -122,8 +113,7 @@ export function ViteSSG(
     } as ViteSSGContext<true>
   }
 
-  // eslint-disable-next-line node/prefer-global/process
-  if (!process.env.VITE_SSG) {
+  if (!import.meta.env.SSR) {
     (async () => {
       const { app, router } = await createApp(true)
       // wait until page component is fetched before mounting
