@@ -4,6 +4,7 @@ Static-site generation for Vue 3 on Vite.
 
 [![NPM version](https://img.shields.io/npm/v/vite-ssg?color=a1b858)](https://www.npmjs.com/package/vite-ssg)
 
+> ℹ️ **ESM-only from `v27.0.0`, CJS generation format also dropped.**
 > ℹ️ **Vite 2 is supported from `v0.2.x`, Vite 1's support is discontinued.**
 
 ## Install
@@ -46,13 +47,55 @@ export const createApp = ViteSSG(
 )
 ```
 
+### How to allow Rollup tree-shake your client code
+
+In order to allow Rollup tree-shake your client code at build time, you need to wrap you code using `import.meta.env.SSR`, that's, checking if the build is for the server: Rollup will remove the server code from the client build.
+
+```ts
+if (import.meta.env.SSR) {
+  // your server code will be removed in the client build
+}
+else {
+  // your client code will be removed in the server build 
+}
+```
+
+Alternatively, you can also use `isClient` from `ViteSSGContext` using these 3 simple rules:
+1) don't destructure the `ViteSSGContext` in the `ViteSSG` function
+2) don't destructure `isClient` from `ViteSSGContext` in the callback function body
+3) use `isClient` from `ViteSSGContext` in the callback function body (implicit ;) )
+
+```ts
+import { ViteSSG } from 'vite-ssg'
+import App from './App.vue'
+
+export const createApp = ViteSSG(
+  // the root component
+  App,
+  // vue-router options
+  { routes },
+  // previous 1) rule
+  (ctx) => {
+    // previous 2) rule
+    const { app, router, routes, initialState } = ctx
+    // previous 3) rule
+    if (ctx.isClient) {
+      // your client code
+    }
+    else {
+      // your server code
+    }
+  }
+)
+```
+
 ### Single Page SSG
 
 For SSG of an index page only (i.e. without `vue-router`); import `vite-ssg/single-page` instead, and only install `@unhead/vue` (`npm i -D vite-ssg @unhead/vue`).
 
 ```ts
 // src/main.ts
-import { ViteSSG } from 'vite-ssg/single-page'
+import {ViteSSG} from 'vite-ssg/single-page'
 import App from './App.vue'
 
 // `export const createApp` is required instead of the original `createApp(App).mount('#app')`
@@ -307,13 +350,13 @@ const { app, router, initialState, isClient, onSSRAppRendered } = ctx
 const pinia = createPinia()
 app.use(pinia)
 
-if (isClient) {
-  pinia.state.value = (initialState.pinia) || {}
-}
-else {
+if (import.meta.env.SSR) {
   onSSRAppRendered(() => {
     initialState.pinia = pinia.state.value
   })
+}
+else {
+  pinia.state.value = (initialState.pinia) || {}
 }
 ```
 
