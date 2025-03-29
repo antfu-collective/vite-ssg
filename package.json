@@ -1,5 +1,6 @@
 {
   "name": "vite-ssg",
+  "type": "module",
   "version": "26.1.0",
   "packageManager": "pnpm@10.7.0",
   "description": "Server-side generation for Vite",
@@ -20,29 +21,20 @@
   ],
   "sideEffects": false,
   "exports": {
-    ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
-    },
-    "./node": {
-      "import": "./dist/node.mjs",
-      "require": "./dist/node.cjs"
-    },
-    "./single-page": {
-      "import": "./dist/client/single-page.mjs",
-      "require": "./dist/client/single-page.cjs"
-    }
+    ".": "./dist/index.mjs",
+    "./node": "./dist/node.mjs",
+    "./single-page": "./dist/client/single-page.mjs"
   },
-  "main": "dist/index.cjs",
+  "main": "dist/index.mjs",
   "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
+  "types": "dist/index.d.mts",
   "typesVersions": {
     "*": {
-      "single-page": [
-        "dist/client/single-page.d.ts"
-      ],
       "node": [
-        "dist/node.d.ts"
+        "dist/node.d.mts"
+      ],
+      "single-page": [
+        "dist/client/single-page.d.mts"
       ]
     }
   },

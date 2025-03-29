@@ -8,14 +8,13 @@ export default defineBuildConfig({
     { input: 'src/node', name: 'node' },
   ],
   clean: true,
-  declaration: true,
+  declaration: 'node16',
   externals: [
     'vue',
     'vue/server-renderer',
     'vue/compiler-sfc',
   ],
   rollup: {
-    emitCJS: true,
     inlineDependencies: true,
   },
 })
