@@ -22,7 +22,7 @@ export function ViteSSG(
     rootContainer = '#app',
   } = options ?? {}
 
-  async function createApp(_client = false) {
+  async function createApp() {
     const app = import.meta.env.SSR || options?.hydration
       ? createSSRApp(App)
       : createClientApp(App)

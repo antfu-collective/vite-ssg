@@ -6,9 +6,9 @@ import type { SSRContext } from 'vue/server-renderer'
 import type { ViteSSGContext, ViteSSGOptions } from '../types'
 import { existsSync } from 'node:fs'
 import fs from 'node:fs/promises'
-import { createRequire } from 'node:module'
-import { dirname, isAbsolute, join, parse } from 'node:path'
+import { dirname, isAbsolute, parse, resolve } from 'node:path'
 import process from 'node:process'
+import { pathToFileURL } from 'node:url'
 import { renderDOMHead } from '@unhead/dom'
 import { blue, cyan, dim, gray, green, red, yellow } from 'ansis'
 import { JSDOM } from 'jsdom'
@@ -21,7 +21,7 @@ import { buildLog, getSize, routesToPaths } from './utils'
 
 export type Manifest = Record<string, string[]>
 
-export type CreateAppFactory = (client: boolean, routePath?: string) => Promise<ViteSSGContext<true> | ViteSSGContext<false>>
+export type CreateAppFactory = (routePath?: string) => Promise<ViteSSGContext<true> | ViteSSGContext<false>>
 
 function DefaultIncludedRoutes(paths: string[], _routes: Readonly<RouteRecordRaw[]>) {
   // ignore dynamic routes
@@ -35,10 +35,10 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
 
   const cwd = process.cwd()
   const root = config.root || cwd
-  const ssgOutTempFolder = join(root, '.vite-ssg-temp')
-  const ssgOut = join(ssgOutTempFolder, Math.random().toString(36).substring(2, 12))
+  const ssgOutTempFolder = resolve(root, '.vite-ssg-temp')
+  const ssgOut = resolve(ssgOutTempFolder, Math.random().toString(36).substring(2, 12))
   const outDir = config.build.outDir || 'dist'
-  const out = isAbsolute(outDir) ? outDir : join(root, outDir)
+  const out = isAbsolute(outDir) ? outDir : resolve(root, outDir)
 
   const mergedOptions = Object.assign({}, config.ssgOptions || {}, ssgOptions)
   const {
@@ -52,7 +52,6 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
     onFinished,
     dirStyle = 'flat',
     includeAllRoutes = false,
-    format = 'esm',
     concurrency = 20,
     rootContainerId = 'app',
     base,
@@ -71,7 +70,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
       ssrManifest: true,
       rollupOptions: {
         input: {
-          app: join(root, './index.html'),
+          app: resolve(root, './index.html'),
         },
       },
     },
@@ -97,15 +96,10 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
       minify: false,
       cssCodeSplit: false,
       rollupOptions: {
-        output: format === 'esm'
-          ? {
-              entryFileNames: '[name].mjs',
-              format: 'esm',
-            }
-          : {
-              entryFileNames: '[name].cjs',
-              format: 'cjs',
-            },
+        output: {
+          entryFileNames: '[name].mjs',
+          format: 'esm',
+        },
       },
     },
     mode: config.mode,
@@ -114,22 +108,17 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
     },
   }))
 
-  const prefix = (format === 'esm' && process.platform === 'win32') ? 'file://' : ''
-  const ext = format === 'esm' ? '.mjs' : '.cjs'
+  const serverEntry = pathToFileURL(resolve(ssgOut, `${parse(ssrEntry).name}.mjs`)).href
+  const {
+    createApp,
+    includedRoutes: serverEntryIncludedRoutes,
+  }: {
+    createApp: CreateAppFactory
+    includedRoutes: ViteSSGOptions['includedRoutes']
+  } = await import(serverEntry)
 
-  /**
-   * `join('file://')` will be equal to `'file:\'`, which is not the correct file protocol and will fail to be parsed under bun.
-   * It is changed to '+' splicing here.
-   */
-  const serverEntry = prefix + join(ssgOut, parse(ssrEntry).name + ext).replace(/\\/g, '/')
-
-  const _require = createRequire(import.meta.url)
-
-  const { createApp, includedRoutes: serverEntryIncludedRoutes }: { createApp: CreateAppFactory, includedRoutes: ViteSSGOptions['includedRoutes'] } = format === 'esm'
-    ? await import(serverEntry)
-    : _require(serverEntry)
   const includedRoutes = serverEntryIncludedRoutes || configIncludedRoutes
-  const { routes } = await createApp(false)
+  const { routes } = await createApp()
 
   let routesPaths = includeAllRoutes
     ? routesToPaths(routes)
@@ -151,11 +140,11 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
     path: _ssrManifestPath,
     content: ssrManifestRaw,
   } = await readFiles(
-    join(out, '.vite', 'ssr-manifest.json'), // Vite 5
-    join(out, 'ssr-manifest.json'), // Vite 4 and below
+    resolve(out, '.vite', 'ssr-manifest.json'), // Vite 5
+    resolve(out, 'ssr-manifest.json'), // Vite 4 and below
   )
   const ssrManifest: Manifest = JSON.parse(ssrManifestRaw)
-  let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
+  let indexHTML = await fs.readFile(resolve(out, 'index.html'), 'utf-8')
   indexHTML = rewriteScripts(indexHTML, script)
 
   const { renderToString }: typeof import('vue/server-renderer') = await import('vue/server-renderer')
@@ -165,7 +154,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
   for (const route of routesPaths) {
     queue.add(async () => {
       try {
-        const appCtx = await createApp(false, route) as ViteSSGContext<true>
+        const appCtx = await createApp(route) as ViteSSGContext<true>
         const { app, router, head, initialState, triggerOnSSRAppRendered, transformState = serializeState } = appCtx
 
         if (router) {
@@ -208,11 +197,11 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
           : route).replace(/^\//g, '')}.html`
 
         const filename = dirStyle === 'nested'
-          ? join(route.replace(/^\//g, ''), 'index.html')
+          ? resolve(route.replace(/^\//g, ''), 'index.html')
           : relativeRouteFile
 
-        await fs.mkdir(join(out, dirname(filename)), { recursive: true })
-        await fs.writeFile(join(out, filename), formatted, 'utf-8')
+        await fs.mkdir(resolve(out, dirname(filename)), { recursive: true })
+        await fs.writeFile(resolve(out, filename), formatted, 'utf-8')
         config.logger.info(
           `${dim(`${outDir}/`)}${cyan(filename.padEnd(15, ' '))}  ${dim(getSize(formatted))}`,
         )
@@ -251,7 +240,7 @@ async function detectEntry(root: string) {
   // pick the first script tag of type module as the entry
   // eslint-disable-next-line regexp/no-super-linear-backtracking
   const scriptSrcReg = /<script.*?src=["'](.+?)["'](?!<).*>\s*<\/script>/gi
-  const html = await fs.readFile(join(root, 'index.html'), 'utf-8')
+  const html = await fs.readFile(resolve(root, 'index.html'), 'utf-8')
   const scripts = [...html.matchAll(scriptSrcReg)]
   const [, entry] = scripts.find((matchResult) => {
     const [script] = matchResult
@@ -264,7 +253,7 @@ async function detectEntry(root: string) {
 async function resolveAlias(config: ResolvedConfig, entry: string) {
   const resolver = config.createResolver()
   const result = await resolver(entry, config.root)
-  return result || join(config.root, entry)
+  return result || resolve(config.root, entry)
 }
 
 function rewriteScripts(indexHTML: string, mode?: string) {
