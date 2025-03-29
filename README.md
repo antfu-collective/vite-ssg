@@ -5,7 +5,7 @@ Static-site generation for Vue 3 on Vite.
 [![NPM version](https://img.shields.io/npm/v/vite-ssg?color=a1b858)](https://www.npmjs.com/package/vite-ssg)
 
 > ℹ️ **ESM-only from `v27.0.0` (CJS generation format also dropped).**
-> 
+>
 > ℹ️ **Vite 2 is supported from `v0.2.x`, Vite 1's support is discontinued.**
 
 ## Install
@@ -57,7 +57,7 @@ if (import.meta.env.SSR) {
   // your server code will be removed in the client build
 }
 else {
-  // your client code will be removed in the server build 
+  // your client code will be removed in the server build
 }
 ```
 
@@ -96,7 +96,7 @@ For SSG of an index page only (i.e. without `vue-router`); import `vite-ssg/sing
 
 ```ts
 // src/main.ts
-import {ViteSSG} from 'vite-ssg/single-page'
+import { ViteSSG } from 'vite-ssg/single-page'
 import App from './App.vue'
 
 // `export const createApp` is required instead of the original `createApp(App).mount('#app')`
