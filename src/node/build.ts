@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import type { InlineConfig, ResolvedConfig } from 'vite'
 import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
 import type { RouteRecordRaw } from 'vue-router'
@@ -5,7 +6,6 @@ import type { SSRContext } from 'vue/server-renderer'
 import type { ViteSSGContext, ViteSSGOptions } from '../types'
 import { existsSync } from 'node:fs'
 import fs from 'node:fs/promises'
-/* eslint-disable no-console */
 import { createRequire } from 'node:module'
 import { dirname, isAbsolute, join, parse } from 'node:path'
 import process from 'node:process'
@@ -109,6 +109,9 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
       },
     },
     mode: config.mode,
+    ssr: {
+      noExternal: ['vite-ssg'],
+    },
   }))
 
   const prefix = (format === 'esm' && process.platform === 'win32') ? 'file://' : ''
@@ -280,8 +283,7 @@ async function renderHTML({
   indexHTML: string
   appHTML: string
   initialState: any
-},
-) {
+}) {
   const stateScript = initialState
     ? `\n<script>window.__INITIAL_STATE__=${initialState}</script>`
     : ''

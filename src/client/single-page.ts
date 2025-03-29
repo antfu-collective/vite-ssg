@@ -2,6 +2,7 @@ import type { VueHeadClient } from '@unhead/vue'
 import type { Component } from 'vue'
 import type { ViteSSGClientOptions, ViteSSGContext } from '../types'
 import { createHead } from '@unhead/vue/client'
+import { createHead as createSSRHead } from '@unhead/vue/server'
 import { createApp as createClientApp, createSSRApp } from 'vue'
 import { documentReady } from '../utils/document-ready'
 import { deserializeState } from '../utils/state'
@@ -12,42 +13,49 @@ export * from '../types'
 export function ViteSSG(
   App: Component,
   fn?: (context: ViteSSGContext<false>) => Promise<void> | void,
-  options: ViteSSGClientOptions = {},
+  options?: ViteSSGClientOptions,
 ) {
   const {
     transformState,
     registerComponents = true,
     useHead = true,
     rootContainer = '#app',
-    hydration = false,
-  } = options
-  const isClient = typeof window !== 'undefined'
+  } = options ?? {}
 
-  async function createApp(client = false) {
-    const app = client && !hydration
-      ? createClientApp(App)
-      : createSSRApp(App)
+  async function createApp(_client = false) {
+    const app = import.meta.env.SSR || options?.hydration
+      ? createSSRApp(App)
+      : createClientApp(App)
 
     let head: VueHeadClient | undefined
 
     if (useHead) {
-      head = createHead()
-      app.use(head)
+      app.use(head = import.meta.env.SSR ? createSSRHead() : createHead())
     }
 
     const appRenderCallbacks: (() => void)[] = []
-    const onSSRAppRendered = client
-      ? () => {}
-      : (cb: () => void) => appRenderCallbacks.push(cb)
+    const onSSRAppRendered = import.meta.env.SSR
+      ? (cb: () => void) => appRenderCallbacks.push(cb)
+      : () => {}
     const triggerOnSSRAppRendered = () => {
       return Promise.all(appRenderCallbacks.map(cb => cb()))
     }
-    const context = { app, head, isClient, router: undefined, routes: undefined, initialState: {}, onSSRAppRendered, triggerOnSSRAppRendered, transformState }
+    const context = {
+      app,
+      head,
+      isClient: !import.meta.env.SSR,
+      router: undefined,
+      routes: undefined,
+      initialState: {},
+      onSSRAppRendered,
+      triggerOnSSRAppRendered,
+      transformState,
+    }
 
     if (registerComponents)
       app.component('ClientOnly', ClientOnly)
 
-    if (client) {
+    if (!import.meta.env.SSR) {
       await documentReady()
       // @ts-expect-error global variable
       context.initialState = transformState?.(window.__INITIAL_STATE__ || {}) || deserializeState(window.__INITIAL_STATE__)
@@ -64,9 +72,9 @@ export function ViteSSG(
     } as ViteSSGContext<false>
   }
 
-  if (isClient) {
+  if (!import.meta.env.SSR) {
     (async () => {
-      const { app } = await createApp(true)
+      const { app } = await createApp()
       app.mount(rootContainer, true)
     })()
   }
