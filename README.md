@@ -4,7 +4,8 @@ Static-site generation for Vue 3 on Vite.
 
 [![NPM version](https://img.shields.io/npm/v/vite-ssg?color=a1b858)](https://www.npmjs.com/package/vite-ssg)
 
-> ℹ️ **ESM-only from `v27.0.0`, CJS generation format also dropped.**
+> ℹ️ **ESM-only from `v27.0.0` (CJS generation format also dropped).**
+> 
 > ℹ️ **Vite 2 is supported from `v0.2.x`, Vite 1's support is discontinued.**
 
 ## Install
