@@ -90,7 +90,7 @@ export function ViteSSG(
       next()
     })
 
-    if (!import.meta.env.SSR) {
+    if (import.meta.env.SSR) {
       const route = context.routePath ?? '/'
       router.push(route)
 
