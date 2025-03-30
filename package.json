@@ -1,7 +1,7 @@
 {
   "name": "vite-ssg",
   "type": "module",
-  "version": "26.1.0",
+  "version": "26.1.1",
   "packageManager": "pnpm@10.7.0",
   "description": "Server-side generation for Vite",
   "author": "Anthony Fu <anthonyfu117@hotmail.com>",
