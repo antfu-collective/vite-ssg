@@ -28,11 +28,12 @@ catalog:
   unplugin-vue-markdown: ^28.3.1
   vite: ^6.2.3
   vite-plugin-pages: ^0.32.5
-  vite-plugin-pwa: ^0.21.2
+  vite-plugin-pwa: ^1.0.0
   vitest: ^3.0.9
   vue: ^3.5.13
   vue-router: ^4.5.0
   vue-tsc: ^2.2.8
   yargs: ^17.7.2
+  workbox-build: ^7.3.0
 onlyBuiltDependencies:
   - esbuild
