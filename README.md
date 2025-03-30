@@ -50,8 +50,7 @@ export const createApp = ViteSSG(
 
 ### How to allow Rollup tree-shake your client code
 
-In order to allow Rollup tree-shake your client code at build time, you need to wrap you code using `import.meta.env.SSR`, that's, checking if the build is for the server: Rollup will remove the server code from the client build.
-
+In order to allow Rollup tree-shake your client code at build time, you need to wrap your code using `import.meta.env.SSR`, that's, checking if the build is for the server: Rollup will remove the server code from the client build.
 ```ts
 if (import.meta.env.SSR) {
   // your server code will be removed in the client build
