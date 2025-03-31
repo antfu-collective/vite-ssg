@@ -59,36 +59,6 @@ else {
   // your client code will be removed in the server build
 }
 ```
-
-Alternatively, you can also use `isClient` from `ViteSSGContext` using these 3 simple rules:
-1) don't destructure the `ViteSSGContext` in the `ViteSSG` function
-2) don't destructure `isClient` from `ViteSSGContext` in the callback function body
-3) use `isClient` from `ViteSSGContext` in the callback function body (implicit ;) )
-
-```ts
-import { ViteSSG } from 'vite-ssg'
-import App from './App.vue'
-
-export const createApp = ViteSSG(
-  // the root component
-  App,
-  // vue-router options
-  { routes },
-  // previous 1) rule
-  (ctx) => {
-    // previous 2) rule
-    const { app, router, routes, initialState } = ctx
-    // previous 3) rule
-    if (ctx.isClient) {
-      // your client code
-    }
-    else {
-      // your server code
-    }
-  }
-)
-```
-
 ### Single Page SSG
 
 For SSG of an index page only (i.e. without `vue-router`); import `vite-ssg/single-page` instead, and only install `@unhead/vue` (`npm i -D vite-ssg @unhead/vue`).
