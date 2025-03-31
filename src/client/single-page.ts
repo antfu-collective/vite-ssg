@@ -40,7 +40,7 @@ export function ViteSSG(
     const triggerOnSSRAppRendered = () => {
       return Promise.all(appRenderCallbacks.map(cb => cb()))
     }
-    const context = {
+    const context: ViteSSGContext<false> = {
       app,
       head,
       isClient: !import.meta.env.SSR,
