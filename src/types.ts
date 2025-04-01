@@ -12,13 +12,6 @@ export interface ViteSSGOptions {
   script?: 'sync' | 'async' | 'defer' | 'async defer'
 
   /**
-   * Build format.
-   *
-   * @default 'esm'
-   */
-  format?: 'esm' | 'cjs'
-
-  /**
    * The path of the main entry file (relative to the project root).
    *
    * @default 'src/main.ts'
@@ -130,6 +123,12 @@ export interface ViteSSGContext<HasRouter extends boolean = true> {
   routes: HasRouter extends true ? Readonly<RouteRecordRaw[]> : undefined
   initialState: Record<string, any>
   head: VueHeadClient | undefined
+  /**
+   * Use `!import.meta.env.SSR` instead.
+   *
+   * @see https://github.com/antfu-collective/vite-ssg?tab=readme-ov-file#how-to-allow-rollup-tree-shake-your-client-code
+   * @deprecated
+   */
   isClient: boolean
   onSSRAppRendered: (cb: () => void) => void
   triggerOnSSRAppRendered: (route: string, appHTML: string, appCtx: ViteSSGContext) => Promise<unknown[]>

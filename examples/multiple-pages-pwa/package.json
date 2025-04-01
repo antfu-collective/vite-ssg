@@ -18,6 +18,7 @@
     "vite-plugin-pages": "catalog:",
     "vite-plugin-pwa": "catalog:",
     "vite-ssg": "workspace:*",
-    "vue-router": "catalog:"
+    "vue-router": "catalog:",
+    "workbox-build": "catalog:"
   }
 }
