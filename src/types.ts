@@ -49,6 +49,7 @@ export interface ViteSSGOptions {
    */
   formatting?: 'minify' | 'prettify' | 'none'
 
+  /**Terser options */
   minifyOptions?: Options
 
   /**

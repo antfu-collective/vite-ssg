@@ -100,6 +100,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
     entry = await detectEntry(root),
     ssgOut: _ssgOutDir = join(root, '.vite-ssg-temp', Math.random().toString(36).substring(2, 12)),
     formatting = 'none',
+    minifyOptions = {},
     crittersOptions = {},
     beastiesOptions = {},
     includedRoutes: configIncludedRoutes = DefaultIncludedRoutes,
@@ -182,8 +183,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
   const ssrManifest: Manifest = JSON.parse(ssrManifestRaw)
   let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
   indexHTML = rewriteScripts(indexHTML, script)
-  const IS_PROD = nodeEnv === 'production'
-  const minifyOptions = ssgOptions.minifyOptions || {}
+  const IS_PROD = nodeEnv === 'production'  
   indexHTML = await formatHtml(indexHTML, IS_PROD ? 'minify' : formatting, minifyOptions)
 
   const { renderToString }: typeof import('vue/server-renderer') = await import('vue/server-renderer')
