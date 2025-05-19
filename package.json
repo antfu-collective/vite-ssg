@@ -65,7 +65,7 @@
     "example:single:dev": "npm -C examples/single-page run dev",
     "example:single:build": "npm -C examples/single-page run build",
     "example:single:serve": "npm -C examples/single-page run serve",
-    "test": "pnpm -r --filter=\"./examples/*\" build && vitest run",
+    "test": "pnpm -r --filter=\"./examples/*\" build && pnpm -C examples/multiple-pages-with-store run build:nested && vitest run",
     "build": "unbuild",
     "prepublishOnly": "npm run build",
     "typecheck": "vue-tsc --noEmit",

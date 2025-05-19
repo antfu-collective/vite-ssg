@@ -6,7 +6,7 @@ import type { SSRContext } from 'vue/server-renderer'
 import type { ViteSSGContext, ViteSSGOptions } from '../types'
 import { existsSync } from 'node:fs'
 import fs from 'node:fs/promises'
-import { dirname, isAbsolute, parse, resolve } from 'node:path'
+import { dirname, isAbsolute, join, parse, resolve } from 'node:path'
 import process from 'node:process'
 import { pathToFileURL } from 'node:url'
 import { renderDOMHead } from '@unhead/dom'
@@ -197,7 +197,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
           : route).replace(/^\//g, '')}.html`
 
         const filename = dirStyle === 'nested'
-          ? resolve(route.replace(/^\//g, ''), 'index.html')
+          ? join(route.replace(/^\//g, ''), 'index.html')
           : relativeRouteFile
 
         await fs.mkdir(resolve(out, dirname(filename)), { recursive: true })
