@@ -1,4 +1,5 @@
 import type { UserConfig } from 'vite'
+import process from 'node:process'
 import Vue from '@vitejs/plugin-vue'
 import Components from 'unplugin-vue-components/vite'
 import Markdown from 'unplugin-vue-markdown/vite'
@@ -24,6 +25,7 @@ const config: UserConfig = {
   ],
   ssgOptions: {
     script: 'async',
+    dirStyle: process.env.NESTED_PAGES === 'true' ? 'nested' : 'flat',
     formatting: 'prettify',
   },
 }

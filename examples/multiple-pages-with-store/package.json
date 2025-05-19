@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "DEBUG='vite-ssg:*' vite",
     "build": "DEBUG='vite-ssg:*' vite-ssg build",
+    "build:nested": "NESTED_PAGES=true DEBUG='vite-ssg:*' vite-ssg build",
     "serve": "vite preview"
   },
   "dependencies": {

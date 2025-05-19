@@ -22,3 +22,19 @@ describe('multiple-pages', () => {
     expect(file).toContain('Page A')
   })
 })
+
+describe('multiple-pages-with-store', () => {
+  it('routes are nested', async () => {
+    const files = await glob('**/*.html', {
+      cwd: 'examples/multiple-pages-with-store/dist',
+    })
+    expect(files).toMatchInlineSnapshot(`
+      [
+        "index.html",
+        "a/index.html",
+        "b/index.html",
+        "nested/deep/b/index.html",
+      ]
+    `)
+  })
+})
