@@ -84,7 +84,7 @@ async function buildServer(config: ResolvedConfig, viteConfig: InlineConfig, { s
   }))
 }
 
-export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?: boolean,'buildOnly'?:boolean }> = {}, viteConfig: InlineConfig = {}) {
+export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?: boolean }> = {}, viteConfig: InlineConfig = {}) {
   const nodeEnv = process.env.NODE_ENV || 'production'
   const mode = process.env.MODE || ssgOptions.mode || nodeEnv
   const config = await resolveConfig(viteConfig, 'build', mode, nodeEnv)
@@ -98,7 +98,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
     script = 'sync',
     mock = false,
     entry = await detectEntry(root),
-    ssgOut: _ssgOutDir = process.env.SSG_OUT ?? join(root, '.vite-ssg-temp', Math.random().toString(36).substring(2, 12)),
+    ssgOut: _ssgOutDir = join(root, '.vite-ssg-temp', Math.random().toString(36).substring(2, 12)),
     formatting = 'none',
     crittersOptions = {},
     beastiesOptions = {},
@@ -112,7 +112,6 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
     format = 'esm',
     concurrency = 20,
     rootContainerId = 'app',
-    
   }: ViteSSGOptions = Object.assign({}, config.ssgOptions || {}, ssgOptions)
 
   const ssgOut = isAbsolute(_ssgOutDir) ? _ssgOutDir : join(root, _ssgOutDir)
@@ -140,10 +139,6 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
   const ssrEntry = await resolveAlias(config, entry)
   if (willRunBuild)
     await buildServer(config, viteConfig, { ssrEntry, ssgOut, format })
-
-  if (ssgOptions.buildOnly) {
-    return ssgOut
-  }
 
   const prefix = (format === 'esm' && process.platform === 'win32') ? 'file://' : ''
   const ext = format === 'esm' ? '.mjs' : '.cjs'
