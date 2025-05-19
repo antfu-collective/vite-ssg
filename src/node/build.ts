@@ -188,7 +188,8 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
   let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
   indexHTML = rewriteScripts(indexHTML, script)
   const IS_PROD = nodeEnv === 'production'
-  indexHTML = await formatHtml(indexHTML, IS_PROD ? 'minify' : formatting)
+  const minifyOptions = ssgOptions.minifyOptions || {}
+  indexHTML = await formatHtml(indexHTML, IS_PROD ? 'minify' : formatting, minifyOptions)
 
   const { renderToString }: typeof import('vue/server-renderer') = await import('vue/server-renderer')
 
@@ -247,6 +248,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
           const formatted = await formatHtml(transformed, formatting, {
             collapseWhitespace : false,
             collapseInlineTagWhitespace : false,
+            ...minifyOptions
           })
 
           const relativeRouteFile = `${(route.endsWith('/')

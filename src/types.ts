@@ -3,6 +3,7 @@ import type { Options as BeastiesOptions } from 'beasties'
 import type { Options as CrittersOptions } from 'critters'
 import type { App } from 'vue'
 import type { Router, RouteRecordRaw, RouterOptions as VueRouterOptions } from 'vue-router'
+import type { Options } from 'html-minifier-terser'
 
 export interface ViteSSGOptions {
   /**
@@ -47,6 +48,8 @@ export interface ViteSSGOptions {
    * @default 'none'
    */
   formatting?: 'minify' | 'prettify' | 'none'
+
+  minifyOptions?: Options
 
   /**
    * Vite environment mode.
