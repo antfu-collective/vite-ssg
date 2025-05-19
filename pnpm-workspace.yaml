@@ -1,25 +1,25 @@
 packages:
   - examples/*
 catalog:
-  '@antfu/eslint-config': ^4.13.0
+  '@antfu/eslint-config': ^4.13.1
   '@nuxt/devalue': ^2.0.2
   '@types/html-minifier-terser': ^7.0.2
   '@types/jsdom': ^21.1.7
-  '@unhead/dom': ^2.0.8
-  '@unhead/vue': ^2.0.8
+  '@unhead/dom': ^2.0.9
+  '@unhead/vue': ^2.0.9
   '@vitejs/plugin-vue': ^5.2.4
   ansis: ^4.0.0
   beasties: ^0.3.3
   bumpp: ^10.1.1
   cac: ^6.7.14
-  eslint: ^9.26.0
+  eslint: ^9.27.0
   html-minifier-terser: ^7.2.0
   html5parser: ^2.0.2
   jsdom: ^26.1.0
   p-queue: ^8.1.0
   pinia: ^3.0.2
   prettier: ^3.5.3
-  rollup: ^4.40.2
+  rollup: ^4.41.0
   tinyglobby: ^0.2.13
   tsx: ^4.19.4
   typescript: ^5.8.3
@@ -29,7 +29,7 @@ catalog:
   vite: ^6.3.5
   vite-plugin-pages: ^0.33.0
   vite-plugin-pwa: ^1.0.0
-  vitest: ^3.1.3
+  vitest: ^3.1.4
   vue: ^3.5.14
   vue-router: ^4.5.1
   vue-tsc: ^2.2.10
