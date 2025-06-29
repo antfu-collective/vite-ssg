@@ -1,40 +1,39 @@
 packages:
   - examples/*
 catalog:
-  '@antfu/eslint-config': ^4.13.1
+  '@antfu/eslint-config': ^4.16.1
   '@nuxt/devalue': ^2.0.2
   '@types/html-minifier-terser': ^7.0.2
   '@types/jsdom': ^21.1.7
-  '@unhead/dom': ^2.0.9
-  '@unhead/vue': ^2.0.9
-  '@vitejs/plugin-vue': ^5.2.4
-  ansis: ^4.0.0
-  beasties: ^0.3.3
-  bumpp: ^10.1.1
+  '@unhead/dom': ^2.0.11
+  '@unhead/vue': ^2.0.11
+  '@vitejs/plugin-vue': ^6.0.0
+  ansis: ^4.1.0
+  beasties: ^0.3.4
+  bumpp: ^10.2.0
   cac: ^6.7.14
-  eslint: ^9.27.0
+  eslint: ^9.30.0
   html-minifier-terser: ^7.2.0
   html5parser: ^2.0.2
   jsdom: ^26.1.0
   p-queue: ^8.1.0
-  pinia: ^3.0.2
-  prettier: ^3.5.3
-  rollup: ^4.41.0
-  tinyglobby: ^0.2.13
-  tsx: ^4.19.4
+  pinia: ^3.0.3
+  prettier: ^3.6.2
+  rollup: ^4.44.1
+  tinyglobby: ^0.2.14
+  tsx: ^4.20.3
   typescript: ^5.8.3
   unbuild: ^3.5.0
-  unplugin-vue-components: ^28.5.0
+  unplugin-vue-components: ^28.7.0
   unplugin-vue-markdown: ^28.3.1
-  vite: ^6.3.5
-  vite-plugin-pages: ^0.33.0
+  vite: ^7.0.0
+  vite-plugin-pages: ^0.33.1
   vite-plugin-pwa: ^1.0.0
-  vitest: ^3.1.4
-  vue: ^3.5.14
+  vitest: ^3.2.4
+  vue: ^3.5.17
   vue-router: ^4.5.1
   vue-tsc: ^2.2.10
   workbox-build: ^7.3.0
-  yargs: ^17.7.2
 onlyBuiltDependencies:
   - esbuild
   - unrs-resolver
