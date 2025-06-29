@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
-    "target": "es2020",
+    "target": "ESNext",
     "lib": [
       "ESNext",
       "DOM"
     ],
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "paths": {
       "vite-ssg": [
         "./src/index.ts"
