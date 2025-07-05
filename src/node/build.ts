@@ -255,19 +255,20 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
             : relativeRouteFile
 
           await fs.ensureDir(join(out, dirname(filename)))
-          await fs.writeFile(join(out, filename), formatted, 'utf-8')
+          return fs.writeFile(join(out, filename), formatted, 'utf-8').then(() => {
+            config.logger.info(
+              `${dim(`${outDir}/`)}${cyan(filename.padEnd(15, ' '))}  ${dim(getSize(formatted))}`,
+            )
+            return { route, html, appCtx }
+          })
 
-          config.logger.info(
-            `${dim(`${outDir}/`)}${cyan(filename.padEnd(15, ' '))}  ${dim(getSize(formatted))}`,
-          )
-          return { route, html, appCtx }
         }
         catch (err: any) {
           throw new Error(`${gray('[vite-ssg]')} ${red(`Error on page: ${cyan(route)}`)}\n${err.stack}`)
         }
       }
       const taskPromise = executeTaskFn()
-      await taskPromise.then(({ route, html, appCtx }) => onDonePageRender?.(route, html, appCtx))
+      return taskPromise.then(({ route, html, appCtx }) => onDonePageRender?.(route, html, appCtx))
     })
   }
 
