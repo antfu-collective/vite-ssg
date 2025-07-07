@@ -55,7 +55,7 @@ export interface WorkerDataEntry {
   const fnLog = (level: 'info' | 'warn' | 'error' | 'log' | 'trace' | 'debug' = 'info', ...msg:any[]) => {
     const newMsg = msg.map(plainnify)
     if(level === 'error') {
-      process.stderr.write(`${red('[vite-ssg-worker]')} ${newMsg}\n`)
+      process.stderr.write(`${red('[vite-ssg-worker]')} ${JSON.stringify(newMsg)}\n`)
       
     }
     parentPort!.postMessage({ type: 'log', args: newMsg, level })
