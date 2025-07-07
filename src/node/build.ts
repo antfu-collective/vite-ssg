@@ -220,6 +220,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
 
   
   const numberOfWorkers = Math.max(1,  _numberOfWorkers)
+  console.log(`${gray('[vite-ssg]')} ${blue(`Using ${numberOfWorkers} workers`)}`)
   const workers = Array.from({length: numberOfWorkers}, (_, index) => createProxy(index))
   const terminateWorkers = () => {
     workers.splice(0, workers.length).forEach(worker => worker.terminate())
@@ -233,7 +234,8 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
   const maxTasksPerWorker = Math.ceil(concurrency / numberOfWorkers)
   let workersInUse: Map<BuildWorkerProxy, Promise<any>[]> = new Map()
   const selectWorker = async () => {
-    const worker = workers.find(w => !workersInUse.has(w) || workersInUse.get(w)!.length < maxTasksPerWorker)      
+    const workerTasksRunning = (w: BuildWorkerProxy) => workersInUse.get(w)?.length || 0
+    const worker = workers.sort((a, b) => workerTasksRunning(a) - workerTasksRunning(b)).find(w => workerTasksRunning(w) < maxTasksPerWorker)
     if(!worker) {
       await Promise.race(Array.from(workersInUse.values()).flat())
       return selectWorker()
