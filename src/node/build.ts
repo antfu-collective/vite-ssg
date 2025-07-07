@@ -23,6 +23,10 @@ import { injectInHtml } from './injection'
 import { buildPreloadLinks } from './preload-links'
 import { buildLog, getSize, routesToPaths } from './utils'
 import type { Options } from 'html-minifier-terser'
+import Critters from 'critters'
+import Beasties from 'beasties'
+// import { Worker } from 'node:worker_threads'
+import { BuildWorkerProxy } from './build.worker.proxy'
 
 export type Manifest = Record<string, string[]>
 
@@ -86,7 +90,7 @@ async function buildServer(config: ResolvedConfig, viteConfig: InlineConfig, { s
 
 export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?: boolean }> = {}, viteConfig: InlineConfig = {}) {
   const nodeEnv = process.env.NODE_ENV || 'production'
-  const mode = process.env.MODE || ssgOptions.mode || nodeEnv
+  const mode = process.env.MODE || ssgOptions.mode || nodeEnv  
   const config = await resolveConfig(viteConfig, 'build', mode, nodeEnv)
 
 
@@ -180,99 +184,72 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
     join(out, '.vite', 'ssr-manifest.json'), // Vite 5
     join(out, 'ssr-manifest.json'), // Vite 4 and below
   )
-  const ssrManifest: Manifest = JSON.parse(ssrManifestRaw)
-  let indexHTML = await fs.readFile(join(out, 'index.html'), 'utf-8')
+  const ssrManifest: Manifest = JSON.parse(ssrManifestRaw as string)
+  let indexHTML = Buffer.from(await fs.readFile(join(out, 'index.html'), 'utf-8')).toString()
   indexHTML = rewriteScripts(indexHTML, script)
   const IS_PROD = nodeEnv === 'production'  
   indexHTML = await formatHtml(indexHTML, IS_PROD ? 'minify' : formatting, minifyOptions)
 
-  const { renderToString }: typeof import('vue/server-renderer') = await import('vue/server-renderer')
+  // const { renderToString }: typeof import('vue/server-renderer') = await import('vue/server-renderer')
 
   const queue = new PQueue({ concurrency })
+  const workerExt =  format === 'esm' ? '.mjs' : '.cjs'
+  const createProxy = () => {
+    const workerProxy = new BuildWorkerProxy(new URL(`./build.worker${workerExt}`, import.meta.url), {
+      workerData: {
+        serverEntry,
+        ssrManifest,
+        format,
+        out,
+        beastiesOptions,
+        dirStyle,      
+        indexHTML,
+        rootContainerId,
+        formatting,
+        minifyOptions,
+        viteConfig: {
+          configFile: config.configFile || 'vite.config.ts',
+        },
+      },
+    })
+    return workerProxy
+  }
 
+  const numberOfWorkers = 5;
+
+  const workers = Array.from({length: numberOfWorkers}, createProxy)
+  let workerIndex = 0;
   for (const route of routesPaths) {
     await queue.onSizeLessThan(concurrency + 5) // avoid grow the number of tasks in queue
-    queue.add(async () => {
-      const executeTaskFn = async () => {
-        try {
-          const appCtx = await createApp(false, route) as ViteSSGContext<true>
-          const { app, router, head, initialState, triggerOnSSRAppRendered, transformState = serializeState } = appCtx
-
-          if (router) {
-            await router.push(route)
-            await router.isReady()
-          }
-
-          const transformedIndexHTML = (await onBeforePageRender?.(route, indexHTML, appCtx)) || indexHTML
-
-          const ctx: SSRContext = {}
-          const appHTML = await renderToString(app, ctx)
-          await triggerOnSSRAppRendered?.(route, appHTML, appCtx)
-          // need to resolve assets so render content first
-
-          /** replace slower jsdom to use unhead/ssr and injectInHtml utils */
-          // render current page's preloadLinks
-          const preloads:string[] = buildPreloadLinks({ html: transformedIndexHTML }, ctx.modules || new Set<string>(), ssrManifest)
-          let ssrHead = {
-            headTags: preloads.join("\n"),
-            bodyAttrs: '',
-            htmlAttrs: '',
-            bodyTagsOpen: '',
-            bodyTags: '',
-          }
-          if (head) {
-            const tmpSSrHead = await renderSSRHead(head as any)
-            ssrHead = Object.assign(tmpSSrHead, {
-              headTags: [tmpSSrHead.headTags.trim(), ssrHead.headTags].filter(x => !!x).join("\n"),
-            })
-          }
-
-          const html = await renderHTML({
-            rootContainerId,
-            indexHTML: transformedIndexHTML,
-            appHTML,
-            initialState: transformState(initialState),
-            ssrHead,
-            teleports: ctx.teleports,
-          })
-
-          let transformed = (await onPageRendered?.(route, html, appCtx)) || html
-          if (beasties)
-            transformed = await beasties.process(transformed)
-
-          const formatted = await formatHtml(transformed, formatting, {
-            collapseWhitespace : false,
-            collapseInlineTagWhitespace : false,
-            ...minifyOptions
-          })
-
-          const relativeRouteFile = `${(route.endsWith('/')
-            ? `${route}index`
-            : route).replace(/^\//g, '')}.html`
-
-          const filename = dirStyle === 'nested'
-            ? join(route.replace(/^\//g, ''), 'index.html')
-            : relativeRouteFile
-
-          await fs.ensureDir(join(out, dirname(filename)))
-          return fs.writeFile(join(out, filename), formatted, 'utf-8').then(() => {
-            config.logger.info(
-              `${dim(`${outDir}/`)}${cyan(filename.padEnd(15, ' '))}  ${dim(getSize(formatted))}`,
-            )
-            return { route, html, appCtx }
-          })
-
-        }
-        catch (err: any) {
-          throw new Error(`${gray('[vite-ssg]')} ${red(`Error on page: ${cyan(route)}`)}\n${err.stack}`)
-        }
-      }
-      const taskPromise = executeTaskFn()
-      return taskPromise.then(({ route, html, appCtx }) => onDonePageRender?.(route, html, appCtx))
+    const workerProxy = workers[workerIndex];
+    workerIndex = (workerIndex + 1) % numberOfWorkers;
+    queue.add(async () => {  
+      const taskPromise = executeTaskInWorker(workerProxy, {          
+          route,
+      })
+      
+      // const taskPromise = executeTaskFn({
+      //   createApp,
+      //   renderToString,
+      //   indexHTML,
+      //   onBeforePageRender,
+      //   onPageRendered,        
+      //   ssrManifest,
+      //   rootContainerId,
+      //   formatting,
+      //   minifyOptions,
+      //   beasties,
+      //   out,
+      //   dirStyle,
+      //   config,
+      //   route,
+      // })
+      return taskPromise//.then(({ route, html, appCtx }) => onDonePageRender?.(route, html, appCtx))
     })
   }
 
   await queue.start().onIdle()
+  workers.forEach(worker => worker.terminate())
 
   if (!ssgOptions['skip-build']) {
     await fs.remove(ssgOut)
@@ -296,6 +273,135 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
     process.exit(0)
   }, waitInSeconds * 1000)
   timeout.unref() // don't wait for timeout
+}
+
+export interface ExecuteInWorkerOptions {  
+  route: string  
+  
+}
+
+
+export function executeTaskInWorker(worker: BuildWorkerProxy, opts: ExecuteInWorkerOptions) {
+  opts = Object.entries(opts).reduce((acc:ExecuteInWorkerOptions, [key, value]) => {
+    if(typeof value === 'function') return acc;
+    const newKey:keyof ExecuteInWorkerOptions = key as keyof ExecuteInWorkerOptions;
+    //@ts-ignore
+    acc[newKey] = value;
+    return acc;
+  },{} as ExecuteInWorkerOptions)
+  
+  return worker.send('executeTaskFn', [opts])
+}
+
+
+export interface CreateTaskFnOptions extends ExecuteInWorkerOptions {
+  indexHTML: string  
+  ssrManifest: Manifest
+  rootContainerId: string
+  formatting: ViteSSGOptions['formatting']
+  minifyOptions: Options  
+  out: string
+  dirStyle: ViteSSGOptions['dirStyle']  
+  createApp: CreateAppFactory
+  renderToString: typeof import('vue/server-renderer')['renderToString']  
+  onDonePageRender?: ViteSSGOptions['onDonePageRender']
+  onBeforePageRender?: ViteSSGOptions['onBeforePageRender']
+  onPageRendered?: ViteSSGOptions['onPageRendered']  
+  beasties: Critters | Beasties | undefined
+  config: {logger: {info: (msg: string) => void}}
+}
+
+export async function executeTaskFn(opts: CreateTaskFnOptions) {
+  const {
+    route, 
+    createApp, 
+    renderToString, 
+    indexHTML, 
+    onBeforePageRender, 
+    onDonePageRender, 
+    onPageRendered, 
+    ssrManifest, 
+    rootContainerId, 
+    formatting, 
+    minifyOptions, 
+    beasties, 
+    out, 
+    dirStyle, 
+    config
+  } = opts
+  try {
+    const appCtx = await createApp(false, route) as ViteSSGContext<true>
+    const { app, router, head, initialState, triggerOnSSRAppRendered, transformState = serializeState } = appCtx
+
+    if (router) {
+      await router.push(route)
+      await router.isReady()
+    }
+
+    const transformedIndexHTML = (await onBeforePageRender?.(route, indexHTML, appCtx)) || indexHTML
+
+    const ctx: SSRContext = {}
+    const appHTML = await renderToString(app, ctx)
+    await triggerOnSSRAppRendered?.(route, appHTML, appCtx)
+    // need to resolve assets so render content first
+
+    /** replace slower jsdom to use unhead/ssr and injectInHtml utils */
+    // render current page's preloadLinks
+    const preloads:string[] = buildPreloadLinks({ html: transformedIndexHTML }, ctx.modules || new Set<string>(), ssrManifest)
+    let ssrHead = {
+      headTags: preloads.join("\n"),
+      bodyAttrs: '',
+      htmlAttrs: '',
+      bodyTagsOpen: '',
+      bodyTags: '',
+    }
+    if (head) {
+      const tmpSSrHead = await renderSSRHead(head as any)
+      ssrHead = Object.assign(tmpSSrHead, {
+        headTags: [tmpSSrHead.headTags.trim(), ssrHead.headTags].filter(x => !!x).join("\n"),
+      })
+    }
+
+    const html = await renderHTML({
+      rootContainerId,
+      indexHTML: transformedIndexHTML,
+      appHTML,
+      initialState: transformState(initialState),
+      ssrHead,
+      teleports: ctx.teleports,
+    })
+
+    let transformed = (await onPageRendered?.(route, html, appCtx)) || html
+    if (beasties)
+      transformed = await beasties.process(transformed)
+
+    const formatted = await formatHtml(transformed, formatting, {
+      collapseWhitespace : false,
+      collapseInlineTagWhitespace : false,
+      ...minifyOptions
+    })
+
+    const relativeRouteFile = `${(route.endsWith('/')
+      ? `${route}index`
+      : route).replace(/^\//g, '')}.html`
+
+    const filename = dirStyle === 'nested'
+      ? join(route.replace(/^\//g, ''), 'index.html')
+      : relativeRouteFile
+
+    await fs.ensureDir(join(out, dirname(filename)))
+    return fs.writeFile(join(out, filename), formatted, 'utf-8').then(() => {
+      config.logger.info(
+        `${dim(`${out}/`)}${cyan(filename.padEnd(15, ' '))}  ${dim(getSize(formatted))}`,
+      )
+      onDonePageRender?.(route, html, appCtx)
+      return { route, html }
+    })
+
+  }
+  catch (err: any) {
+    throw new Error(`${gray('[vite-ssg]')} ${red(`Error on page: ${cyan(route)}`)}\n${err.stack}`)
+  }
 }
 
 // async function createJSDOM(renderedHTML: string) {

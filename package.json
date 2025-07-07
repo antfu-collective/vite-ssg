@@ -31,6 +31,10 @@
     "./single-page": {
       "import": "./dist/client/single-page.mjs",
       "require": "./dist/client/single-page.cjs"
+    },
+    "./node/build.worker": {
+      "import": "./dist/shared/build.worker.mjs",
+      "require": "./dist/shared/build.worker.cjs"
     }
   },
   "main": "dist/index.cjs",
@@ -43,6 +47,9 @@
       ],
       "node": [
         "dist/node.d.ts"
+      ],
+      "shared/build.worker": [
+        "dist/shared/build.worker.d.ts"
       ]
     }
   },

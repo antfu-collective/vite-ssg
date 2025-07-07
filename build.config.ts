@@ -6,6 +6,7 @@ export default defineBuildConfig({
     { input: 'src/client/single-page', name: 'client/single-page' },
     { input: 'src/node/cli', name: 'node/cli' },
     { input: 'src/node', name: 'node' },
+    { input: 'src/node/build.worker', name: 'shared/build.worker' },
   ],
   clean: true,
   declaration: true,
