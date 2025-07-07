@@ -18,7 +18,7 @@
     "vite": "catalog:",
     "vite-plugin-pages": "catalog:",
     "vite-plugin-pwa": "catalog:",
-    "vite-ssg": "workspace:*",
+    "vite-ssg-optimized": "workspace:*",
     "vue-router": "catalog:"
   }
 }

@@ -20,7 +20,7 @@
     "unplugin-vue-markdown": "catalog:",
     "vite": "catalog:",
     "vite-plugin-pages": "catalog:",
-    "vite-ssg": "workspace:*",
+    "vite-ssg-optimized": "workspace:*",
     "vue-router": "catalog:"
   }
 }
