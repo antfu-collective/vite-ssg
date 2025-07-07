@@ -5,7 +5,7 @@ import { parentPort, workerData } from "node:worker_threads";
 import { CreateAppFactory, CreateTaskFnOptions, ExecuteInWorkerOptions, Manifest } from "./build";
 import { ViteSSGOptions } from "vite-ssg";
 import { getBeastiesOrCritters } from "./critical";
-import { blue, gray, red } from "kolorist";
+import { blue, gray, red, yellow } from "kolorist";
 import type { Options as BeastiesOptions } from "beasties";
 import { executeTaskFn } from "./build";
 import { resolveConfig } from "vite";
@@ -37,6 +37,7 @@ export interface WorkerDataEntry {
 ;(async () => {
 
   const plainnify = (m: any):any => {
+    
     if(m instanceof Function) {
       return undefined
     }
@@ -44,6 +45,13 @@ export interface WorkerDataEntry {
       return m.map(plainnify)
     }
     if (typeof m === 'object' && m !== null) {
+      if(m instanceof Error || 'stack' in m){
+        return {
+          message: m.message,
+          stack: m.stack,
+        }
+      }
+
       return Object.entries(m).reduce((acc, [key, value]) => {
         acc[key] = plainnify(value)
         return acc
@@ -55,7 +63,7 @@ export interface WorkerDataEntry {
   const fnLog = (level: 'info' | 'warn' | 'error' | 'log' | 'trace' | 'debug' = 'info', ...msg:any[]) => {
     const newMsg = msg.map(plainnify)
     if(level === 'error') {
-      process.stderr.write(`${red('[vite-ssg-worker]')} ${JSON.stringify(newMsg)}\n`)
+      process.stderr.write(`${yellow('[vite-ssg-worker-console]')} ${JSON.stringify(newMsg)}\n`)
       
     }
     parentPort!.postMessage({ type: 'log', args: newMsg, level })
