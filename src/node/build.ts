@@ -259,8 +259,18 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
     queue.add(async () => {  
       const workerProxy = await selectWorker(workerIndex ++ % numberOfWorkers)
       
+      let retryCount = 0
+      const maxRetries = 3
       const taskPromise = executeTaskInWorker(workerProxy, {          
           route,
+      }).catch(e => {
+        if ( (retryCount++) < maxRetries) {          
+          console.log(`${gray('[vite-ssg]')} ${yellow(`Retrying ${retryCount} of ${maxRetries} for route: ${cyan(route)}`)}`)
+          return executeTaskInWorker(workerProxy, {          
+            route,
+          })
+        }
+        throw e
       })
       const workerPromises = workersInUse.get(workerProxy) || []
       workersInUse.set(workerProxy, workerPromises)
