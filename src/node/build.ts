@@ -229,14 +229,27 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
   process.on('beforeExit', terminateWorkers)
   process.on('exit', terminateWorkers)
   
-  let workerIndex = 0;
+  // let workerIndex = 0;
+  let workersInUse: Map<BuildWorkerProxy, Promise<any>> = new Map()
+  const selectWorker = async () => {
+    const worker = workers.find(w => !workersInUse.has(w))      
+    if(!worker) {
+      await Promise.race(Array.from(workersInUse.values()))
+      return selectWorker()
+    }
+    return worker
+  }
   for (const route of routesPaths) {
     await queue.onSizeLessThan(concurrency + 5) // avoid grow the number of tasks in queue
-    const workerProxy = workers[workerIndex];
-    workerIndex = (workerIndex + 1) % numberOfWorkers;
     queue.add(async () => {  
+      const workerProxy = await selectWorker()
+      
       const taskPromise = executeTaskInWorker(workerProxy, {          
           route,
+      })
+      workersInUse.set(workerProxy, taskPromise)
+      taskPromise.finally(() => {
+        workersInUse.delete(workerProxy)
       })
       
       // const taskPromise = executeTaskFn({
@@ -255,7 +268,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
       //   config,
       //   route,
       // })
-      return await taskPromise//.then(({ route, html, appCtx }) => onDonePageRender?.(route, html, appCtx))
+      return taskPromise//.then(({ route, html, appCtx }) => onDonePageRender?.(route, html, appCtx))
     })
   }
 
