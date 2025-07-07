@@ -24,10 +24,10 @@ export class BuildWorkerProxy {
       const {type, level='info', args = []} = message
       if(type !== 'log') return
       const fn = console[level as keyof Logger]?.bind(console)
-      let msg = args.map((arg:any) => typeof arg === 'object' && !!arg ? "[object]" : arg).join(' ')
+      // let msg = args.map((arg:any) => typeof arg === 'object' && !!arg ? "[object]" : arg).join(' ')
       const workerId = options.workerData.workerId
       // process.stdout.write(`[${workerId}] ${msg}\n`)
-      fn?.(`[woker #${workerId}] ${msg}`)
+      fn?.(`[woker #${workerId}] `, ...args)
     })
 
     this.worker.on('message', (message) => {
