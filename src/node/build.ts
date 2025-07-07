@@ -232,7 +232,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
   process.on('exit', terminateWorkers)
   
   const maxTasksPerWorker = Math.ceil(concurrency / numberOfWorkers)
-  let workersInUse: Map<BuildWorkerProxy, Promise<any>[]> = new Map()
+  const workersInUse: Map<BuildWorkerProxy, Promise<any>[]> = new Map()
   const selectWorker = async () => {
     const workerTasksRunning = (w: BuildWorkerProxy) => workersInUse.get(w)?.length || 0
     const worker = workers.filter(w => workerTasksRunning(w) < maxTasksPerWorker).sort((a, b) => workerTasksRunning(a) - workerTasksRunning(b))[0]
@@ -240,6 +240,15 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
       await Promise.race(Array.from(workersInUse.values()).flat())
       return selectWorker()
     }
+    const workerPromises = workersInUse.get(worker) || []
+    const delayPromise = new Promise(resolve => setImmediate(resolve))
+    workersInUse.set(worker, [...workerPromises, delayPromise])
+    delayPromise.finally(() => {
+      workerPromises.splice(workerPromises.indexOf(delayPromise), 1)
+      workersInUse.set(worker, workerPromises)
+    })
+
+    
     return worker
   }
   for (const route of routesPaths) {
