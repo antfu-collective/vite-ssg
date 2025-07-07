@@ -217,7 +217,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
     return workerProxy
   }
 
-  const numberOfWorkers = 5;
+  const numberOfWorkers = 10;
 
   const workers = Array.from({length: numberOfWorkers}, (_, index) => createProxy(index))
   const terminateWorkers = () => {
