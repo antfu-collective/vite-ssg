@@ -62,10 +62,10 @@ export interface WorkerDataEntry {
  
   const fnLog = (level: 'info' | 'warn' | 'error' | 'log' | 'trace' | 'debug' = 'info', ...msg:any[]) => {
     const newMsg = msg.map(plainnify)
-    if(level === 'error') {
-      process.stderr.write(`${yellow('[vite-ssg-worker-console]')} ${JSON.stringify(newMsg)}\n`)
+    // if(level === 'error') {
+    //   process.stderr.write(`${yellow('[vite-ssg-worker-console]')} ${JSON.stringify(newMsg)}\n`)
       
-    }
+    // }
     parentPort!.postMessage({ type: 'log', args: newMsg, level })
   }
   globalThis.console = Object.assign(globalThis.console, {
