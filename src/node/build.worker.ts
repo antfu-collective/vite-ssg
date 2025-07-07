@@ -5,7 +5,7 @@ import { parentPort, workerData } from "node:worker_threads";
 import { CreateAppFactory, CreateTaskFnOptions, ExecuteInWorkerOptions, Manifest } from "./build";
 import { ViteSSGOptions } from "vite-ssg";
 import { getBeastiesOrCritters } from "./critical";
-import { blue, gray } from "kolorist";
+import { blue, gray, red } from "kolorist";
 import type { Options as BeastiesOptions } from "beasties";
 import { executeTaskFn } from "./build";
 import { resolveConfig } from "vite";
@@ -29,7 +29,7 @@ export interface WorkerDataEntry {
   formatting: ViteSSGOptions['formatting']
   minifyOptions: MinifyOptions  
   viteConfig: {
-    configFile: string
+    configFile?: string
   },  
 }
 
@@ -122,10 +122,11 @@ export interface WorkerDataEntry {
         parentPort!.postMessage({ type: 'result', id, result })
       }
       catch(e:any) {
-        // process.stdout.write(JSON.stringify(e))
-        const message = e.message
+        const message = e.message || e.toString()
         const stack = e.stack || ''
-        parentPort!.postMessage({ type: 'error', id, error: {message, stack} })
+        const error = {message, stack}
+        process.stderr.write(`${red('[vite-ssg-worker]')} ${message} ${stack}\n`)
+        parentPort!.postMessage({ type: 'error', id, error })
       }
     }
   })

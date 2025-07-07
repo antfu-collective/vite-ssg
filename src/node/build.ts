@@ -210,7 +210,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
         formatting,
         minifyOptions,
         viteConfig: {
-          configFile: config.configFile || 'vite.config.ts',
+          configFile: config.configFile,
         },
       },
     })
