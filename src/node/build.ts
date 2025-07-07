@@ -196,6 +196,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
   const workerExt =  format === 'esm' ? '.mjs' : '.cjs'
   const createProxy = (index: number) => {
     const workerProxy = new BuildWorkerProxy(new URL(`./build.worker${workerExt}`, import.meta.url), {
+      env: process.env,
       workerData: {
         workerId: index,
         serverEntry,

@@ -4,7 +4,7 @@ import { WorkerDataEntry } from "./build.worker"
 
 type WorKerConstructorArgs = ConstructorParameters<typeof Worker>
 type WorkerPath = WorKerConstructorArgs[0]
-type WorkerOptions = Omit<WorKerConstructorArgs[1], 'workerData'> & {workerData: WorkerDataEntry}
+type WorkerOptions = Omit<NonNullable<WorKerConstructorArgs[1]>, 'workerData'> & {workerData: WorkerDataEntry}
 type Logger = {
   info: (msg: string) => void
   warn: (msg: string) => void
