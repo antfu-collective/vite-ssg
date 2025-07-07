@@ -83,7 +83,7 @@ export interface WorkerDataEntry {
         onDonePageRender: onDonePageRender,
         beasties,        
         config: {logger: {info: (msg: string) => {
-          config.logger?.info?.(msg)
+          // config.logger?.info?.(msg)
           parentPort!.postMessage({ type: 'log', args: [msg] })
         }}},
         ...opts,
@@ -97,7 +97,7 @@ export interface WorkerDataEntry {
     if(type in execMap) {
       parentPort!.postMessage(`running ${type}`)
       try{
-        process.stdout.write(JSON.stringify(args))
+        // process.stdout.write(JSON.stringify(args))
         // @ts-ignore
         const result = await execMap[type](...(args ?? []))        
         if(result.appCtx) {
@@ -110,7 +110,7 @@ export interface WorkerDataEntry {
         parentPort!.postMessage({ type: 'result', id, result })
       }
       catch(e:any) {
-        process.stdout.write(JSON.stringify(e))
+        // process.stdout.write(JSON.stringify(e))
         parentPort!.postMessage({ type: 'error', id, error: e.toString() })
       }
     }
