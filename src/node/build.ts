@@ -281,7 +281,7 @@ export interface ExecuteInWorkerOptions {
 }
 
 
-export function executeTaskInWorker(worker: BuildWorkerProxy, opts: ExecuteInWorkerOptions) {
+function executeTaskInWorker(worker: BuildWorkerProxy, opts: ExecuteInWorkerOptions) {
   opts = Object.entries(opts).reduce((acc:ExecuteInWorkerOptions, [key, value]) => {
     if(typeof value === 'function') return acc;
     const newKey:keyof ExecuteInWorkerOptions = key as keyof ExecuteInWorkerOptions;

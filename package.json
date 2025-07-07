@@ -84,7 +84,8 @@
     "build": "unbuild",
     "prepublishOnly": "npm run build",
     "typecheck": "vue-tsc --noEmit",
-    "release": "bumpp && pnpm publish"
+    "release": "bumpp && pnpm publish",
+    "postinstall": "pnpm run build"
   },
   "peerDependencies": {
     "beasties": "^0.1.0",
@@ -104,8 +105,7 @@
       "optional": true
     }
   },
-  "dependencies": {
-    "@unhead/dom": "catalog:",
+  "dependencies": {    
     "@unhead/ssr": "catalog:",
     "@unhead/vue": "catalog:",
     "fs-extra": "catalog:",
