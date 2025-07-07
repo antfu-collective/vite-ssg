@@ -1,5 +1,5 @@
 {
-  "name": "vite-ssg",
+  "name": "reinaldomendes/vite-ssg",
   "version": "0.24.2-optimized.1",
   "packageManager": "pnpm@9.14.4",
   "description": "Server-side generation for Vite",
