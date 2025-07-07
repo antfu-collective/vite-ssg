@@ -230,15 +230,18 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
   process.on('SIGBREAK', terminateWorkers)  
   process.on('beforeExit', terminateWorkers)
   process.on('exit', terminateWorkers)
-  
+  let workerIndex = 0
   const maxTasksPerWorker = Math.ceil(concurrency / numberOfWorkers)
   const workersInUse: Map<BuildWorkerProxy, Promise<any>[]> = new Map()
-  const selectWorker = async () => {
-    const workerTasksRunning = (w: BuildWorkerProxy) => workersInUse.get(w)?.length || 0
-    const worker = workers.filter(w => workerTasksRunning(w) < maxTasksPerWorker).sort((a, b) => workerTasksRunning(a) - workerTasksRunning(b))[0]
+  const workerTasksRunning = (w: BuildWorkerProxy) => workersInUse.get(w)?.length || 0
+  const selectIdleWorker = () => workers.filter(w => workerTasksRunning(w) < maxTasksPerWorker).sort((a, b) => workerTasksRunning(a) - workerTasksRunning(b))[0]
+  const selectWorker = async (workerIndex?: number) => {
+    const index = workerIndex ?? (Math.round(Math.random() * numberOfWorkers))
+    const maybeWorker = workers[index % numberOfWorkers]
+    const worker = maybeWorker && workerTasksRunning(maybeWorker) < maxTasksPerWorker ? maybeWorker : selectIdleWorker()
     if(!worker) {
       await Promise.race(Array.from(workersInUse.values()).flat())
-      return selectWorker()
+      return selectWorker(workerIndex)
     }
     const workerPromises = workersInUse.get(worker) || []
     const delayPromise = new Promise(resolve => setImmediate(resolve))
@@ -254,7 +257,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
   for (const route of routesPaths) {
     await queue.onSizeLessThan(concurrency) // avoid grow the number of tasks in queue
     queue.add(async () => {  
-      const workerProxy = await selectWorker()
+      const workerProxy = await selectWorker(workerIndex ++ % numberOfWorkers)
       
       const taskPromise = executeTaskInWorker(workerProxy, {          
           route,
