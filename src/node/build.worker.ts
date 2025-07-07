@@ -123,7 +123,9 @@ export interface WorkerDataEntry {
       }
       catch(e:any) {
         // process.stdout.write(JSON.stringify(e))
-        parentPort!.postMessage({ type: 'error', id, error: e.toString() })
+        const message = e.message
+        const stack = e.stack || ''
+        parentPort!.postMessage({ type: 'error', id, error: {message, stack} })
       }
     }
   })

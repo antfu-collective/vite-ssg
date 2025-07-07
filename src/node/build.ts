@@ -105,12 +105,12 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
     ssgOut: _ssgOutDir = join(root, '.vite-ssg-temp', Math.random().toString(36).substring(2, 12)),
     formatting = 'none',
     minifyOptions = {},
-    crittersOptions = {},
+    // crittersOptions = {},
     beastiesOptions = {},
     includedRoutes: configIncludedRoutes = DefaultIncludedRoutes,
-    onBeforePageRender,
-    onPageRendered,
-    onDonePageRender,
+    // onBeforePageRender,
+    // onPageRendered,
+    // onDonePageRender,
     onFinished,
     dirStyle = 'flat',
     includeAllRoutes = false,
@@ -220,6 +220,15 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
   const numberOfWorkers = 5;
 
   const workers = Array.from({length: numberOfWorkers}, (_, index) => createProxy(index))
+  const terminateWorkers = () => {
+    workers.splice(0, workers.length).forEach(worker => worker.terminate())
+  }
+  process.on('SIGINT', terminateWorkers)
+  process.on('SIGTERM', terminateWorkers)
+  process.on('SIGBREAK', terminateWorkers)  
+  process.on('beforeExit', terminateWorkers)
+  process.on('exit', terminateWorkers)
+  
   let workerIndex = 0;
   for (const route of routesPaths) {
     await queue.onSizeLessThan(concurrency + 5) // avoid grow the number of tasks in queue
@@ -251,7 +260,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
   }
 
   await queue.start().onIdle()
-  workers.forEach(worker => worker.terminate())
+  terminateWorkers();
 
   if (!ssgOptions['skip-build']) {
     await fs.remove(ssgOut)
