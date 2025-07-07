@@ -111,6 +111,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
     // onBeforePageRender,
     // onPageRendered,
     // onDonePageRender,
+    numberOfWorkers:_numberOfWorkers = 5,
     onFinished,
     dirStyle = 'flat',
     includeAllRoutes = false,
@@ -217,8 +218,8 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
     return workerProxy
   }
 
-  const numberOfWorkers = 10;
-
+  
+  const numberOfWorkers = Math.max(1,  _numberOfWorkers)
   const workers = Array.from({length: numberOfWorkers}, (_, index) => createProxy(index))
   const terminateWorkers = () => {
     workers.splice(0, workers.length).forEach(worker => worker.terminate())
@@ -229,27 +230,29 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
   process.on('beforeExit', terminateWorkers)
   process.on('exit', terminateWorkers)
   
-  // let workerIndex = 0;
-  let workersInUse: Map<BuildWorkerProxy, Promise<any>> = new Map()
+  const maxTasksPerWorker = Math.ceil(concurrency / numberOfWorkers)
+  let workersInUse: Map<BuildWorkerProxy, Promise<any>[]> = new Map()
   const selectWorker = async () => {
-    const worker = workers.find(w => !workersInUse.has(w))      
+    const worker = workers.find(w => !workersInUse.has(w) || workersInUse.get(w)!.length < maxTasksPerWorker)      
     if(!worker) {
-      await Promise.race(Array.from(workersInUse.values()))
+      await Promise.race(Array.from(workersInUse.values()).flat())
       return selectWorker()
     }
     return worker
   }
   for (const route of routesPaths) {
-    await queue.onSizeLessThan(concurrency + 5) // avoid grow the number of tasks in queue
+    await queue.onSizeLessThan(concurrency) // avoid grow the number of tasks in queue
     queue.add(async () => {  
       const workerProxy = await selectWorker()
       
       const taskPromise = executeTaskInWorker(workerProxy, {          
           route,
       })
-      workersInUse.set(workerProxy, taskPromise)
+      const workerPromises = workersInUse.get(workerProxy) || []
+      workersInUse.set(workerProxy, workerPromises)
       taskPromise.finally(() => {
-        workersInUse.delete(workerProxy)
+        workerPromises.splice(workerPromises.indexOf(taskPromise), 1)
+        workersInUse.set(workerProxy, workerPromises)
       })
       
       // const taskPromise = executeTaskFn({
@@ -328,7 +331,7 @@ export interface CreateTaskFnOptions extends ExecuteInWorkerOptions {
   dirStyle: ViteSSGOptions['dirStyle']  
   createApp: CreateAppFactory
   renderToString: typeof import('vue/server-renderer')['renderToString']  
-  onDonePageRender?: ViteSSGOptions['onDonePageRender']
+  // onDonePageRender?: ViteSSGOptions['onDonePageRender']
   onBeforePageRender?: ViteSSGOptions['onBeforePageRender']
   onPageRendered?: ViteSSGOptions['onPageRendered']  
   beasties: Critters | Beasties | undefined
@@ -342,7 +345,7 @@ export async function executeTaskFn(opts: CreateTaskFnOptions) {
     renderToString, 
     indexHTML, 
     onBeforePageRender, 
-    onDonePageRender, 
+    // onDonePageRender, 
     onPageRendered, 
     ssrManifest, 
     rootContainerId, 
@@ -419,7 +422,7 @@ export async function executeTaskFn(opts: CreateTaskFnOptions) {
       config.logger.info(
         `${dim(`${outDir}/`)}${cyan(filename.padEnd(15, ' '))}  ${dim(getSize(formatted))}`,
       )
-      onDonePageRender?.(route, html, appCtx)
+      // onDonePageRender?.(route, html, appCtx)
       return { route, html }
     })
 

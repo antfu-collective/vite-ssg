@@ -83,7 +83,7 @@ export interface WorkerDataEntry {
   const {
     onPageRendered, 
     onBeforePageRender, 
-    onDonePageRender,
+    // onDonePageRender,
   } = config.ssgOptions || {}
 
   const { renderToString }: typeof import('vue/server-renderer') = await import('vue/server-renderer')  
@@ -120,7 +120,7 @@ export interface WorkerDataEntry {
         renderToString,
         onPageRendered: onPageRendered,
         onBeforePageRender: onBeforePageRender,
-        onDonePageRender: onDonePageRender,
+        // onDonePageRender: onDonePageRender,
         beasties,        
         config: {logger: {info: (msg: string) => {
           // config.logger?.info?.(msg)

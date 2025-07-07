@@ -132,10 +132,18 @@ export interface ViteSSGOptions {
    * It's useful to debug memory leaks 
    *
    */
-  onDonePageRender?: (route: string, renderedHTML: string, appCtx: ViteSSGContext<true>) => Promise< void> | void
+  // onDonePageRender?: (route: string, renderedHTML: string, appCtx: ViteSSGContext<true>) => Promise< void> | void
 
 
   onFinished?: () => Promise<void> | void
+
+
+  /**
+   * The number of workers to use.
+   *
+   * @default 5
+   */
+  numberOfWorkers?: number
 
   /**
    * The application's root container `id`.
