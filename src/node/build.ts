@@ -235,7 +235,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
   let workersInUse: Map<BuildWorkerProxy, Promise<any>[]> = new Map()
   const selectWorker = async () => {
     const workerTasksRunning = (w: BuildWorkerProxy) => workersInUse.get(w)?.length || 0
-    const worker = workers.sort((a, b) => workerTasksRunning(a) - workerTasksRunning(b)).find(w => workerTasksRunning(w) < maxTasksPerWorker)
+    const worker = workers.filter(w => workerTasksRunning(w) < maxTasksPerWorker).sort((a, b) => workerTasksRunning(a) - workerTasksRunning(b))[0]
     if(!worker) {
       await Promise.race(Array.from(workersInUse.values()).flat())
       return selectWorker()
