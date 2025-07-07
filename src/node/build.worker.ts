@@ -17,6 +17,7 @@ import type { Options as MinifyOptions } from 'html-minifier-terser'
 
 export interface WorkerDataEntry {
   serverEntry: string
+  workerId: number|string,
   format: 'esm' | 'cjs',
   out: string,
   dirStyle: ViteSSGOptions['dirStyle'],
@@ -36,6 +37,17 @@ export interface WorkerDataEntry {
 ;(async () => {
 
  
+  const fnLog = (level: 'info' | 'warn' | 'error' | 'log' | 'trace' | 'debug' = 'info', msg:string) => {
+    parentPort!.postMessage({ type: 'log', args: [msg], level })
+  }
+  globalThis.console = Object.assign(globalThis.console, {
+    info: fnLog.bind(globalThis.console, 'info'),
+    warn: fnLog.bind(globalThis.console, 'warn'),
+    error: fnLog.bind(globalThis.console, 'error'),
+    log: fnLog.bind(globalThis.console, 'log'),
+    trace: fnLog.bind(globalThis.console, 'trace'),
+    debug: fnLog.bind(globalThis.console, 'debug'),
+  })
 
   const {serverEntry,  out, beastiesOptions, viteConfig, mode, format, dirStyle, ...extraOpts} = (workerData as WorkerDataEntry)
   const nodeEnv = process.env.NODE_ENV || 'production'  

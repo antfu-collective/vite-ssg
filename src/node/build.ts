@@ -194,9 +194,10 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
 
   const queue = new PQueue({ concurrency })
   const workerExt =  format === 'esm' ? '.mjs' : '.cjs'
-  const createProxy = () => {
+  const createProxy = (index: number) => {
     const workerProxy = new BuildWorkerProxy(new URL(`./build.worker${workerExt}`, import.meta.url), {
       workerData: {
+        workerId: index,
         serverEntry,
         ssrManifest,
         format,
@@ -217,7 +218,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
 
   const numberOfWorkers = 5;
 
-  const workers = Array.from({length: numberOfWorkers}, createProxy)
+  const workers = Array.from({length: numberOfWorkers}, (_, index) => createProxy(index))
   let workerIndex = 0;
   for (const route of routesPaths) {
     await queue.onSizeLessThan(concurrency + 5) // avoid grow the number of tasks in queue
@@ -391,8 +392,9 @@ export async function executeTaskFn(opts: CreateTaskFnOptions) {
 
     await fs.ensureDir(join(out, dirname(filename)))
     return fs.writeFile(join(out, filename), formatted, 'utf-8').then(() => {
+      const outDir = out.replace(process.cwd(), '').replace(/^\//,'')
       config.logger.info(
-        `${dim(`${out}/`)}${cyan(filename.padEnd(15, ' '))}  ${dim(getSize(formatted))}`,
+        `${dim(`${outDir}/`)}${cyan(filename.padEnd(15, ' '))}  ${dim(getSize(formatted))}`,
       )
       onDonePageRender?.(route, html, appCtx)
       return { route, html }
