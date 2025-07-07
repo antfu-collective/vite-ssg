@@ -36,9 +36,29 @@ export interface WorkerDataEntry {
 
 ;(async () => {
 
+  const plainnify = (m: any):any => {
+    if(m instanceof Function) {
+      return undefined
+    }
+    if (Array.isArray(m)) {
+      return m.map(plainnify)
+    }
+    if (typeof m === 'object' && m !== null) {
+      return Object.entries(m).reduce((acc, [key, value]) => {
+        acc[key] = plainnify(value)
+        return acc
+      }, {} as Record<string, any>)
+    }
+    return m?.toString()
+  }
  
-  const fnLog = (level: 'info' | 'warn' | 'error' | 'log' | 'trace' | 'debug' = 'info', msg:string) => {
-    parentPort!.postMessage({ type: 'log', args: [msg], level })
+  const fnLog = (level: 'info' | 'warn' | 'error' | 'log' | 'trace' | 'debug' = 'info', ...msg:any[]) => {
+    const newMsg = msg.map(plainnify)
+    if(level === 'error') {
+      process.stderr.write(`${red('[vite-ssg-worker]')} ${newMsg}\n`)
+      
+    }
+    parentPort!.postMessage({ type: 'log', args: newMsg, level })
   }
   globalThis.console = Object.assign(globalThis.console, {
     info: fnLog.bind(globalThis.console, 'info'),
