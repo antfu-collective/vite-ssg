@@ -1,6 +1,7 @@
 import { Worker } from "node:worker_threads"
 
 import { WorkerDataEntry } from "./build.worker"
+import { reset } from "kolorist"
 
 type WorKerConstructorArgs = ConstructorParameters<typeof Worker>
 type WorkerPath = WorKerConstructorArgs[0]
@@ -27,7 +28,7 @@ export class BuildWorkerProxy {
       // let msg = args.map((arg:any) => typeof arg === 'object' && !!arg ? "[object]" : arg).join(' ')
       const workerId = options.workerData.workerId
       // process.stdout.write(`[${workerId}] ${msg}\n`)
-      fn?.(`[woker #${workerId}] `, ...args)
+      fn?.(`[woker #${workerId}] `, ...args, reset(''))
     })
 
     this.worker.on('message', (message) => {
