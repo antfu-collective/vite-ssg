@@ -7,7 +7,7 @@ import type { SSRContext } from 'vue/server-renderer'
 import type { ViteSSGContext, ViteSSGOptions } from '../types'
 import type { InjectOptions } from './injection'
 import { createRequire } from 'node:module'
-import { basename, dirname, isAbsolute, join, parse } from 'node:path'
+import { dirname, isAbsolute, join, parse } from 'node:path'
 import process from 'node:process'
 import { renderSSRHead } from '@unhead/ssr'
 // import { renderDOMHead } from '@unhead/dom'
@@ -18,7 +18,7 @@ import PQueue from 'p-queue'
 
 import { mergeConfig, resolveConfig, build as viteBuild } from 'vite'
 import { serializeState } from '../utils/state'
-import { getBeastiesOrCritters } from './critical'
+// import { getBeastiesOrCritters } from './critical'
 import { injectInHtml } from './injection'
 import { buildPreloadLinks } from './preload-links'
 import { buildLog, getSize, routesToPaths } from './utils'
@@ -119,9 +119,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
   const root = getRoot(config)
   const outDir = config.build.outDir || 'dist'
   const out = isAbsolute(outDir) ? outDir : join(root, outDir)
-  
-
-  
+    
 
   const {
     script = 'sync',
@@ -147,8 +145,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
 
   const ssgOut = isAbsolute(_ssgOutDir) ? _ssgOutDir : join(root, _ssgOutDir)  
   
-  const numberOfWorkers = Math.max(1,  _numberOfWorkers)
-  console.log(`${gray('[vite-ssg]')} ${blue(`Using ${numberOfWorkers} workers`)}`)
+  
   const createProxyOptions:Omit<Parameters<typeof createProxy>[0], 'workerId'> = {
     format,
     out,
@@ -157,36 +154,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
       configFile: config.configFile,
     } ,
   };
-  const workers = Array.from({length: numberOfWorkers}, (_, index) => createProxy({
-    ...createProxyOptions,
-    workerId: index,    
-  }))
-  const terminateWorkers = () => {
-    workers.splice(0, workers.length).forEach(worker => worker.terminate())
-  }
-
-  let workerIndex = 0
-  const maxTasksPerWorker = Math.ceil(concurrency / numberOfWorkers)
-  const workersInUse: Map<BuildWorkerProxy, Promise<any>[]> = new Map()
-  const workerTasksRunning = (w: BuildWorkerProxy) => workersInUse.get(w)?.length || 0
-  const selectIdleWorker = () => workers.filter(w => workerTasksRunning(w) < maxTasksPerWorker).sort((a, b) => workerTasksRunning(a) - workerTasksRunning(b))[0]
-  const selectWorker = async (workerIndex?: number) => {
-    const index = workerIndex ?? (Math.round(Math.random() * numberOfWorkers))
-    const maybeWorker = workers[index % numberOfWorkers]
-    const worker = maybeWorker && workerTasksRunning(maybeWorker) < maxTasksPerWorker ? maybeWorker : selectIdleWorker()
-    if(!worker) {
-      await Promise.race(Array.from(workersInUse.values()).flat())
-      return selectWorker(workerIndex)
-    }
-    const workerPromises = workersInUse.get(worker) || []
-    const delayPromise = new Promise(resolve => setImmediate(resolve))
-    workersInUse.set(worker, [...workerPromises, delayPromise])
-    delayPromise.finally(() => {
-      workerPromises.splice(workerPromises.indexOf(delayPromise), 1)
-      workersInUse.set(worker, workerPromises)
-    })    
-    return worker
-  }
+  
 
 
   let willRunBuild: boolean = true
@@ -225,6 +193,43 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
 
   const prefix = (format === 'esm' && process.platform === 'win32') ? 'file://' : ''
   const ext = format === 'esm' ? '.mjs' : '.cjs'
+
+
+  /** initialize workers */
+  const numberOfWorkers = Math.max(1,  _numberOfWorkers)
+  console.log(`${gray('[vite-ssg]')} ${blue(`Using ${numberOfWorkers} workers`)}`)
+  const workers = Array.from({length: numberOfWorkers}, (_, index) => createProxy({
+    ...createProxyOptions,
+    workerId: index,    
+  }))
+  const terminateWorkers = () => {
+    workers.splice(0, workers.length).forEach(worker => worker.terminate())
+  }
+
+  let workerIndex = 0
+  const maxTasksPerWorker = Math.ceil(concurrency / numberOfWorkers)
+  const workersInUse: Map<BuildWorkerProxy, Promise<any>[]> = new Map()
+  const workerTasksRunning = (w: BuildWorkerProxy) => workersInUse.get(w)?.length || 0
+  const selectIdleWorker = () => workers.filter(w => workerTasksRunning(w) < maxTasksPerWorker).sort((a, b) => workerTasksRunning(a) - workerTasksRunning(b))[0]
+  const selectWorker = async (workerIndex?: number) => {
+    const index = workerIndex ?? (Math.round(Math.random() * numberOfWorkers))
+    const maybeWorker = workers[index % numberOfWorkers]
+    const worker = maybeWorker && workerTasksRunning(maybeWorker) < maxTasksPerWorker ? maybeWorker : selectIdleWorker()
+    if(!worker) {
+      await Promise.race(Array.from(workersInUse.values()).flat())
+      return selectWorker(workerIndex)
+    }
+    const workerPromises = workersInUse.get(worker) || []
+    const delayPromise = new Promise(resolve => setImmediate(resolve))
+    workersInUse.set(worker, [...workerPromises, delayPromise])
+    delayPromise.finally(() => {
+      workerPromises.splice(workerPromises.indexOf(delayPromise), 1)
+      workersInUse.set(worker, workerPromises)
+    })    
+    return worker
+  }
+  /** end of workers initialization */
+
 
   /**
    * `join('file://')` will be equal to `'file:\'`, which is not the correct file protocol and will fail to be parsed under bun.
