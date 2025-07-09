@@ -149,14 +149,17 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
   
   const numberOfWorkers = Math.max(1,  _numberOfWorkers)
   console.log(`${gray('[vite-ssg]')} ${blue(`Using ${numberOfWorkers} workers`)}`)
-  const workers = Array.from({length: numberOfWorkers}, (_, index) => createProxy({
+  const createProxyOptions:Omit<Parameters<typeof createProxy>[0], 'workerId'> = {
     format,
     out,
-    dirStyle,
-    workerId: index,
+    dirStyle,    
     viteConfig: {
       configFile: config.configFile,
     } ,
+  };
+  const workers = Array.from({length: numberOfWorkers}, (_, index) => createProxy({
+    ...createProxyOptions,
+    workerId: index,    
   }))
   const terminateWorkers = () => {
     workers.splice(0, workers.length).forEach(worker => worker.terminate())
@@ -198,9 +201,12 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
 
   // client
   if (willRunBuild){
-    const clientWorker = await selectWorker(0)
+    const clientWorker = createProxy({
+      ...createProxyOptions,
+      workerId: 'client',
+    })
     // await buildClient(config, viteConfig)
-    const cpBuildClient =  execInWorker(clientWorker, buildClient, config, viteConfig)
+    const cpBuildClient =  execInWorker(clientWorker, buildClient, config, viteConfig).finally(() => clientWorker.terminate())
     buildPromises.push(cpBuildClient)
   }
 
@@ -208,8 +214,11 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
   const ssrEntry = await resolveAlias(config, entry)
   if (willRunBuild) {
     // await buildServer(config, viteConfig, { ssrEntry, ssgOut, format })
-    const serverWorker = await selectWorker(1)
-    const cpBuildServer = execInWorker(serverWorker, buildServer, config, viteConfig, { ssrEntry, ssgOut, format, mock })
+    const serverWorker = createProxy({
+      ...createProxyOptions,
+      workerId: 'server',
+    })
+    const cpBuildServer = execInWorker(serverWorker, buildServer, config, viteConfig, { ssrEntry, ssgOut, format, mock }).finally(() => serverWorker.terminate())
     buildPromises.push(cpBuildServer)
   }
   await Promise.all(buildPromises)

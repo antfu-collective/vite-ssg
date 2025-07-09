@@ -1,6 +1,6 @@
 import type { MergeHead, VueHeadClient } from '@unhead/vue'
 import type { Component } from 'vue'
-import { createHead, createServerHead } from '@unhead/vue'
+import { createHead } from '@unhead/vue'
 import { createApp as createClientApp, createSSRApp } from 'vue'
 import type { ViteSSGClientOptions, ViteSSGContext } from '../types'
 import { documentReady } from '../utils/document-ready'
@@ -29,8 +29,8 @@ export function ViteSSG(
 
     let head: VueHeadClient<MergeHead> | undefined
 
-    if (useHead) {
-      head = client ? createHead() : createServerHead()
+    if (useHead) {      
+      head = createHead()
       app.use(head)
     }
 

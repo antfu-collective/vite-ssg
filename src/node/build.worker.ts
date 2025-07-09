@@ -78,19 +78,9 @@ export interface WorkerDataEntry {
   const _require = createRequire(import.meta.url)
   
 
-  let createApp:CreateAppFactory|undefined = undefined 
-  // const logger = createWokerLoggerDelegate(parentPort!)
-  // globalThis.console = Object.assign(globalThis.console, logger)
+  let createAppPromise:Promise<CreateAppFactory>|undefined = undefined 
+  let beastiesPromise:Promise<Critters | Beasties | undefined>|undefined = undefined;
   
-
-  // const onPageRendered:ViteSSGOptions['onPageRendered'] = async (route: string, renderedHTML: string, appCtx: ViteSSGContext<true>):Promise<any> => {
-  //   parentPort!.postMessage({ type: 'pageRendered',  args: [route, renderedHTML, appCtx] })
-  //   return;    
-  // }
-  // const onBeforePageRender:ViteSSGOptions['onBeforePageRender'] = async (route: string, indexHTML: string, appCtx: ViteSSGContext<true>):Promise<any> => {
-  //   parentPort!.postMessage({ type: 'beforePageRender',  args: [route, indexHTML, appCtx] })
-  //   return;    
-  // }
   const execMap:{
     executeTaskFn: (opts: ExecuteInWorkerOptions) => ReturnType<typeof executeTaskFn>,
     buildClient: typeof buildClient,
@@ -98,22 +88,15 @@ export interface WorkerDataEntry {
   } = {
     executeTaskFn: async (opts: ExecuteInWorkerOptions) => {      
       const { serverEntry } = opts  
-      if (!createApp) {
-        const mod: { createApp: CreateAppFactory } = (format === 'esm'
-        ? await import(serverEntry)
-        : _require(serverEntry))        
-        createApp = mod.createApp
-      }
-
-      const beastiesOptions = opts.beastiesOptions
-      if(beasties === undefined){
-        beasties = beastiesOptions !== false
-          ? await getBeastiesOrCritters(outDir, beastiesOptions)
-          : undefined
-        if (beasties){
-          console.log(`${gray('[vite-ssg]')} ${blue('Critical CSS generation enabled via `beasties`')}`)
-        }
-      }
+      createAppPromise ??= Promise.resolve(format === "esm" ?  import(serverEntry) : _require(serverEntry)).then(({createApp}:{createApp:CreateAppFactory}) => createApp)
+      const createApp = await createAppPromise      
+      const beastiesOptions = opts.beastiesOptions;
+      beastiesPromise ??= Promise.resolve(beastiesOptions !== false ? getBeastiesOrCritters(outDir, beastiesOptions) : void 0).then(beasties => {
+        if (!beasties) return;
+        console.log(`${gray("[vite-ssg]")} ${blue("Critical CSS generation enabled via `beasties`")}`);        
+        return beasties
+      })        
+      const beasties = await beastiesPromise;
       const newOpts: CreateTaskFnOptions = {        
         ...extraOpts,
         out,

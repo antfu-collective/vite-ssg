@@ -3,7 +3,7 @@ import Vue from '@vitejs/plugin-vue'
 import Components from 'unplugin-vue-components/vite'
 import Markdown from 'unplugin-vue-markdown/vite'
 import Pages from 'vite-plugin-pages'
-import 'vite-ssg'
+import  'vite-ssg-optimized'
 
 const config: UserConfig = {
   plugins: [

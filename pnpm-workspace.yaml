@@ -9,7 +9,7 @@ catalog:
   '@types/yargs': ^17.0.33  
   '@unhead/vue': ^1.11.13
   '@vitejs/plugin-vue': ^5.2.1
-  "@unhead/ssr": "~1.11.13"
+  "@unhead/ssr": "~1.11.13"  
   beasties: ^0.1.0
   bumpp: ^9.8.1
   critters: ^0.0.25

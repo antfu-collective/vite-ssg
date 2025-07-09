@@ -24,9 +24,6 @@ catalogs:
     '@types/yargs':
       specifier: ^17.0.33
       version: 17.0.33
-    '@unhead/dom':
-      specifier: ^1.11.13
-      version: 1.11.13
     '@unhead/ssr':
       specifier: ~1.11.13
       version: 1.11.13
@@ -128,9 +125,6 @@ importers:
 
   .:
     dependencies:
-      '@unhead/dom':
-        specifier: 'catalog:'
-        version: 1.11.13
       '@unhead/ssr':
         specifier: 'catalog:'
         version: 1.11.13
@@ -256,7 +250,7 @@ importers:
       vite-plugin-pages:
         specifier: 'catalog:'
         version: 0.32.4(@vue/compiler-sfc@3.5.13)(vite@6.0.3(@types/node@22.5.5)(jiti@2.4.1)(terser@5.33.0)(tsx@4.19.1)(yaml@2.6.1))(vue-router@4.5.0(vue@3.5.13(typescript@5.6.3)))
-      vite-ssg:
+      vite-ssg-optimized:
         specifier: workspace:*
         version: link:../..
       vue-router:
@@ -293,7 +287,7 @@ importers:
       vite-plugin-pwa:
         specifier: 'catalog:'
         version: 0.21.1(vite@6.0.3(@types/node@22.5.5)(jiti@2.4.1)(terser@5.33.0)(tsx@4.19.1)(yaml@2.6.1))(workbox-build@7.1.1)(workbox-window@7.1.0)
-      vite-ssg:
+      vite-ssg-optimized:
         specifier: workspace:*
         version: link:../..
       vue-router:
@@ -336,7 +330,7 @@ importers:
       vite-plugin-pages:
         specifier: 'catalog:'
         version: 0.32.4(@vue/compiler-sfc@3.5.13)(vite@6.0.3(@types/node@22.5.5)(jiti@2.4.1)(terser@5.33.0)(tsx@4.19.1)(yaml@2.6.1))(vue-router@4.5.0(vue@3.5.13(typescript@5.6.3)))
-      vite-ssg:
+      vite-ssg-optimized:
         specifier: workspace:*
         version: link:../..
       vue-router:
@@ -364,7 +358,7 @@ importers:
       vite:
         specifier: ^6.0.2
         version: 6.0.3(@types/node@22.5.5)(jiti@2.4.1)(terser@5.33.0)(tsx@4.19.1)(yaml@2.6.1)
-      vite-ssg:
+      vite-ssg-optimized:
         specifier: workspace:*
         version: link:../..
 
