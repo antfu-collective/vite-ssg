@@ -50,6 +50,17 @@ export interface WorkerDataEntry {
     trace: fnLog.bind(globalThis.console, 'trace'),
     debug: fnLog.bind(globalThis.console, 'debug'),
   })
+  const noop = () => void(0)
+  
+  const proccessInjections = {
+    clearLine:noop,
+    cursorTo:noop,
+    clearScreenDown:noop,
+    moveCursor: noop,
+    isTTY: false
+  };
+  Object.assign(process.stdout, proccessInjections)
+  Object.assign(process.stderr, proccessInjections)
 
   const { format, out, dirStyle, viteConfig, mode, ...extraOpts} = (workerData as WorkerDataEntry)
   const nodeEnv = process.env.NODE_ENV || 'production'  
@@ -67,7 +78,7 @@ export interface WorkerDataEntry {
   const _require = createRequire(import.meta.url)
   
 
-  let doCreateApp:CreateAppFactory|undefined = undefined 
+  let createApp:CreateAppFactory|undefined = undefined 
   // const logger = createWokerLoggerDelegate(parentPort!)
   // globalThis.console = Object.assign(globalThis.console, logger)
   
@@ -86,17 +97,23 @@ export interface WorkerDataEntry {
     buildServer: typeof buildServer,
   } = {
     executeTaskFn: async (opts: ExecuteInWorkerOptions) => {      
-      const { serverEntry } = opts      
-      const { createApp }: { createApp: CreateAppFactory } = doCreateApp ? {createApp:doCreateApp} :  (format === 'esm'
-      ? await import(serverEntry)
-      : _require(serverEntry))
+      const { serverEntry } = opts  
+      if (!createApp) {
+        const mod: { createApp: CreateAppFactory } = (format === 'esm'
+        ? await import(serverEntry)
+        : _require(serverEntry))        
+        createApp = mod.createApp
+      }
 
       const beastiesOptions = opts.beastiesOptions
-      beasties ??= beastiesOptions !== false
-        ? await getBeastiesOrCritters(outDir, beastiesOptions)
-        : undefined
-      if (beasties)
-      console.log(`${gray('[vite-ssg]')} ${blue('Critical CSS generation enabled via `beasties`')}`)
+      if(beasties === undefined){
+        beasties = beastiesOptions !== false
+          ? await getBeastiesOrCritters(outDir, beastiesOptions)
+          : undefined
+        if (beasties){
+          console.log(`${gray('[vite-ssg]')} ${blue('Critical CSS generation enabled via `beasties`')}`)
+        }
+      }
       const newOpts: CreateTaskFnOptions = {        
         ...extraOpts,
         out,
