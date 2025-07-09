@@ -2,32 +2,28 @@
 ///<reference types="node/worker_threads" />
 import { createRequire } from "node:module";
 import { parentPort, workerData } from "node:worker_threads";
-import { CreateAppFactory, CreateTaskFnOptions, ExecuteInWorkerOptions, Manifest } from "./build";
-import { ViteSSGOptions } from "vite-ssg";
+import { buildClient, buildServer, CreateAppFactory, CreateTaskFnOptions, ExecuteInWorkerOptions, Manifest, plainify } from "./build";
+import { ViteSSGOptions } from "../types";
 import { getBeastiesOrCritters } from "./critical";
-import { blue, gray, red, yellow } from "kolorist";
-import type { Options as BeastiesOptions } from "beasties";
+import { blue, gray, red } from "kolorist";
+// import type { Options as BeastiesOptions } from "beasties";
 import { executeTaskFn } from "./build";
 import { resolveConfig } from "vite";
-import type { Options as MinifyOptions } from 'html-minifier-terser'
+// import type { Options as MinifyOptions } from 'html-minifier-terser'
+import Critters from "critters";
+import Beasties from "beasties";
 
 
 
 
 
-export interface WorkerDataEntry {
-  serverEntry: string
-  workerId: number|string,
+
+export interface WorkerDataEntry {  
+  workerId: number|string,  
   format: 'esm' | 'cjs',
   out: string,
-  dirStyle: ViteSSGOptions['dirStyle'],
-  beastiesOptions: BeastiesOptions|false,
-  mode?: string,
-  ssrManifest: Manifest,
-  indexHTML: string
-  rootContainerId: string
-  formatting: ViteSSGOptions['formatting']
-  minifyOptions: MinifyOptions  
+  dirStyle: ViteSSGOptions['dirStyle'],  
+  mode?: string,  
   viteConfig: {
     configFile?: string
   },  
@@ -36,32 +32,10 @@ export interface WorkerDataEntry {
 
 ;(async () => {
 
-  const plainnify = (m: any):any => {
-    
-    if(m instanceof Function) {
-      return undefined
-    }
-    if (Array.isArray(m)) {
-      return m.map(plainnify)
-    }
-    if (typeof m === 'object' && m !== null) {
-      if(m instanceof Error || 'stack' in m){
-        return {
-          message: m.message,
-          stack: m.stack,
-        }
-      }
-
-      return Object.entries(m).reduce((acc, [key, value]) => {
-        acc[key] = plainnify(value)
-        return acc
-      }, {} as Record<string, any>)
-    }
-    return m?.toString()
-  }
+  
  
   const fnLog = (level: 'info' | 'warn' | 'error' | 'log' | 'trace' | 'debug' = 'info', ...msg:any[]) => {
-    const newMsg = msg.map(plainnify)
+    const newMsg = msg.map(plainify)
     // if(level === 'error') {
     //   process.stderr.write(`${yellow('[vite-ssg-worker-console]')} ${JSON.stringify(newMsg)}\n`)
       
@@ -77,7 +51,7 @@ export interface WorkerDataEntry {
     debug: fnLog.bind(globalThis.console, 'debug'),
   })
 
-  const {serverEntry,  out, beastiesOptions, viteConfig, mode, format, dirStyle, ...extraOpts} = (workerData as WorkerDataEntry)
+  const { format, out, dirStyle, viteConfig, mode, ...extraOpts} = (workerData as WorkerDataEntry)
   const nodeEnv = process.env.NODE_ENV || 'production'  
   const config = await resolveConfig(viteConfig, 'build', mode, nodeEnv)
   const {
@@ -86,18 +60,14 @@ export interface WorkerDataEntry {
     // onDonePageRender,
   } = config.ssgOptions || {}
 
+  let beasties:Critters | Beasties | undefined = undefined
+
   const { renderToString }: typeof import('vue/server-renderer') = await import('vue/server-renderer')  
   const outDir = out.replace(process.cwd(), '').replace(/^\//g, '')
   const _require = createRequire(import.meta.url)
-  const beasties = beastiesOptions !== false
-    ? await getBeastiesOrCritters(outDir, beastiesOptions)
-    : undefined
-  if (beasties)
-    console.log(`${gray('[vite-ssg]')} ${blue('Critical CSS generation enabled via `beasties`')}`)
+  
 
-  const { createApp }: { createApp: CreateAppFactory } = format === 'esm'
-    ? await import(serverEntry)
-    : _require(serverEntry)
+  let doCreateApp:CreateAppFactory|undefined = undefined 
   // const logger = createWokerLoggerDelegate(parentPort!)
   // globalThis.console = Object.assign(globalThis.console, logger)
   
@@ -110,8 +80,23 @@ export interface WorkerDataEntry {
   //   parentPort!.postMessage({ type: 'beforePageRender',  args: [route, indexHTML, appCtx] })
   //   return;    
   // }
-  const execMap = {
-    executeTaskFn: async (opts: ExecuteInWorkerOptions) => {
+  const execMap:{
+    executeTaskFn: (opts: ExecuteInWorkerOptions) => ReturnType<typeof executeTaskFn>,
+    buildClient: typeof buildClient,
+    buildServer: typeof buildServer,
+  } = {
+    executeTaskFn: async (opts: ExecuteInWorkerOptions) => {      
+      const { serverEntry } = opts      
+      const { createApp }: { createApp: CreateAppFactory } = doCreateApp ? {createApp:doCreateApp} :  (format === 'esm'
+      ? await import(serverEntry)
+      : _require(serverEntry))
+
+      const beastiesOptions = opts.beastiesOptions
+      beasties ??= beastiesOptions !== false
+        ? await getBeastiesOrCritters(outDir, beastiesOptions)
+        : undefined
+      if (beasties)
+      console.log(`${gray('[vite-ssg]')} ${blue('Critical CSS generation enabled via `beasties`')}`)
       const newOpts: CreateTaskFnOptions = {        
         ...extraOpts,
         out,
@@ -130,6 +115,18 @@ export interface WorkerDataEntry {
       }
       return executeTaskFn(newOpts)
     },
+    buildClient: async (...args:any[]):Promise<void> => {
+      let [_config, _viteConfig] = args
+      _config = Object.assign({}, config, _config)
+      _viteConfig = Object.assign({}, viteConfig, _viteConfig)
+      return await buildClient(_config, _viteConfig)
+    },
+    buildServer: async (...args:any[]):Promise<void> => {
+      let [_config, _viteConfig, _opts] = args
+      _config = Object.assign({}, config, _config)
+      _viteConfig = Object.assign({}, viteConfig, _viteConfig)
+      return await buildServer(_config, _viteConfig, _opts)
+    }
   }
   
   parentPort?.on('message', async (message) => {
@@ -139,14 +136,8 @@ export interface WorkerDataEntry {
       try{
         // process.stdout.write(JSON.stringify(args))
         // @ts-ignore
-        const result = await execMap[type](...(args ?? []))        
-        if(result.appCtx) {
-          Object.assign(result, {
-            appCtx: result.appCtx.router.push(result.route)
-          })
-        }
-        
-        
+        let result = await execMap[type](...(args ?? []))        
+        result = plainify(result)        
         parentPort!.postMessage({ type: 'result', id, result })
       }
       catch(e:any) {
@@ -159,3 +150,4 @@ export interface WorkerDataEntry {
     }
   })
 })();
+
