@@ -194,11 +194,14 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
     }
   }
 
+  const buildPromises:Promise<any>[] = []
+
   // client
   if (willRunBuild){
     const clientWorker = await selectWorker(0)
     // await buildClient(config, viteConfig)
-    await execInWorker(clientWorker, buildClient, config, viteConfig)
+    const cpBuildClient =  execInWorker(clientWorker, buildClient, config, viteConfig)
+    buildPromises.push(cpBuildClient)
   }
 
   // server
@@ -206,8 +209,10 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
   if (willRunBuild) {
     // await buildServer(config, viteConfig, { ssrEntry, ssgOut, format })
     const serverWorker = await selectWorker(1)
-    await execInWorker(serverWorker, buildServer, config, viteConfig, { ssrEntry, ssgOut, format, mock })
+    const cpBuildServer = execInWorker(serverWorker, buildServer, config, viteConfig, { ssrEntry, ssgOut, format, mock })
+    buildPromises.push(cpBuildServer)
   }
+  await Promise.all(buildPromises)
 
   const prefix = (format === 'esm' && process.platform === 'win32') ? 'file://' : ''
   const ext = format === 'esm' ? '.mjs' : '.cjs'
