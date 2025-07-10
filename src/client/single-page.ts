@@ -1,9 +1,15 @@
-import type { VueHeadClient } from '@unhead/vue'
+
+
+
+
+
+import type {  VueHeadClient } from '@unhead/vue'
 import type { Component } from 'vue'
 import type { ViteSSGClientOptions, ViteSSGContext } from '../types'
 import { createHead } from '@unhead/vue/client'
 import { createHead as createSSRHead } from '@unhead/vue/server'
 import { createApp as createClientApp, createSSRApp } from 'vue'
+
 import { documentReady } from '../utils/document-ready'
 import { deserializeState } from '../utils/state'
 import { ClientOnly } from './components/ClientOnly'
@@ -23,14 +29,16 @@ export function ViteSSG(
   } = options ?? {}
 
   async function createApp() {
-    const app = import.meta.env.SSR || options?.hydration
+    const isClient = !import.meta.env.SSR
+    const isHydrationMode = options?.hydration || (isClient && document.querySelectorAll('[data-server-rendered]').length > 0)
+    const app = import.meta.env.SSR || isHydrationMode
       ? createSSRApp(App)
       : createClientApp(App)
 
     let head: VueHeadClient | undefined
 
     if (useHead) {
-      app.use(head = import.meta.env.SSR ? createSSRHead() : createHead())
+      app.use(head = (import.meta.env.SSR ? createSSRHead() : createHead()))
     }
 
     const appRenderCallbacks: (() => void)[] = []

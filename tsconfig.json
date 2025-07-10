@@ -18,7 +18,8 @@
     "resolveJsonModule": true,
     "types": [
       "vite/client",
-      "vite-plugin-pages/client"
+      "vite-plugin-pages/client",
+      "node"
     ],
     "strict": true,
     "strictNullChecks": true,
@@ -29,5 +30,8 @@
     "**/dist",
     "**/node_modules",
     "**/test"
-  ]
+  ],
+  "typeAcquisition": {
+    "enable": true
+  },
 }

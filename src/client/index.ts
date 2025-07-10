@@ -5,6 +5,8 @@ import { createHead } from '@unhead/vue/client'
 import { createHead as createSSRHead } from '@unhead/vue/server'
 import { createApp as createClientApp, createSSRApp } from 'vue'
 import { createMemoryHistory, createRouter, createWebHistory } from 'vue-router'
+
+
 import { documentReady } from '../utils/document-ready'
 import { deserializeState } from '../utils/state'
 import { ClientOnly } from './components/ClientOnly'
@@ -24,13 +26,15 @@ export function ViteSSG(
     rootContainer = '#app',
   } = options ?? {}
 
+
   async function createApp(routePath?: string) {
-    const app = import.meta.env.SSR || options?.hydration
-      ? createSSRApp(App)
-      : createClientApp(App)
+    const isClient = !import.meta.env.SSR
+    const isHydrationMode = options?.hydration || (isClient && document.querySelectorAll('[data-server-rendered]').length > 0)
+    const app = import.meta.env.SSR || isHydrationMode
+      ? createClientApp(App)
+      : createSSRApp(App)
 
     let head: VueHeadClient | undefined
-
     if (useHead) {
       app.use(head = import.meta.env.SSR ? createSSRHead() : createHead())
     }

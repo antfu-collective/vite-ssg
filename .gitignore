@@ -5,3 +5,4 @@ examples/*/README.md
 .vite-ssg-temp
 *.d.ts
 .idea/
+.vscode/launch.json

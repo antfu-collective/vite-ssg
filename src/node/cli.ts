@@ -12,6 +12,7 @@ cli
   .option('--mode <mode>', 'Specify the mode the Vite process is running in')
   .option('--config, -c <config>', 'The vite config file to use')
   .option('--base, -b <base>', 'The base path to render')
+  .option('--skip-build', 'Skip build if already have build in ssg-out dir')
   .action(async (args) => {
     const { config: configFile = undefined, ...ssgOptions } = args
     if (args.script && !['sync', 'async', 'defer', 'async defer'].includes(args.script)) {

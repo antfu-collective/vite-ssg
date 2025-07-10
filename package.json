@@ -1,7 +1,7 @@
 {
-  "name": "vite-ssg",
+  "name": "vite-ssg-optimized",
   "type": "module",
-  "version": "28.0.0",
+  "version": "0.28.0-optimized.0",
   "packageManager": "pnpm@10.12.4",
   "description": "Server-side generation for Vite",
   "author": "Anthony Fu <anthonyfu117@hotmail.com>",
@@ -23,6 +23,7 @@
   "exports": {
     ".": "./dist/index.mjs",
     "./node": "./dist/node.mjs",
+    "./node/build.worker": "./dist/shared/build.worker.mjs",
     "./single-page": "./dist/client/single-page.mjs"
   },
   "main": "dist/index.mjs",
@@ -32,6 +33,9 @@
     "*": {
       "node": [
         "dist/node.d.mts"
+      ],
+      "shared/build.worker": [
+        "dist/shared/build.worker.d.ts"
       ],
       "single-page": [
         "dist/client/single-page.d.mts"
@@ -90,7 +94,7 @@
     }
   },
   "dependencies": {
-    "@unhead/dom": "catalog:",
+    "@unhead/ssr": "catalog:",
     "@unhead/vue": "catalog:",
     "ansis": "catalog:",
     "cac": "catalog:",

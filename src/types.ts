@@ -2,6 +2,7 @@ import type { VueHeadClient } from '@unhead/vue'
 import type { Options as BeastiesOptions } from 'beasties'
 import type { App } from 'vue'
 import type { Router, RouteRecordRaw, RouterOptions as VueRouterOptions } from 'vue-router'
+import type { Options  as MinifyOptions} from 'html-minifier-terser'
 
 export interface ViteSSGOptions {
   /**
@@ -31,6 +32,9 @@ export interface ViteSSGOptions {
    * @default 'none'
    */
   formatting?: 'minify' | 'prettify' | 'none'
+
+  /**Terser options */
+  minifyOptions?: MinifyOptions
 
   /**
    * Vite environment mode.
@@ -67,6 +71,7 @@ export interface ViteSSGOptions {
    * @see https://github.com/danielroe/beasties
    */
   beastiesOptions?: BeastiesOptions | false
+  
 
   /**
    * Custom function to modify the routes to do the SSG.
@@ -98,7 +103,29 @@ export interface ViteSSGOptions {
    */
   onPageRendered?: (route: string, renderedHTML: string, appCtx: ViteSSGContext<true>) => Promise<string | null | undefined> | string | null | undefined
 
+/**
+   * Callback to be called on every rendered page.
+   *
+   * It's useful to debug memory leaks 
+   *
+   */
+  // onDonePageRender?: (route: string, renderedHTML: string, appCtx: ViteSSGContext<true>) => Promise< void> | void
+
+
   onFinished?: () => Promise<void> | void
+
+
+  /**
+   * The number of workers to use.
+   *
+   * @default 5
+   */
+  numberOfWorkers?: number
+
+  /**
+   * output directory of SSG server files
+   */
+  ssgOut?: string
 
   /**
    * The application's root container `id`.

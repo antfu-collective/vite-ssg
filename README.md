@@ -1,4 +1,4 @@
-# Vite SSG
+# Vite SSG Optimized
 
 Static-site generation for Vue 3 on Vite.
 
@@ -7,6 +7,37 @@ Static-site generation for Vue 3 on Vite.
 > ℹ️ **ESM-only from `v27.0.0` (CJS generation format also dropped).**
 >
 > ℹ️ **Vite 2 is supported from `v0.2.x`, Vite 1's support is discontinued.**
+
+> ℹ️  This is a fork from vite-ssg
+
+## Optimizations
+
+* Replaced @unhead/dom by @unhead/ssr
+* Used a custom injectInHtml instead of jsdom with is faster
+* Added worker threads to avoid locking main event loop
+* Avoid grow the number of tasks in queue when we have many routes
+* Added teleport support, the original vite-ssg don't writes teleports to the final file causing SSR mismatches
+* Detect if is in isHydrationMode by quering [data-server-rendered] on client
+* Creates SSRApp or App accord with environment and hydration
+
+
+
+#### Thread Workers
+
+To configure `workerThreads`  `ssgOptions.numberOfWorkers` in `vite.config.ts`
+
+Each thread accept the `Math.ceil(concurrency / numberOfWorkers )` concurrent tasks at max.
+
+```ts
+ defineConfig({
+   ssgOptions: {
+      concurrency: 50,
+      numberOfWorkers: 5 // 5 is the default
+    }
+ })
+ ```
+ 
+
 
 ## Install
 

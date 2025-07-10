@@ -1,22 +1,29 @@
 /* eslint-disable no-console */
+
+import type { SSRHeadPayload } from '@unhead/ssr'
+
 import type { InlineConfig, ResolvedConfig } from 'vite'
 import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
 import type { RouteRecordRaw } from 'vue-router'
 import type { SSRContext } from 'vue/server-renderer'
 import type { ViteSSGContext, ViteSSGOptions } from '../types'
+import type { InjectOptions } from './injection'
+import { renderSSRHead } from '@unhead/ssr'
+import { injectInHtml } from './injection'
+import { buildPreloadLinks } from './preload-links'
+import type { Options as MinifyOptions } from 'html-minifier-terser'
+import Beasties from 'beasties'
+import { BuildWorkerProxy } from './build.worker.proxy'
+import { WorkerDataEntry } from './build.worker'
 import { existsSync } from 'node:fs'
 import fs from 'node:fs/promises'
 import { dirname, isAbsolute, join, parse, resolve } from 'node:path'
 import process from 'node:process'
 import { pathToFileURL } from 'node:url'
-import { renderDOMHead } from '@unhead/dom'
 import { blue, cyan, dim, gray, green, red, yellow } from 'ansis'
-import { JSDOM } from 'jsdom'
 import PQueue from 'p-queue'
 import { mergeConfig, resolveConfig, build as viteBuild } from 'vite'
 import { serializeState } from '../utils/state'
-import { getBeasties } from './critical'
-import { renderPreloadLinks } from './preload-links'
 import { buildLog, getSize, routesToPaths } from './utils'
 
 export type Manifest = Record<string, string[]>
@@ -28,42 +35,15 @@ function DefaultIncludedRoutes(paths: string[], _routes: Readonly<RouteRecordRaw
   return paths.filter(i => !i.includes(':') && !i.includes('*'))
 }
 
-export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig: InlineConfig = {}) {
-  const nodeEnv = process.env.NODE_ENV || 'production'
-  const mode = process.env.MODE || ssgOptions.mode || nodeEnv
-  const config = await resolveConfig(viteConfig, 'build', mode, nodeEnv)
-
+function getRoot(config: ResolvedConfig) {
   const cwd = process.cwd()
-  const root = config.root || cwd
-  const ssgOutTempFolder = resolve(root, '.vite-ssg-temp')
-  const ssgOut = resolve(ssgOutTempFolder, Math.random().toString(36).substring(2, 12))
-  const outDir = config.build.outDir || 'dist'
-  const out = isAbsolute(outDir) ? outDir : resolve(root, outDir)
+  return config.root || cwd
+}
 
-  const mergedOptions = Object.assign({}, config.ssgOptions || {}, ssgOptions)
-  const {
-    script = 'sync',
-    mock = false,
-    entry = await detectEntry(root),
-    formatting = 'none',
-    includedRoutes: configIncludedRoutes = DefaultIncludedRoutes,
-    onBeforePageRender,
-    onPageRendered,
-    onFinished,
-    dirStyle = 'flat',
-    includeAllRoutes = false,
-    concurrency = 20,
-    rootContainerId = 'app',
-    base,
-  }: ViteSSGOptions = mergedOptions
-
-  const beastiesOptions = mergedOptions.beastiesOptions ?? {}
-
-  if (existsSync(ssgOutTempFolder))
-    await fs.rm(ssgOutTempFolder, { recursive: true })
-
-  // client
+export async function buildClient(config: ResolvedConfig, viteConfig: InlineConfig): Promise<void> {
+  const root = getRoot(config)  
   buildLog('Build for client...')
+  const { base } = config
   await viteBuild(mergeConfig(viteConfig, {
     base,
     build: {
@@ -76,18 +56,20 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
     },
     mode: config.mode,
   }))
+}
 
-  // load jsdom before building the SSR and so jsdom will be available
-  if (mock) {
+export async function buildServer(config: ResolvedConfig, viteConfig: InlineConfig, { ssrEntry, ssgOut, mock }: { ssrEntry: string, ssgOut: string, mock: boolean }): Promise<void> {
+  buildLog('Build for server...')
+  process.env.VITE_SSG = 'true'
+  const { base } = config
+
+   // load jsdom before building the SSR and so jsdom will be available
+   if (mock) {
     // @ts-expect-error just ignore it
     const { jsdomGlobal }: { jsdomGlobal: () => void } = await import('./jsdomGlobal.mjs')
     jsdomGlobal()
   }
 
-  // server
-  buildLog('Build for server...')
-  process.env.VITE_SSG = 'true'
-  const ssrEntry = await resolveAlias(config, entry)
   await viteBuild(mergeConfig(viteConfig, {
     base,
     build: {
@@ -107,6 +89,100 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
       noExternal: ['vite-ssg'],
     },
   }))
+}
+
+function createProxy(options:WorkerDataEntry ):BuildWorkerProxy {
+  const workerExt = '.mjs'
+  const workerProxy = new BuildWorkerProxy(new URL(`./build.worker${workerExt}`, import.meta.url), {
+    env: process.env,
+    workerData: options,
+  })
+  process.on('SIGINT', workerProxy.terminate.bind(workerProxy))
+  process.on('SIGTERM', workerProxy.terminate.bind(workerProxy))
+  process.on('SIGBREAK', workerProxy.terminate.bind(workerProxy))  
+  process.on('beforeExit', workerProxy.terminate.bind(workerProxy))
+  process.on('exit', workerProxy.terminate.bind(workerProxy))
+  return workerProxy
+}
+
+export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?: boolean }> = {}, viteConfig: InlineConfig = {}) {
+  const nodeEnv = process.env.NODE_ENV || 'production'
+  const mode = process.env.MODE || ssgOptions.mode || nodeEnv  
+  const config = await resolveConfig(viteConfig, 'build', mode, nodeEnv)
+
+
+  const root = getRoot(config)
+  const outDir = config.build.outDir || 'dist'
+  const out = isAbsolute(outDir) ? outDir : join(root, outDir)
+    
+
+  const {
+    script = 'sync',
+    mock = false,
+    entry = await detectEntry(root),
+    ssgOut: _ssgOutDir = join(root, '.vite-ssg-temp', Math.random().toString(36).substring(2, 12)),
+    formatting = 'none',
+    minifyOptions = {},
+    // crittersOptions = {},
+    beastiesOptions = {},
+    includedRoutes: configIncludedRoutes = DefaultIncludedRoutes,
+    // onBeforePageRender,
+    // onPageRendered,
+    // onDonePageRender,
+    numberOfWorkers:_numberOfWorkers = 5,
+    onFinished,
+    dirStyle = 'flat',
+    includeAllRoutes = false,    
+    concurrency = 20,
+    rootContainerId = 'app',
+  }: ViteSSGOptions = Object.assign({}, config.ssgOptions || {}, ssgOptions)
+
+  const ssgOut = isAbsolute(_ssgOutDir) ? _ssgOutDir : join(root, _ssgOutDir)  
+  
+  
+  const createProxyOptions:Omit<Parameters<typeof createProxy>[0], 'workerId'> = {    
+    out,
+    dirStyle,    
+    viteConfig: {
+      configFile: config.configFile,
+    } ,
+  };
+  
+
+
+  let willRunBuild: boolean = true
+  if (existsSync(ssgOut)) {
+    willRunBuild = !ssgOptions['skip-build']
+    if (willRunBuild) {      
+      await fs.rm(ssgOut, { recursive: true })
+    }
+  }
+
+  const buildPromises:Promise<any>[] = []
+
+  // client
+  if (willRunBuild){
+    const clientWorker = createProxy({
+      ...createProxyOptions,
+      workerId: 'client',
+    })
+    // await buildClient(config, viteConfig)
+    const cpBuildClient =  execInWorker(clientWorker, buildClient, config, viteConfig).finally(() => clientWorker.terminate())
+    buildPromises.push(cpBuildClient)
+  }
+
+  // server
+  const ssrEntry = await resolveAlias(config, entry)
+  if (willRunBuild) {
+    // await buildServer(config, viteConfig, { ssrEntry, ssgOut, format })
+    const serverWorker = createProxy({
+      ...createProxyOptions,
+      workerId: 'server',
+    })
+    const cpBuildServer = execInWorker(serverWorker, buildServer, config, viteConfig, { ssrEntry, ssgOut, mock }).finally(() => serverWorker.terminate())
+    buildPromises.push(cpBuildServer)
+  }
+  await Promise.all(buildPromises)
 
   const serverEntry = pathToFileURL(resolve(ssgOut, `${parse(ssrEntry).name}.mjs`)).href
   const {
@@ -116,6 +192,44 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
     createApp: CreateAppFactory
     includedRoutes: ViteSSGOptions['includedRoutes']
   } = await import(serverEntry)
+
+
+  /** initialize workers */
+  const numberOfWorkers = Math.max(1,  _numberOfWorkers)
+  console.log(`${gray('[vite-ssg]')} ${blue(`Using ${numberOfWorkers} workers`)}`)
+  const workers = Array.from({length: numberOfWorkers}, (_, index) => createProxy({
+    ...createProxyOptions,
+    workerId: index,    
+  }))
+  const terminateWorkers = () => {
+    workers.splice(0, workers.length).forEach(worker => worker.terminate())
+  }
+
+  let workerIndex = 0
+  const maxTasksPerWorker = Math.ceil(concurrency / numberOfWorkers)
+  const workersInUse: Map<BuildWorkerProxy, Promise<any>[]> = new Map()
+  const workerTasksRunning = (w: BuildWorkerProxy) => workersInUse.get(w)?.length || 0
+  const selectIdleWorker = () => workers.filter(w => workerTasksRunning(w) < maxTasksPerWorker).sort((a, b) => workerTasksRunning(a) - workerTasksRunning(b))[0]
+  const selectWorker = async (workerIndex?: number) => {
+    const index = workerIndex ?? (Math.round(Math.random() * numberOfWorkers))
+    const maybeWorker = workers[index % numberOfWorkers]
+    const worker = maybeWorker && workerTasksRunning(maybeWorker) < maxTasksPerWorker ? maybeWorker : selectIdleWorker()
+    if(!worker) {
+      await Promise.race(Array.from(workersInUse.values()).flat())
+      return selectWorker(workerIndex)
+    }
+    const workerPromises = workersInUse.get(worker) || []
+    const delayPromise = new Promise(resolve => setImmediate(resolve))
+    workersInUse.set(worker, [...workerPromises, delayPromise])
+    delayPromise.finally(() => {
+      workerPromises.splice(workerPromises.indexOf(delayPromise), 1)
+      workersInUse.set(worker, workerPromises)
+    })    
+    return worker
+  }
+  /** end of workers initialization */
+  
+
 
   const includedRoutes = serverEntryIncludedRoutes || configIncludedRoutes
   const { routes } = await createApp()
@@ -129,12 +243,6 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
 
   buildLog('Rendering Pages...', routesPaths.length)
 
-  const beasties = beastiesOptions !== false
-    ? await getBeasties(outDir, beastiesOptions)
-    : undefined
-
-  if (beasties)
-    console.log(`${gray('[vite-ssg]')} ${blue('Critical CSS generation enabled via `beasties`')}`)
 
   const {
     path: _ssrManifestPath,
@@ -146,75 +254,56 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
   const ssrManifest: Manifest = JSON.parse(ssrManifestRaw)
   let indexHTML = await fs.readFile(resolve(out, 'index.html'), 'utf-8')
   indexHTML = rewriteScripts(indexHTML, script)
+  const IS_PROD = nodeEnv === 'production'  
+  indexHTML = await formatHtml(indexHTML, IS_PROD ? 'minify' : formatting, minifyOptions)
 
-  const { renderToString }: typeof import('vue/server-renderer') = await import('vue/server-renderer')
+  // const { renderToString }: typeof import('vue/server-renderer') = await import('vue/server-renderer')
 
   const queue = new PQueue({ concurrency })
-
+ 
   for (const route of routesPaths) {
-    queue.add(async () => {
-      try {
-        const appCtx = await createApp(route) as ViteSSGContext<true>
-        const { app, router, head, initialState, triggerOnSSRAppRendered, transformState = serializeState } = appCtx
-
-        if (router) {
-          await router.push(route)
-          await router.isReady()
-        }
-
-        const transformedIndexHTML = (await onBeforePageRender?.(route, indexHTML, appCtx)) || indexHTML
-
-        const ctx: SSRContext = {}
-        const appHTML = await renderToString(app, ctx)
-        await triggerOnSSRAppRendered?.(route, appHTML, appCtx)
-        // need to resolve assets so render content first
-        const renderedHTML = await renderHTML({
+    await queue.onSizeLessThan(concurrency) // avoid grow the number of tasks in queue
+    queue.add(async () => {  
+      const workerProxy = await selectWorker(workerIndex ++ % numberOfWorkers)
+      
+      let retryCount = 0
+      const maxRetries = 3
+      const execOpts:ExecuteInWorkerOptions = {      
+          route,
+          ssrManifest,
+          indexHTML,
           rootContainerId,
-          indexHTML: transformedIndexHTML,
-          appHTML,
-          initialState: transformState(initialState),
-        })
-
-        // create jsdom from renderedHTML
-        const jsdom = new JSDOM(renderedHTML)
-
-        // render current page's preloadLinks
-        renderPreloadLinks(jsdom.window.document, ctx.modules || new Set<string>(), ssrManifest)
-
-        // render head
-        if (head)
-          await renderDOMHead(head, { document: jsdom.window.document })
-
-        const html = jsdom.serialize()
-        let transformed = (await onPageRendered?.(route, html, appCtx)) || html
-        if (beasties)
-          transformed = await beasties.process(transformed)
-
-        const formatted = await formatHtml(transformed, formatting)
-
-        const relativeRouteFile = `${(route.endsWith('/')
-          ? `${route}index`
-          : route).replace(/^\//g, '')}.html`
-
-        const filename = dirStyle === 'nested'
-          ? join(route.replace(/^\//g, ''), 'index.html')
-          : relativeRouteFile
-
-        await fs.mkdir(resolve(out, dirname(filename)), { recursive: true })
-        await fs.writeFile(resolve(out, filename), formatted, 'utf-8')
-        config.logger.info(
-          `${dim(`${outDir}/`)}${cyan(filename.padEnd(15, ' '))}  ${dim(getSize(formatted))}`,
-        )
+          formatting,
+          minifyOptions,
+          // out,
+          // dirStyle,
+          beastiesOptions,          
+          serverEntry,
+      
       }
-      catch (err: any) {
-        throw new Error(`${gray('[vite-ssg]')} ${red(`Error on page: ${cyan(route)}`)}\n${err.stack}`)
-      }
+      const taskPromise = executeTaskInWorker(workerProxy, execOpts).catch(e => {
+        if ( (retryCount++) < maxRetries) {          
+          console.log(`${gray('[vite-ssg]')} ${yellow(`Retrying ${retryCount} of ${maxRetries} for route: ${cyan(route)}`)}`)
+          return executeTaskInWorker(workerProxy, execOpts)
+        }
+        throw e
+      })
+      const workerPromises = workersInUse.get(workerProxy) || []
+      workersInUse.set(workerProxy, workerPromises)
+      taskPromise.finally(() => {
+        workerPromises.splice(workerPromises.indexOf(taskPromise), 1)
+        workersInUse.set(workerProxy, workerPromises)
+      })
+      return taskPromise//.then(({ route, html, appCtx }) => onDonePageRender?.(route, html, appCtx))
     })
   }
 
   await queue.start().onIdle()
+  terminateWorkers();
 
-  await fs.rm(ssgOutTempFolder, { recursive: true, force: true })
+  if (!ssgOptions['skip-build']) {
+    await fs.rm(ssgOut, { recursive: true })
+  }
 
   // when `vite-plugin-pwa` is presented, use it to regenerate SW after rendering
   const pwaPlugin: VitePluginPWAAPI = config.plugins.find(i => i.name === 'vite-plugin-pwa')?.api
@@ -236,11 +325,167 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
   timeout.unref() // don't wait for timeout
 }
 
+
+
+export interface ExecuteInWorkerOptions {  
+  route: string  
+  serverEntry: string
+  ssrManifest: Manifest 
+  indexHTML: string    
+  rootContainerId: string
+  formatting: ViteSSGOptions['formatting']
+  beastiesOptions: ViteSSGOptions['beastiesOptions'] | false
+  minifyOptions: MinifyOptions  
+  // out: string
+  // dirStyle: ViteSSGOptions['dirStyle']   
+}
+
+
+function executeTaskInWorker(worker: BuildWorkerProxy, opts: ExecuteInWorkerOptions) {
+ return execInWorker(worker, executeTaskFn, opts)
+}
+
+
+export async function execInWorker<T extends (...args:any[]) => any>(worker: BuildWorkerProxy, fn:T, ...args:any[]) : Promise<Awaited<ReturnType<T>>> {
+  //@ts-ignore
+  return await worker.send(fn.name, plainify(args ?? [])) as Awaited<ReturnType<T>>
+}
+
+
+export interface CreateTaskFnOptions extends Omit<ExecuteInWorkerOptions, 'beastiesOptions'> {  
+  out: string
+  dirStyle: ViteSSGOptions['dirStyle']
+  createApp: CreateAppFactory
+  renderToString: typeof import('vue/server-renderer')['renderToString']  
+  // onDonePageRender?: ViteSSGOptions['onDonePageRender']
+  onBeforePageRender?: ViteSSGOptions['onBeforePageRender']
+  onPageRendered?: ViteSSGOptions['onPageRendered']  
+  beasties: Beasties | undefined
+  config: {logger: {info: (msg: string) => void}}
+}
+
+export async function executeTaskFn(opts: CreateTaskFnOptions) {
+  const {
+    route, 
+    createApp, 
+    renderToString, 
+    indexHTML, 
+    onBeforePageRender, 
+    // onDonePageRender, 
+    onPageRendered, 
+    ssrManifest, 
+    rootContainerId, 
+    formatting, 
+    minifyOptions, 
+    beasties, 
+    out, 
+    dirStyle, 
+    config
+  } = opts
+  try {
+    const appCtx = await createApp(route) as ViteSSGContext<true>
+    const { app, router, head, initialState, triggerOnSSRAppRendered, transformState = serializeState } = appCtx
+
+    if (router) {
+      await router.push(route)
+      await router.isReady()
+    }
+
+    const transformedIndexHTML = (await onBeforePageRender?.(route, indexHTML, appCtx)) || indexHTML
+
+    const ctx: SSRContext = {}
+    const appHTML = await renderToString(app, ctx)
+    await triggerOnSSRAppRendered?.(route, appHTML, appCtx)
+    // need to resolve assets so render content first
+
+    /** replace slower jsdom to use unhead/ssr and injectInHtml utils */
+    // render current page's preloadLinks
+    const preloads:string[] = buildPreloadLinks({ html: transformedIndexHTML }, ctx.modules || new Set<string>(), ssrManifest)
+    let ssrHead = {
+      headTags: preloads.join("\n"),
+      bodyAttrs: '',
+      htmlAttrs: '',
+      bodyTagsOpen: '',
+      bodyTags: '',
+    }
+    if (head) {
+      const tmpSSrHead = await renderSSRHead(head as any)
+      ssrHead = Object.assign(tmpSSrHead, {
+        headTags: [tmpSSrHead.headTags.trim(), ssrHead.headTags].filter(x => !!x).join("\n"),
+      })
+    }
+
+    const html = await renderHTML({
+      rootContainerId,
+      indexHTML: transformedIndexHTML,
+      appHTML,
+      initialState: transformState(initialState),
+      ssrHead,
+      teleports: ctx.teleports,
+    })
+
+    let transformed = (await onPageRendered?.(route, html, appCtx)) || html
+    if (beasties)
+      transformed = await beasties.process(transformed)
+
+    const formatted = await formatHtml(transformed, formatting, {
+      collapseWhitespace : false,
+      collapseInlineTagWhitespace : false,
+      ...minifyOptions
+    })
+
+    const relativeRouteFile = `${(route.endsWith('/')
+      ? `${route}index`
+      : route).replace(/^\//g, '')}.html`
+
+    const filename = dirStyle === 'nested'
+      ? join(route.replace(/^\//g, ''), 'index.html')
+      : relativeRouteFile
+
+    await fs.mkdir(join(out, dirname(filename)), { recursive: true })
+    return fs.writeFile(join(out, filename), formatted, 'utf-8').then(() => {
+      const outDir = out.replace(process.cwd(), '').replace(/^\//,'')
+      config.logger.info(
+        `${dim(`${outDir}/`)}${cyan(filename.padEnd(15, ' '))}  ${dim(getSize(formatted))}`,
+      )      
+      return { route, html }
+    })
+
+  }
+  catch (err: any) {
+    throw new Error(`${gray('[vite-ssg]')} ${red(`Error on page: ${cyan(route)}`)}\n${err.stack}`)
+  }
+}
+
+export function plainify(m: any):any {    
+  if(m instanceof Function) {
+    return undefined
+  }
+  if (Array.isArray(m)) {
+    return m.map(plainify)
+  }
+  if (typeof m === 'object' && m !== null) {
+    if(m instanceof Error || 'stack' in m){
+      return {
+        message: m.message,
+        stack: m.stack,
+      }
+    }
+
+    return Object.entries(m).reduce((acc, [key, value]) => {
+      acc[key] = plainify(value)
+      return acc
+    }, {} as Record<string, any>)
+  }
+  return m
+}
+
+
 async function detectEntry(root: string) {
   // pick the first script tag of type module as the entry
   // eslint-disable-next-line regexp/no-super-linear-backtracking
   const scriptSrcReg = /<script.*?src=["'](.+?)["'](?!<).*>\s*<\/script>/gi
-  const html = await fs.readFile(resolve(root, 'index.html'), 'utf-8')
+  const html = await fs.readFile(join(root, 'index.html'), 'utf-8')
   const scripts = [...html.matchAll(scriptSrcReg)]
   const [, entry] = scripts.find((matchResult) => {
     const [script] = matchResult
@@ -267,51 +512,65 @@ async function renderHTML({
   indexHTML,
   appHTML,
   initialState,
+  ssrHead,
+  teleports,
 }: {
   rootContainerId: string
   indexHTML: string
   appHTML: string
   initialState: any
-}) {
-  const stateScript = initialState
-    ? `\n<script>window.__INITIAL_STATE__=${initialState}</script>`
-    : ''
-  const container = `<div id="${rootContainerId}"></div>`
-  if (indexHTML.includes(container)) {
-    return indexHTML
-      .replace(
-        container,
-        () => `<div id="${rootContainerId}" data-server-rendered="true">${appHTML}</div>${stateScript}`,
-      )
-  }
-
-  const html5Parser = await import('html5parser')
-  const ast = html5Parser.parse(indexHTML)
-  let renderedOutput: string | undefined
-
-  html5Parser.walk(ast, {
-    enter: (node) => {
-      if (!renderedOutput
-        && node?.type === html5Parser.SyntaxKind.Tag
-        && Array.isArray(node.attributes)
-        && node.attributes.length > 0
-        && node.attributes.some(attr => attr.name.value === 'id' && attr.value?.value === rootContainerId)
-      ) {
-        const attributesStringified = [...node.attributes.map(({ name: { value: name }, value }) => `${name}="${value!.value}"`)].join(' ')
-        const indexHTMLBefore = indexHTML.slice(0, node.start)
-        const indexHTMLAfter = indexHTML.slice(node.end)
-        renderedOutput = `${indexHTMLBefore}<${node.name} ${attributesStringified} data-server-rendered="true">${appHTML}</${node.name}>${stateScript}${indexHTMLAfter}`
-      }
-    },
+  ssrHead: SSRHeadPayload
+  teleports?: Record<string, string>
+},
+) {
+  // const regex = new RegExp(`<\\w+(?:[-\\w])?\\s*id\\s*=\\s*("|')${rootContainerId}\\1`)
+  // if (!regex.test(indexHTML)) {
+  //   throw new Error(`Could not find a tag with id="${rootContainerId}" to replace it with server-side rendered HTML`)
+  // }
+  const teleportInjections: InjectOptions[] = Object.entries(teleports ?? {}).map(([sel, value]) => {
+    let match: any = {}
+    /** match id class and tag but only simple selectors */
+    const tagMatch = sel.match(/^[\w-]+/)
+    const idMatch = sel.match(/#([\w-]+)/)
+    const classMatch = sel.match(/\.([\w-]+)/)
+    if (tagMatch) {
+      match = { ...match, tag: tagMatch[0] }
+    }
+    if (idMatch) {
+      match = { ...match, attr: { id: idMatch[1] } }
+    }
+    if (classMatch) {
+      match = { ...match, attr: { class: new RegExp(`\b${classMatch[1]}\b`) } }
+    }
+    return { match, append: value }
   })
 
-  if (!renderedOutput)
-    throw new Error(`Could not find a tag with id="${rootContainerId}" to replace it with server-side rendered HTML`)
+  const stateScript = initialState ? `\n<script>window.__INITIAL_STATE__=${initialState}<\/script>\n` : ''
+  const injectOptions: InjectOptions[] = [
+    { match: { tag: 'html' }, attrs: ssrHead.htmlAttrs },
+    { match: { tag: 'head' }, prepend: ssrHead.headTags, removeChildren: [{ tag: 'title' }] },
+    ...teleportInjections,
+    { match: { tag: 'body' }, attrs: ssrHead.bodyAttrs, prepend: ssrHead.bodyTagsOpen, append: ssrHead.bodyTags },
+    {
+      match: {
+        attr: { id: rootContainerId },
+      },
+      throwException: true,
+      attrs: 'data-server-rendered="true"',
+      append: appHTML,
+      after: stateScript,
+    },
+  ]
 
-  return renderedOutput
+  try {
+    return injectInHtml(indexHTML, injectOptions)
+  }
+  catch (_e: any) {
+    throw new Error(`Could not find a tag with id="${rootContainerId}" to replace it with server-side rendered HTML ${_e.toString()}`)
+  }
 }
 
-async function formatHtml(html: string, formatting: ViteSSGOptions['formatting']) {
+async function formatHtml(html: string, formatting: ViteSSGOptions['formatting'], opts: MinifyOptions = {}) {
   if (formatting === 'minify') {
     const htmlMinifier = await import('html-minifier-terser')
     return await htmlMinifier.minify(html, {
@@ -320,6 +579,7 @@ async function formatHtml(html: string, formatting: ViteSSGOptions['formatting']
       collapseInlineTagWhitespace: false,
       minifyJS: true,
       minifyCSS: true,
+      ...opts,
     })
   }
   else if (formatting === 'prettify') {
