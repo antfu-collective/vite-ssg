@@ -1,37 +1,34 @@
 /* eslint-disable no-console */
+
 import type { SSRHeadPayload } from '@unhead/ssr'
+
 import type { InlineConfig, ResolvedConfig } from 'vite'
 import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
 import type { RouteRecordRaw } from 'vue-router'
 import type { SSRContext } from 'vue/server-renderer'
 import type { ViteSSGContext, ViteSSGOptions } from '../types'
 import type { InjectOptions } from './injection'
-import { createRequire } from 'node:module'
-import { dirname, isAbsolute, join, parse } from 'node:path'
-import process from 'node:process'
 import { renderSSRHead } from '@unhead/ssr'
-// import { renderDOMHead } from '@unhead/dom'
-import fs from 'fs-extra'
-// import { JSDOM } from 'jsdom'
-import { blue, cyan, dim, gray, green, red, yellow } from 'kolorist'
-import PQueue from 'p-queue'
-
-import { mergeConfig, resolveConfig, build as viteBuild } from 'vite'
-import { serializeState } from '../utils/state'
-// import { getBeastiesOrCritters } from './critical'
 import { injectInHtml } from './injection'
 import { buildPreloadLinks } from './preload-links'
-import { buildLog, getSize, routesToPaths } from './utils'
-import type { Options } from 'html-minifier-terser'
-import Critters from 'critters'
+import type { Options as MinifyOptions } from 'html-minifier-terser'
 import Beasties from 'beasties'
-// import { Worker } from 'node:worker_threads'
 import { BuildWorkerProxy } from './build.worker.proxy'
 import { WorkerDataEntry } from './build.worker'
+import { existsSync } from 'node:fs'
+import fs from 'node:fs/promises'
+import { dirname, isAbsolute, join, parse, resolve } from 'node:path'
+import process from 'node:process'
+import { pathToFileURL } from 'node:url'
+import { blue, cyan, dim, gray, green, red, yellow } from 'ansis'
+import PQueue from 'p-queue'
+import { mergeConfig, resolveConfig, build as viteBuild } from 'vite'
+import { serializeState } from '../utils/state'
+import { buildLog, getSize, routesToPaths } from './utils'
 
 export type Manifest = Record<string, string[]>
 
-export type CreateAppFactory = (client: boolean, routePath?: string) => Promise<ViteSSGContext<true> | ViteSSGContext<false>>
+export type CreateAppFactory = (routePath?: string) => Promise<ViteSSGContext<true> | ViteSSGContext<false>>
 
 function DefaultIncludedRoutes(paths: string[], _routes: Readonly<RouteRecordRaw[]>) {
   // ignore dynamic routes
@@ -44,7 +41,7 @@ function getRoot(config: ResolvedConfig) {
 }
 
 export async function buildClient(config: ResolvedConfig, viteConfig: InlineConfig): Promise<void> {
-  const root = getRoot(config)
+  const root = getRoot(config)  
   buildLog('Build for client...')
   const { base } = config
   await viteBuild(mergeConfig(viteConfig, {
@@ -53,7 +50,7 @@ export async function buildClient(config: ResolvedConfig, viteConfig: InlineConf
       ssrManifest: true,
       rollupOptions: {
         input: {
-          app: join(root, './index.html'),
+          app: resolve(root, './index.html'),
         },
       },
     },
@@ -61,7 +58,7 @@ export async function buildClient(config: ResolvedConfig, viteConfig: InlineConf
   }))
 }
 
-export async function buildServer(config: ResolvedConfig, viteConfig: InlineConfig, { ssrEntry, ssgOut, format, mock }: { ssrEntry: string, ssgOut: string, format: ViteSSGOptions['format'], mock: boolean }): Promise<void> {
+export async function buildServer(config: ResolvedConfig, viteConfig: InlineConfig, { ssrEntry, ssgOut, mock }: { ssrEntry: string, ssgOut: string, mock: boolean }): Promise<void> {
   buildLog('Build for server...')
   process.env.VITE_SSG = 'true'
   const { base } = config
@@ -81,23 +78,21 @@ export async function buildServer(config: ResolvedConfig, viteConfig: InlineConf
       minify: false,
       cssCodeSplit: false,
       rollupOptions: {
-        output: format === 'esm'
-          ? {
-              entryFileNames: '[name].mjs',
-              format: 'esm',
-            }
-          : {
-              entryFileNames: '[name].cjs',
-              format: 'cjs',
-            },
+        output: {
+          entryFileNames: '[name].mjs',
+          format: 'esm',
+        },
       },
     },
     mode: config.mode,
+    ssr: {
+      noExternal: ['vite-ssg'],
+    },
   }))
 }
 
-function createProxy(options:WorkerDataEntry & {format:string}):BuildWorkerProxy {
-  const workerExt =  options.format === 'esm' ? '.mjs' : '.cjs'
+function createProxy(options:WorkerDataEntry ):BuildWorkerProxy {
+  const workerExt = '.mjs'
   const workerProxy = new BuildWorkerProxy(new URL(`./build.worker${workerExt}`, import.meta.url), {
     env: process.env,
     workerData: options,
@@ -137,8 +132,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
     numberOfWorkers:_numberOfWorkers = 5,
     onFinished,
     dirStyle = 'flat',
-    includeAllRoutes = false,
-    format = 'esm',
+    includeAllRoutes = false,    
     concurrency = 20,
     rootContainerId = 'app',
   }: ViteSSGOptions = Object.assign({}, config.ssgOptions || {}, ssgOptions)
@@ -146,8 +140,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
   const ssgOut = isAbsolute(_ssgOutDir) ? _ssgOutDir : join(root, _ssgOutDir)  
   
   
-  const createProxyOptions:Omit<Parameters<typeof createProxy>[0], 'workerId'> = {
-    format,
+  const createProxyOptions:Omit<Parameters<typeof createProxy>[0], 'workerId'> = {    
     out,
     dirStyle,    
     viteConfig: {
@@ -158,10 +151,10 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
 
 
   let willRunBuild: boolean = true
-  if (fs.existsSync(ssgOut)) {
+  if (existsSync(ssgOut)) {
     willRunBuild = !ssgOptions['skip-build']
-    if (willRunBuild) {
-      await fs.remove(ssgOut)
+    if (willRunBuild) {      
+      await fs.rm(ssgOut, { recursive: true })
     }
   }
 
@@ -186,13 +179,19 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
       ...createProxyOptions,
       workerId: 'server',
     })
-    const cpBuildServer = execInWorker(serverWorker, buildServer, config, viteConfig, { ssrEntry, ssgOut, format, mock }).finally(() => serverWorker.terminate())
+    const cpBuildServer = execInWorker(serverWorker, buildServer, config, viteConfig, { ssrEntry, ssgOut, mock }).finally(() => serverWorker.terminate())
     buildPromises.push(cpBuildServer)
   }
   await Promise.all(buildPromises)
 
-  const prefix = (format === 'esm' && process.platform === 'win32') ? 'file://' : ''
-  const ext = format === 'esm' ? '.mjs' : '.cjs'
+  const serverEntry = pathToFileURL(resolve(ssgOut, `${parse(ssrEntry).name}.mjs`)).href
+  const {
+    createApp,
+    includedRoutes: serverEntryIncludedRoutes,
+  }: {
+    createApp: CreateAppFactory
+    includedRoutes: ViteSSGOptions['includedRoutes']
+  } = await import(serverEntry)
 
 
   /** initialize workers */
@@ -229,21 +228,11 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
     return worker
   }
   /** end of workers initialization */
+  
 
 
-  /**
-   * `join('file://')` will be equal to `'file:\'`, which is not the correct file protocol and will fail to be parsed under bun.
-   * It is changed to '+' splicing here.
-   */
-  const serverEntry = prefix + join(ssgOut, parse(ssrEntry).name + ext).replace(/\\/g, '/')
-
-  const _require = createRequire(import.meta.url)
-
-  const { createApp, includedRoutes: serverEntryIncludedRoutes }: { createApp: CreateAppFactory, includedRoutes: ViteSSGOptions['includedRoutes'] } = format === 'esm'
-    ? await import(serverEntry)
-    : _require(serverEntry)
   const includedRoutes = serverEntryIncludedRoutes || configIncludedRoutes
-  const { routes } = await createApp(false)
+  const { routes } = await createApp()
 
   let routesPaths = includeAllRoutes
     ? routesToPaths(routes)
@@ -254,21 +243,16 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
 
   buildLog('Rendering Pages...', routesPaths.length)
 
-  // const beasties = beastiesOptions !== false
-  //   ? await getBeastiesOrCritters(outDir, beastiesOptions)
-  //   : undefined
-  // if (beasties)
-  //   console.log(`${gray('[vite-ssg]')} ${blue('Critical CSS generation enabled via `beasties`')}`)
 
   const {
     path: _ssrManifestPath,
     content: ssrManifestRaw,
   } = await readFiles(
-    join(out, '.vite', 'ssr-manifest.json'), // Vite 5
-    join(out, 'ssr-manifest.json'), // Vite 4 and below
+    resolve(out, '.vite', 'ssr-manifest.json'), // Vite 5
+    resolve(out, 'ssr-manifest.json'), // Vite 4 and below
   )
-  const ssrManifest: Manifest = JSON.parse(ssrManifestRaw as string)
-  let indexHTML = Buffer.from(await fs.readFile(join(out, 'index.html'), 'utf-8')).toString()
+  const ssrManifest: Manifest = JSON.parse(ssrManifestRaw)
+  let indexHTML = await fs.readFile(resolve(out, 'index.html'), 'utf-8')
   indexHTML = rewriteScripts(indexHTML, script)
   const IS_PROD = nodeEnv === 'production'  
   indexHTML = await formatHtml(indexHTML, IS_PROD ? 'minify' : formatting, minifyOptions)
@@ -318,7 +302,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
   terminateWorkers();
 
   if (!ssgOptions['skip-build']) {
-    await fs.remove(ssgOut)
+    await fs.rm(ssgOut, { recursive: true })
   }
 
   // when `vite-plugin-pwa` is presented, use it to regenerate SW after rendering
@@ -350,8 +334,8 @@ export interface ExecuteInWorkerOptions {
   indexHTML: string    
   rootContainerId: string
   formatting: ViteSSGOptions['formatting']
-  beastiesOptions: ViteSSGOptions['beastiesOptions'] | ViteSSGOptions['crittersOptions'] | false
-  minifyOptions: Options  
+  beastiesOptions: ViteSSGOptions['beastiesOptions'] | false
+  minifyOptions: MinifyOptions  
   // out: string
   // dirStyle: ViteSSGOptions['dirStyle']   
 }
@@ -359,15 +343,6 @@ export interface ExecuteInWorkerOptions {
 
 function executeTaskInWorker(worker: BuildWorkerProxy, opts: ExecuteInWorkerOptions) {
  return execInWorker(worker, executeTaskFn, opts)
-  // opts = Object.entries(opts).reduce((acc:ExecuteInWorkerOptions, [key, value]) => {
-  //   if(typeof value === 'function') return acc;
-  //   const newKey:keyof ExecuteInWorkerOptions = key as keyof ExecuteInWorkerOptions;
-  //   //@ts-ignore
-  //   acc[newKey] = value;
-  //   return acc;
-  // },{} as ExecuteInWorkerOptions)
-  
-  // return worker.send('executeTaskFn', [opts])
 }
 
 
@@ -385,7 +360,7 @@ export interface CreateTaskFnOptions extends Omit<ExecuteInWorkerOptions, 'beast
   // onDonePageRender?: ViteSSGOptions['onDonePageRender']
   onBeforePageRender?: ViteSSGOptions['onBeforePageRender']
   onPageRendered?: ViteSSGOptions['onPageRendered']  
-  beasties: Critters | Beasties | undefined
+  beasties: Beasties | undefined
   config: {logger: {info: (msg: string) => void}}
 }
 
@@ -408,7 +383,7 @@ export async function executeTaskFn(opts: CreateTaskFnOptions) {
     config
   } = opts
   try {
-    const appCtx = await createApp(false, route) as ViteSSGContext<true>
+    const appCtx = await createApp(route) as ViteSSGContext<true>
     const { app, router, head, initialState, triggerOnSSRAppRendered, transformState = serializeState } = appCtx
 
     if (router) {
@@ -467,13 +442,12 @@ export async function executeTaskFn(opts: CreateTaskFnOptions) {
       ? join(route.replace(/^\//g, ''), 'index.html')
       : relativeRouteFile
 
-    await fs.ensureDir(join(out, dirname(filename)))
+    await fs.mkdir(join(out, dirname(filename)), { recursive: true })
     return fs.writeFile(join(out, filename), formatted, 'utf-8').then(() => {
       const outDir = out.replace(process.cwd(), '').replace(/^\//,'')
       config.logger.info(
         `${dim(`${outDir}/`)}${cyan(filename.padEnd(15, ' '))}  ${dim(getSize(formatted))}`,
-      )
-      // onDonePageRender?.(route, html, appCtx)
+      )      
       return { route, html }
     })
 
@@ -506,15 +480,6 @@ export function plainify(m: any):any {
   return m
 }
 
-// async function createJSDOM(renderedHTML: string) {
-//   const jsdom = new JSDOM(renderedHTML, { runScripts: 'dangerously' })
-//   async function dispose() {
-//     const { window } = jsdom
-//     window.close()
-//     await new Promise(res => setImmediate(res))
-//   };
-//   return { jsdom, dispose }
-// }
 
 async function detectEntry(root: string) {
   // pick the first script tag of type module as the entry
@@ -533,7 +498,7 @@ async function detectEntry(root: string) {
 async function resolveAlias(config: ResolvedConfig, entry: string) {
   const resolver = config.createResolver()
   const result = await resolver(entry, config.root)
-  return result || join(config.root, entry)
+  return result || resolve(config.root, entry)
 }
 
 function rewriteScripts(indexHTML: string, mode?: string) {
@@ -605,7 +570,7 @@ async function renderHTML({
   }
 }
 
-async function formatHtml(html: string, formatting: ViteSSGOptions['formatting'], opts: Options = {}) {
+async function formatHtml(html: string, formatting: ViteSSGOptions['formatting'], opts: MinifyOptions = {}) {
   if (formatting === 'minify') {
     const htmlMinifier = await import('html-minifier-terser')
     return await htmlMinifier.minify(html, {
@@ -626,7 +591,7 @@ async function formatHtml(html: string, formatting: ViteSSGOptions['formatting']
 
 async function readFiles(...paths: string[]) {
   for (const path of paths) {
-    if (fs.existsSync(path)) {
+    if (existsSync(path)) {
       return {
         path,
         content: await fs.readFile(path, 'utf-8'),

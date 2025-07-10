@@ -4,13 +4,13 @@ import { createRequire } from "node:module";
 import { parentPort, workerData } from "node:worker_threads";
 import { buildClient, buildServer, CreateAppFactory, CreateTaskFnOptions, ExecuteInWorkerOptions, Manifest, plainify } from "./build";
 import { ViteSSGOptions } from "../types";
-import { getBeastiesOrCritters } from "./critical";
-import { blue, gray, red } from "kolorist";
+import { getBeasties } from "./critical";
+import { blue, gray, red } from "ansis";
 // import type { Options as BeastiesOptions } from "beasties";
 import { executeTaskFn } from "./build";
 import { resolveConfig } from "vite";
 // import type { Options as MinifyOptions } from 'html-minifier-terser'
-import Critters from "critters";
+
 import Beasties from "beasties";
 
 
@@ -19,8 +19,7 @@ import Beasties from "beasties";
 
 
 export interface WorkerDataEntry {  
-  workerId: number|string,  
-  format: 'esm' | 'cjs',
+  workerId: number|string,
   out: string,
   dirStyle: ViteSSGOptions['dirStyle'],  
   mode?: string,  
@@ -62,7 +61,7 @@ export interface WorkerDataEntry {
   Object.assign(process.stdout, proccessInjections)
   Object.assign(process.stderr, proccessInjections)
 
-  const { format, out, dirStyle, viteConfig, mode, ...extraOpts} = (workerData as WorkerDataEntry)
+  const { out, dirStyle, viteConfig, mode, ...extraOpts} = (workerData as WorkerDataEntry)
   const nodeEnv = process.env.NODE_ENV || 'production'  
   const config = await resolveConfig(viteConfig, 'build', mode, nodeEnv)
   const {
@@ -71,7 +70,7 @@ export interface WorkerDataEntry {
     // onDonePageRender,
   } = config.ssgOptions || {}
 
-  let beasties:Critters | Beasties | undefined = undefined
+  let beasties: Beasties | undefined = undefined
 
   const { renderToString }: typeof import('vue/server-renderer') = await import('vue/server-renderer')  
   const outDir = out.replace(process.cwd(), '').replace(/^\//g, '')
@@ -79,7 +78,7 @@ export interface WorkerDataEntry {
   
 
   let createAppPromise:Promise<CreateAppFactory>|undefined = undefined 
-  let beastiesPromise:Promise<Critters | Beasties | undefined>|undefined = undefined;
+  let beastiesPromise:Promise< Beasties | undefined>|undefined = undefined;
   
   const execMap:{
     executeTaskFn: (opts: ExecuteInWorkerOptions) => ReturnType<typeof executeTaskFn>,
@@ -88,10 +87,10 @@ export interface WorkerDataEntry {
   } = {
     executeTaskFn: async (opts: ExecuteInWorkerOptions) => {      
       const { serverEntry } = opts  
-      createAppPromise ??= Promise.resolve(format === "esm" ?  import(serverEntry) : _require(serverEntry)).then(({createApp}:{createApp:CreateAppFactory}) => createApp)
+      createAppPromise ??= Promise.resolve(import(serverEntry)).then(({createApp}:{createApp:CreateAppFactory}) => createApp)
       const createApp = await createAppPromise      
       const beastiesOptions = opts.beastiesOptions;
-      beastiesPromise ??= Promise.resolve(beastiesOptions !== false ? getBeastiesOrCritters(outDir, beastiesOptions) : void 0).then(beasties => {
+      beastiesPromise ??= Promise.resolve(beastiesOptions !== false ? getBeasties(outDir, beastiesOptions) : void 0).then(beasties => {
         if (!beasties) return;
         console.log(`${gray("[vite-ssg]")} ${blue("Critical CSS generation enabled via `beasties`")}`);        
         return beasties

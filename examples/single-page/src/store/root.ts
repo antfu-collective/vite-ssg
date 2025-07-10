@@ -4,8 +4,7 @@ interface RootState {
   user: Record<string, any> | null
 }
 
-export const useRootStore = defineStore({
-  id: 'root',
+export const useRootStore = defineStore('root', {
   state: (): RootState => ({
     user: null,
   }),

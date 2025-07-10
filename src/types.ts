@@ -1,9 +1,8 @@
-import type { MergeHead, VueHeadClient } from '@unhead/vue'
+import type { VueHeadClient } from '@unhead/vue'
 import type { Options as BeastiesOptions } from 'beasties'
-import type { Options as CrittersOptions } from 'critters'
 import type { App } from 'vue'
 import type { Router, RouteRecordRaw, RouterOptions as VueRouterOptions } from 'vue-router'
-import type { Options } from 'html-minifier-terser'
+import type { Options  as MinifyOptions} from 'html-minifier-terser'
 
 export interface ViteSSGOptions {
   /**
@@ -12,21 +11,6 @@ export interface ViteSSGOptions {
    * @default 'sync'
    */
   script?: 'sync' | 'async' | 'defer' | 'async defer'
-
-  /**
-   * Build format.
-   *
-   * @default 'esm'
-   */
-  format?: 'esm' | 'cjs'
-
-  /**
-   * output directory of SSG server files
-   */
-  ssgOut?: string
-
-  
-  
 
   /**
    * The path of the main entry file (relative to the project root).
@@ -50,7 +34,7 @@ export interface ViteSSGOptions {
   formatting?: 'minify' | 'prettify' | 'none'
 
   /**Terser options */
-  minifyOptions?: Options
+  minifyOptions?: MinifyOptions
 
   /**
    * Vite environment mode.
@@ -82,19 +66,12 @@ export interface ViteSSGOptions {
   includeAllRoutes?: boolean
 
   /**
-   * Options for the critters package.
-   *
-   * @deprecated Use `beastiesOptions` instead.
-   * @see https://github.com/GoogleChromeLabs/critters
-   */
-  crittersOptions?: CrittersOptions | false
-
-  /**
    * Options for the beasties package.
    *
    * @see https://github.com/danielroe/beasties
    */
   beastiesOptions?: BeastiesOptions | false
+  
 
   /**
    * Custom function to modify the routes to do the SSG.
@@ -146,6 +123,11 @@ export interface ViteSSGOptions {
   numberOfWorkers?: number
 
   /**
+   * output directory of SSG server files
+   */
+  ssgOut?: string
+
+  /**
    * The application's root container `id`.
    *
    * @default `app`
@@ -167,7 +149,13 @@ export interface ViteSSGContext<HasRouter extends boolean = true> {
   router: HasRouter extends true ? Router : undefined
   routes: HasRouter extends true ? Readonly<RouteRecordRaw[]> : undefined
   initialState: Record<string, any>
-  head: VueHeadClient<MergeHead> | undefined
+  head: VueHeadClient | undefined
+  /**
+   * Use `!import.meta.env.SSR` instead.
+   *
+   * @see https://github.com/antfu-collective/vite-ssg?tab=readme-ov-file#how-to-allow-rollup-tree-shake-your-client-code
+   * @deprecated
+   */
   isClient: boolean
   onSSRAppRendered: (cb: () => void) => void
   triggerOnSSRAppRendered: (route: string, appHTML: string, appCtx: ViteSSGContext) => Promise<unknown[]>
@@ -188,6 +176,12 @@ export interface ViteSSGClientOptions {
    * @default `#app`
    */
   rootContainer?: string | Element
+  /**
+   * Enable Vue hydration on client side
+   *
+   * @default false
+   */
+  hydration?: boolean
 }
 
 export type RouterOptions = PartialKeys<VueRouterOptions, 'history'> & { base?: string }

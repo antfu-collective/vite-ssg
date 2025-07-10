@@ -2,8 +2,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "cross-env DEBUG=vite-ssg:* vite",
-    "build": "cross-env DEBUG=vite-ssg:* vite-ssg build --base /ssg-base/ --mode ssg",
+    "dev": "DEBUG='vite-ssg:*' vite",
+    "build": "DEBUG='vite-ssg:*' vite-ssg build --base /ssg-base/ --mode ssg",
     "serve": "vite preview --base /ssg-base/"
   },
   "dependencies": {
@@ -12,13 +12,12 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "catalog:",
-    "cross-env": "catalog:",
     "typescript": "catalog:",
     "unplugin-vue-components": "catalog:",
     "unplugin-vue-markdown": "catalog:",
     "vite": "catalog:",
     "vite-plugin-pages": "catalog:",
-    "vite-ssg-optimized": "workspace:*",
+    "vite-ssg": "workspace:*",
     "vue-router": "catalog:"
   }
 }

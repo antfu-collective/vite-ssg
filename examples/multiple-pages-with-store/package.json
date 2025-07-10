@@ -2,8 +2,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "cross-env DEBUG=vite-ssg:* vite",
-    "build": "cross-env DEBUG=vite-ssg:* vite-ssg build",
+    "dev": "DEBUG='vite-ssg:*' vite",
+    "build": "DEBUG='vite-ssg:*' vite-ssg build",
+    "build:nested": "NESTED_PAGES=true DEBUG='vite-ssg:*' vite-ssg build",
     "serve": "vite preview"
   },
   "dependencies": {
@@ -14,13 +15,12 @@
   "devDependencies": {
     "@nuxt/devalue": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
-    "cross-env": "catalog:",
     "typescript": "catalog:",
     "unplugin-vue-components": "catalog:",
     "unplugin-vue-markdown": "catalog:",
     "vite": "catalog:",
     "vite-plugin-pages": "catalog:",
-    "vite-ssg-optimized": "workspace:*",
+    "vite-ssg": "workspace:*",
     "vue-router": "catalog:"
   }
 }

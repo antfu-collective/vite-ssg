@@ -1,7 +1,8 @@
 {
   "name": "vite-ssg-optimized",
-  "version": "0.24.2-optimized.33",
-  "packageManager": "pnpm@9.14.4",
+  "type": "module",
+  "version": "0.28.0-optimized.0",
+  "packageManager": "pnpm@10.12.4",
   "description": "Server-side generation for Vite",
   "author": "Anthony Fu <anthonyfu117@hotmail.com>",
   "license": "MIT",
@@ -20,36 +21,24 @@
   ],
   "sideEffects": false,
   "exports": {
-    ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
-    },
-    "./node": {
-      "import": "./dist/node.mjs",
-      "require": "./dist/node.cjs"
-    },
-    "./single-page": {
-      "import": "./dist/client/single-page.mjs",
-      "require": "./dist/client/single-page.cjs"
-    },
-    "./node/build.worker": {
-      "import": "./dist/shared/build.worker.mjs",
-      "require": "./dist/shared/build.worker.cjs"
-    }
+    ".": "./dist/index.mjs",
+    "./node": "./dist/node.mjs",
+    "./node/build.worker": "./dist/shared/build.worker.mjs",
+    "./single-page": "./dist/client/single-page.mjs"
   },
-  "main": "dist/index.cjs",
+  "main": "dist/index.mjs",
   "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
+  "types": "dist/index.d.mts",
   "typesVersions": {
     "*": {
-      "single-page": [
-        "dist/client/single-page.d.ts"
-      ],
       "node": [
-        "dist/node.d.ts"
+        "dist/node.d.mts"
       ],
       "shared/build.worker": [
         "dist/shared/build.worker.d.ts"
+      ],
+      "single-page": [
+        "dist/client/single-page.d.mts"
       ]
     }
   },
@@ -62,12 +51,12 @@
     "dist"
   ],
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=20.0.0"
   },
   "scripts": {
     "dev": "unbuild",
     "lint": "eslint .",
-    "copy-readme-files": "esno scripts/copy-readme-files.ts",
+    "copy-readme-files": "tsx scripts/copy-readme-files.ts",
     "example:dev": "npm run copy-readme-files && npm -C examples/multiple-pages run dev",
     "example:build": "npm run copy-readme-files && npm -C examples/multiple-pages run build",
     "example:serve": "npm run copy-readme-files && npm -C examples/multiple-pages run serve",
@@ -80,17 +69,16 @@
     "example:single:dev": "npm -C examples/single-page run dev",
     "example:single:build": "npm -C examples/single-page run build",
     "example:single:serve": "npm -C examples/single-page run serve",
-    "test": "pnpm -r --filter=./examples/* build && vitest run",
+    "test": "pnpm -r --filter=\"./examples/*\" build && pnpm -C examples/multiple-pages-with-store run build:nested && vitest run",
     "build": "unbuild",
     "prepublishOnly": "npm run build",
     "typecheck": "vue-tsc --noEmit",
     "release": "bumpp && pnpm publish"
-    
   },
   "peerDependencies": {
-    "beasties": "^0.1.0",
-    "critters": "^0.0.24",
-    "vite": "^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0-0 || ^6.0.0",
+    "beasties": "^0.2.0",
+    "prettier": "^3.3.0",
+    "vite": "^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0-0 || ^6.0.0 || ^7.0.0-0",
     "vue": "^3.2.10",
     "vue-router": "^4.0.1"
   },
@@ -98,39 +86,34 @@
     "beasties": {
       "optional": true
     },
-    "critters": {
+    "prettier": {
       "optional": true
     },
     "vue-router": {
       "optional": true
     }
   },
-  "dependencies": {    
+  "dependencies": {
     "@unhead/ssr": "catalog:",
     "@unhead/vue": "catalog:",
-    "fs-extra": "catalog:",
+    "ansis": "catalog:",
+    "cac": "catalog:",
     "html-minifier-terser": "catalog:",
     "html5parser": "catalog:",
-    "jsdom": "catalog:",
-    "kolorist": "catalog:",
-    "prettier": "catalog:",
-    "yargs": "catalog:"
+    "jsdom": "catalog:"
   },
   "devDependencies": {
     "@antfu/eslint-config": "catalog:",
-    "@types/fs-extra": "catalog:",
     "@types/html-minifier-terser": "catalog:",
     "@types/jsdom": "catalog:",
-    "@types/yargs": "catalog:",
     "beasties": "catalog:",
     "bumpp": "catalog:",
-    "critters": "catalog:",
     "eslint": "catalog:",
-    "esno": "catalog:",
-    "fast-glob": "catalog:",
     "p-queue": "catalog:",
+    "prettier": "catalog:",
     "rollup": "catalog:",
-    "tsup": "catalog:",
+    "tinyglobby": "catalog:",
+    "tsx": "catalog:",
     "typescript": "catalog:",
     "unbuild": "catalog:",
     "vite": "catalog:",
@@ -141,6 +124,6 @@
     "vue-tsc": "catalog:"
   },
   "resolutions": {
-    "vite": "^6.0.2"
+    "vite": "catalog:"
   }
 }

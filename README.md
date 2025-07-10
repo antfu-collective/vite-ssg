@@ -4,6 +4,8 @@ Static-site generation for Vue 3 on Vite.
 
 [![NPM version](https://img.shields.io/npm/v/vite-ssg?color=a1b858)](https://www.npmjs.com/package/vite-ssg)
 
+> ℹ️ **ESM-only from `v27.0.0` (CJS generation format also dropped).**
+>
 > ℹ️ **Vite 2 is supported from `v0.2.x`, Vite 1's support is discontinued.**
 
 > ℹ️  This is a fork from vite-ssg
@@ -77,6 +79,17 @@ export const createApp = ViteSSG(
 )
 ```
 
+### How to allow Rollup tree-shake your client code
+
+In order to allow Rollup tree-shake your client code at build time, you need to wrap your code using `import.meta.env.SSR`, that's, checking if the build is for the server: Rollup will remove the server code from the client build.
+```ts
+if (import.meta.env.SSR) {
+  // your server code will be removed in the client build
+}
+else {
+  // your client code will be removed in the server build
+}
+```
 ### Single Page SSG
 
 For SSG of an index page only (i.e. without `vue-router`); import `vite-ssg/single-page` instead, and only install `@unhead/vue` (`npm i -D vite-ssg @unhead/vue`).
@@ -105,7 +118,7 @@ The `ClientOnly` component is registered globally when the app is created.
 
 ## Document head
 
-We ship [`@unhead/vue`](https://unhead.harlanzw.com/integrations/vue/setup) to manage the document-head out of the box. You can use it directly in your pages/components.
+We ship [`@unhead/vue v2`](https://unhead.unjs.io/docs/vue/head/guides/get-started/overview) to manage the document-head out of the box. You can use it directly in your pages/components.
 For example:
 
 ```html
@@ -130,7 +143,7 @@ useHead({
 
 That's all! No configuration is needed. Vite SSG will automatically handle the server-side rendering and merging.
 
-See [`@unhead/vue`'s docs](https://unhead.unjs.io/setup/vue/installation) for more usage information about `useHead`.
+See [`@unhead/vue v2`'s docs](https://unhead.unjs.io/docs/vue/head/api/composables/use-head) for more usage information about `useHead`.
 
 ## Critical CSS
 
@@ -338,13 +351,13 @@ const { app, router, initialState, isClient, onSSRAppRendered } = ctx
 const pinia = createPinia()
 app.use(pinia)
 
-if (isClient) {
-  pinia.state.value = (initialState.pinia) || {}
-}
-else {
+if (import.meta.env.SSR) {
   onSSRAppRendered(() => {
     initialState.pinia = pinia.state.value
   })
+}
+else {
+  pinia.state.value = (initialState.pinia) || {}
 }
 ```
 

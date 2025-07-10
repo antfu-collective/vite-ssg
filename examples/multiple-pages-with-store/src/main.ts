@@ -1,6 +1,6 @@
 import devalue from '@nuxt/devalue'
 import { createPinia } from 'pinia'
-import { ViteSSG } from 'vite-ssg-optimized'
+import { ViteSSG } from 'vite-ssg'
 import routes from '~pages'
 import App from './App.vue'
 import { useRootStore } from './store/root'

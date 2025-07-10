@@ -1,9 +1,12 @@
-import type { MergeHead, VueHeadClient } from '@unhead/vue'
+import type { VueHeadClient } from '@unhead/vue'
 import type { Component } from 'vue'
-import { createHead } from '@unhead/vue'
+import type { RouterOptions, ViteSSGClientOptions, ViteSSGContext } from '../types'
+import { createHead } from '@unhead/vue/client'
+import { createHead as createSSRHead } from '@unhead/vue/server'
 import { createApp as createClientApp, createSSRApp } from 'vue'
 import { createMemoryHistory, createRouter, createWebHistory } from 'vue-router'
-import type { RouterOptions, ViteSSGClientOptions, ViteSSGContext } from '../types'
+
+
 import { documentReady } from '../utils/document-ready'
 import { deserializeState } from '../utils/state'
 import { ClientOnly } from './components/ClientOnly'
@@ -14,33 +17,32 @@ export function ViteSSG(
   App: Component,
   routerOptions: RouterOptions,
   fn?: (context: ViteSSGContext<true>) => Promise<void> | void,
-  options: ViteSSGClientOptions = {},
+  options?: ViteSSGClientOptions,
 ) {
   const {
     transformState,
     registerComponents = true,
     useHead = true,
     rootContainer = '#app',
-  } = options
-  const isClient = typeof window !== 'undefined'
+  } = options ?? {}
 
-  async function createApp(client = false, routePath?: string) {
-    const isHydrationMode = isClient && document.querySelectorAll('[data-server-rendered]').length > 0
-    const app = client && !isHydrationMode
+
+  async function createApp(routePath?: string) {
+    const isClient = !import.meta.env.SSR
+    const isHydrationMode = options?.hydration || (isClient && document.querySelectorAll('[data-server-rendered]').length > 0)
+    const app = import.meta.env.SSR || isHydrationMode
       ? createClientApp(App)
       : createSSRApp(App)
 
-    let head: VueHeadClient<MergeHead> | undefined
-
-    if (useHead) {      
-      head = createHead()
-      app.use(head)
+    let head: VueHeadClient | undefined
+    if (useHead) {
+      app.use(head = import.meta.env.SSR ? createSSRHead() : createHead())
     }
 
     const router = createRouter({
-      history: client
-        ? createWebHistory(routerOptions.base)
-        : createMemoryHistory(routerOptions.base),
+      history: import.meta.env.SSR
+        ? createMemoryHistory(routerOptions.base)
+        : createWebHistory(routerOptions.base),
       ...routerOptions,
     })
 
@@ -50,16 +52,16 @@ export function ViteSSG(
       app.component('ClientOnly', ClientOnly)
 
     const appRenderCallbacks: (() => void)[] = []
-    const onSSRAppRendered = client
-      ? () => {}
-      : (cb: () => void) => appRenderCallbacks.push(cb)
+    const onSSRAppRendered = import.meta.env.SSR
+      ? (cb: () => void) => appRenderCallbacks.push(cb)
+      : () => {}
     const triggerOnSSRAppRendered = () => {
       return Promise.all(appRenderCallbacks.map(cb => cb()))
     }
     const context: ViteSSGContext<true> = {
       app,
       head,
-      isClient,
+      isClient: !import.meta.env.SSR,
       router,
       routes,
       onSSRAppRendered,
@@ -69,7 +71,7 @@ export function ViteSSG(
       routePath,
     }
 
-    if (client) {
+    if (!import.meta.env.SSR) {
       await documentReady()
       // @ts-expect-error global variable
       context.initialState = transformState?.(window.__INITIAL_STATE__ || {}) || deserializeState(window.__INITIAL_STATE__)
@@ -92,7 +94,7 @@ export function ViteSSG(
       next()
     })
 
-    if (!client) {
+    if (import.meta.env.SSR) {
       const route = context.routePath ?? '/'
       router.push(route)
 
@@ -108,9 +110,9 @@ export function ViteSSG(
     } as ViteSSGContext<true>
   }
 
-  if (isClient) {
+  if (!import.meta.env.SSR) {
     (async () => {
-      const { app, router } = await createApp(true)
+      const { app, router } = await createApp()
       // wait until page component is fetched before mounting
       await router.isReady()
       app.mount(rootContainer, true)

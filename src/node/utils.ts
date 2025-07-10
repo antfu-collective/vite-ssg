@@ -1,5 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router'
-import { blue, gray, yellow } from 'kolorist'
+import { blue, gray, yellow } from 'ansis'
 
 export function buildLog(text: string, count?: number) {
   // eslint-disable-next-line no-console

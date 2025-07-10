@@ -9,14 +9,13 @@ export default defineBuildConfig({
     { input: 'src/node/build.worker', name: 'shared/build.worker' },
   ],
   clean: true,
-  declaration: true,
+  declaration: 'node16',
   externals: [
     'vue',
     'vue/server-renderer',
     'vue/compiler-sfc',
   ],
   rollup: {
-    emitCJS: true,
     inlineDependencies: true,
   },
 })

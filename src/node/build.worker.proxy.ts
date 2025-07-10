@@ -1,7 +1,7 @@
 import { Worker } from "node:worker_threads"
 
 import { WorkerDataEntry } from "./build.worker"
-import { reset } from "kolorist"
+import { reset } from "ansis"
 
 type WorKerConstructorArgs = ConstructorParameters<typeof Worker>
 type WorkerPath = WorKerConstructorArgs[0]
