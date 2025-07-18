@@ -113,6 +113,28 @@ export interface ViteSSGOptions {
    * @default 20
    */
   concurrency?: number
+
+  /**
+   * Given a route name, `vite-ssg` will use the route name to generate the HTML file,
+   * this function will allow you to change that HTML filename.
+   *
+   * For example, using `unplugin-vue-router/vite` plugin on Windows, the `catch all` (`[...all].vue`)
+   * page will throw an error since the file (`:all(.*).html`) is not a valid file name on Windows
+   * filesystem. Old `vite-plugin-pages` plugin allows us to change the route styles to Nuxt, but this
+   * feature is still missing at `unplugin-vue-router/vite`.
+   *
+   * Beware that this function is called for every route; you can return `undefined` to keep the
+   * default behavior for unchanged routes.
+   *
+   * Beware also that you will need to handle the new file in your backend server, as the file name
+   * will not match the route name.
+   *
+   * The provided HTML filename will always be relative to the output directory.
+   *
+   * @param filename {string} The file name including the `.html` extension.
+   * @return The new file name, or `undefined` to keep the default behavior.
+   */
+  useHtmlFileName?: (filename: string) => string | undefined | Promise<string | undefined>
 }
 
 type PartialKeys<T, Keys extends keyof T> = Omit<T, Keys> & Partial<Pick<T, Keys>>
