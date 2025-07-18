@@ -131,7 +131,7 @@ export interface ViteSSGOptions {
    *
    * The provided HTML filename will always be relative to the output directory.
    *
-   * @param filename {string} The file name including the `.html` extension.
+   * @param filename The file name including the `.html` extension.
    * @return The new file name, or `undefined` to keep the default behavior.
    */
   useHtmlFileName?: (filename: string) => string | undefined | Promise<string | undefined>
