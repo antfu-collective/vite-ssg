@@ -115,7 +115,7 @@ export interface ViteSSGOptions {
   concurrency?: number
 
   /**
-   * Given a route name, `vite-ssg` will use the route name to generate the HTML file,
+   * Given a route name, `vite-ssg` will use the route path to generate the HTML file,
    * this function will allow you to change that HTML filename.
    *
    * For example, using `unplugin-vue-router/vite` plugin on Windows, the `catch all` (`[...all].vue`)
