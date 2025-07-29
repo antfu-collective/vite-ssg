@@ -27,7 +27,7 @@ const config: UserConfig = {
     script: 'async',
     dirStyle: process.env.NESTED_PAGES === 'true' ? 'nested' : 'flat',
     formatting: 'prettify',
-    useHtmlFileName: process.env.LOG_ROUTES === 'true'
+    htmlFileName: process.env.LOG_ROUTES === 'true'
       ? (filename) => {
           console.log(`Generating HTML file: ${filename}`)
           return undefined
