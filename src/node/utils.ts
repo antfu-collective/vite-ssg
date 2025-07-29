@@ -13,12 +13,12 @@ export function getSize(str: string) {
 
 export async function prepareHtmlFileName(
   filename: string,
-  useHtmlFileName?: ViteSSGOptions['useHtmlFileName'],
+  htmlFileName?: ViteSSGOptions['htmlFileName'],
 ) {
-  if (!useHtmlFileName)
+  if (!htmlFileName)
     return filename
 
-  const newFileName = await useHtmlFileName(filename)
+  const newFileName = await htmlFileName(filename)
   return newFileName || filename
 }
 

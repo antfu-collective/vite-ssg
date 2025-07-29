@@ -55,7 +55,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
     concurrency = 20,
     rootContainerId = 'app',
     base,
-    useHtmlFileName,
+    htmlFileName,
   }: ViteSSGOptions = mergedOptions
 
   const beastiesOptions = mergedOptions.beastiesOptions ?? {}
@@ -201,7 +201,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
           dirStyle === 'nested'
             ? join(route.replace(/^\//g, ''), 'index.html')
             : relativeRouteFile,
-          useHtmlFileName,
+          htmlFileName,
         )
 
         await fs.mkdir(resolve(out, dirname(filename)), { recursive: true })
