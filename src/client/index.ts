@@ -23,12 +23,23 @@ export function ViteSSG(
     rootContainer = '#app',
   } = options
   const isClient = typeof window !== 'undefined'
+  async function detectHydrationMode(){
+    if(!isClient) return false;
+    return new Promise(resolve => {
+      const fnResolve = () => {
+        if (document.readyState !== 'loading') {          
+          resolve(document.querySelectorAll("[data-server-rendered]").length > 0);
+          document.removeEventListener('readystatechange', fnResolve)
+        }
+      }
+      document.addEventListener('readystatechange', fnResolve)
+      fnResolve();
+    })
+  }
 
   async function createApp(client = false, routePath?: string) {
-    const isHydrationMode = isClient && document.querySelectorAll('[data-server-rendered]').length > 0
-    const app = client && !isHydrationMode
-      ? createClientApp(App)
-      : createSSRApp(App)
+    const isHydrationMode = await detectHydrationMode()
+    const app = isHydrationMode ? createSSRApp(App) : createClientApp(App)
 
     let head: VueHeadClient<MergeHead> | undefined
 
