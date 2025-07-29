@@ -15,6 +15,7 @@ export async function prepareHtmlFileName(
   filename: string,
   htmlFileName?: ViteSSGOptions['htmlFileName'],
 ) {
+  filename = filename.replace(/\\/g, '/')
   if (!htmlFileName)
     return filename
 
