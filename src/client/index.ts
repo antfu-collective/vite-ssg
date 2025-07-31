@@ -29,9 +29,9 @@ export function ViteSSG(
       let timeout: NodeJS.Timeout | undefined = undefined;
       const fnResolve = () => {
         if (document.readyState !== 'loading') {          
-          resolve(document.querySelectorAll("[data-server-rendered]").length > 0);
           document.removeEventListener('readystatechange', fnResolve)
           clearTimeout(timeout)
+          resolve(document.querySelectorAll("[data-server-rendered]").length > 0);
         }
       }
       timeout = setTimeout(fnResolve, 1000)
