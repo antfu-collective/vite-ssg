@@ -26,12 +26,15 @@ export function ViteSSG(
   async function detectHydrationMode(){
     if(!isClient) return false;
     return new Promise(resolve => {
+      let timeout: NodeJS.Timeout | undefined = undefined;
       const fnResolve = () => {
         if (document.readyState !== 'loading') {          
           resolve(document.querySelectorAll("[data-server-rendered]").length > 0);
           document.removeEventListener('readystatechange', fnResolve)
+          clearTimeout(timeout)
         }
       }
+      timeout = setTimeout(fnResolve, 1000)
       document.addEventListener('readystatechange', fnResolve)
       fnResolve();
     })
