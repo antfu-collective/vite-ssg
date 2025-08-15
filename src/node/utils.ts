@@ -1,3 +1,4 @@
+import type { ViteSSGOptions } from 'vite-ssg'
 import type { RouteRecordRaw } from 'vue-router'
 import { blue, gray, yellow } from 'ansis'
 
@@ -8,6 +9,18 @@ export function buildLog(text: string, count?: number) {
 
 export function getSize(str: string) {
   return `${(str.length / 1024).toFixed(2)} KiB`
+}
+
+export async function prepareHtmlFileName(
+  filename: string,
+  htmlFileName?: ViteSSGOptions['htmlFileName'],
+) {
+  filename = filename.replace(/\\/g, '/')
+  if (!htmlFileName)
+    return filename
+
+  const newFileName = await htmlFileName(filename)
+  return newFileName || filename
 }
 
 export function routesToPaths(routes?: Readonly<RouteRecordRaw[]>) {

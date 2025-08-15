@@ -17,7 +17,7 @@ import { mergeConfig, resolveConfig, build as viteBuild } from 'vite'
 import { serializeState } from '../utils/state'
 import { getBeasties } from './critical'
 import { renderPreloadLinks } from './preload-links'
-import { buildLog, getSize, routesToPaths } from './utils'
+import { buildLog, getSize, prepareHtmlFileName, routesToPaths } from './utils'
 
 export type Manifest = Record<string, string[]>
 
@@ -55,6 +55,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
     concurrency = 20,
     rootContainerId = 'app',
     base,
+    htmlFileName,
   }: ViteSSGOptions = mergedOptions
 
   const beastiesOptions = mergedOptions.beastiesOptions ?? {}
@@ -196,9 +197,12 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
           ? `${route}index`
           : route).replace(/^\//g, '')}.html`
 
-        const filename = dirStyle === 'nested'
-          ? join(route.replace(/^\//g, ''), 'index.html')
-          : relativeRouteFile
+        const filename = await prepareHtmlFileName(
+          dirStyle === 'nested'
+            ? join(route.replace(/^\//g, ''), 'index.html')
+            : relativeRouteFile,
+          htmlFileName,
+        )
 
         await fs.mkdir(resolve(out, dirname(filename)), { recursive: true })
         await fs.writeFile(resolve(out, filename), formatted, 'utf-8')
