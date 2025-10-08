@@ -69,6 +69,7 @@ export interface WorkerDataEntry {
     onPageRendered, 
     onBeforePageRender, 
     // onDonePageRender,
+    onFinished,
   } = config.ssgOptions || {}
 
   let beasties:Critters | Beasties | undefined = undefined
@@ -85,6 +86,7 @@ export interface WorkerDataEntry {
     executeTaskFn: (opts: ExecuteInWorkerOptions) => ReturnType<typeof executeTaskFn>,
     buildClient: typeof buildClient,
     buildServer: typeof buildServer,
+    onFinished: typeof onFinished,
   } = {
     executeTaskFn: async (opts: ExecuteInWorkerOptions) => {      
       const { serverEntry } = opts  
@@ -115,6 +117,7 @@ export interface WorkerDataEntry {
       }
       return executeTaskFn(newOpts)
     },
+    onFinished,
     buildClient: async (...args:any[]):Promise<void> => {
       let [_config, _viteConfig] = args
       _config = Object.assign({}, config, _config)
