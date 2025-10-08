@@ -318,8 +318,10 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
           workerPromises.splice(workerPromises.indexOf(taskPromise), 1)
           workersInUse.set(workerProxy, workerPromises)
         })
-      const timerPromise = new Promise(resolve => setTimeout(resolve, 100))
-      return Promise.all([taskPromise, timerPromise]).then(async () => await taskPromise)
+        
+        return taskPromise
+      // const timerPromise = new Promise(resolve => setTimeout(resolve, 100))
+      // return Promise.all([taskPromise, timerPromise]).then(() => taskPromise)
     })
   }
 
