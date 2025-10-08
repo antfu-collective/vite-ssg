@@ -202,8 +202,8 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
     ...createProxyOptions,
     workerId: index,    
   }))
-  const terminateWorkers = () => {
-    workers.splice(0, workers.length).forEach(worker => worker.terminate())
+  const terminateWorkers = async () => {
+    await Promise.all(workers.splice(0, workers.length).map(worker => worker.terminate()))
   }
 
   let workerIndex = 0
@@ -315,7 +315,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
   }
 
   await queue.start().onIdle()
-  terminateWorkers();
+  await terminateWorkers();
 
   if (!ssgOptions['skip-build']) {
     await fs.remove(ssgOut)

@@ -62,7 +62,7 @@ export class BuildWorkerProxy {
     return promise
   }
   terminate() {
-    this.worker.terminate()
+    return this.worker.terminate()
   }
   
 }
