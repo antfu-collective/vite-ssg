@@ -297,20 +297,29 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
           serverEntry,
       
       }
-      const taskPromise = executeTaskInWorker(workerProxy, execOpts).catch(e => {
-        if ( (retryCount++) < maxRetries) {          
-          console.log(`${gray('[vite-ssg]')} ${yellow(`Retrying ${retryCount} of ${maxRetries} for route: ${cyan(route)}`)}`)
-          return executeTaskInWorker(workerProxy, execOpts)
-        }
-        throw e
-      })
+      
+      const taskPromise = executeTaskInWorker(workerProxy, execOpts)
+
       const workerPromises = workersInUse.get(workerProxy) || []
       workersInUse.set(workerProxy, workerPromises)
-      taskPromise.finally(() => {
-        workerPromises.splice(workerPromises.indexOf(taskPromise), 1)
-        workersInUse.set(workerProxy, workerPromises)
-      })
-      return taskPromise//.then(({ route, html, appCtx }) => onDonePageRender?.(route, html, appCtx))
+
+
+      const retryFn = async (e:any):Promise<any> => {
+        if ( (retryCount++) < maxRetries) {          
+          console.log(`${gray('[vite-ssg]')} ${yellow(`Retrying ${retryCount} of ${maxRetries} for route: ${cyan(route)}`)}`)
+          return await executeTaskInWorker(workerProxy, execOpts).catch(retryFn)
+        }
+        throw e
+      }
+      //add catch and finaly
+      taskPromise
+        .catch(retryFn)
+        .finally(() => {
+          workerPromises.splice(workerPromises.indexOf(taskPromise), 1)
+          workersInUse.set(workerProxy, workerPromises)
+        })
+      const timerPromise = new Promise(resolve => setTimeout(resolve, 100))
+      return Promise.all([taskPromise, timerPromise]).then(async () => await taskPromise)
     })
   }
 
@@ -358,16 +367,7 @@ export interface ExecuteInWorkerOptions {
 
 
 function executeTaskInWorker(worker: BuildWorkerProxy, opts: ExecuteInWorkerOptions) {
- return execInWorker(worker, executeTaskFn, opts)
-  // opts = Object.entries(opts).reduce((acc:ExecuteInWorkerOptions, [key, value]) => {
-  //   if(typeof value === 'function') return acc;
-  //   const newKey:keyof ExecuteInWorkerOptions = key as keyof ExecuteInWorkerOptions;
-  //   //@ts-ignore
-  //   acc[newKey] = value;
-  //   return acc;
-  // },{} as ExecuteInWorkerOptions)
-  
-  // return worker.send('executeTaskFn', [opts])
+ return execInWorker(worker, executeTaskFn, opts) 
 }
 
 
@@ -448,6 +448,8 @@ export async function executeTaskFn(opts: CreateTaskFnOptions) {
       ssrHead,
       teleports: ctx.teleports,
     })
+
+    
 
     let transformed = (await onPageRendered?.(route, html, appCtx)) || html
     if (beasties)
