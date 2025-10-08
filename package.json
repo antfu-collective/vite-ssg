@@ -1,6 +1,6 @@
 {
   "name": "vite-ssg-optimized",
-  "version": "0.24.2-optimized.42",
+  "version": "0.24.2-optimized.43",
   "packageManager": "pnpm@9.14.4",
   "description": "Server-side generation for Vite",
   "author": "Anthony Fu <anthonyfu117@hotmail.com>",
