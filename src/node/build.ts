@@ -304,7 +304,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
       const taskPromise = executeTaskInWorker(workerProxy, execOpts)
 
       const workerPromises = workersInUse.get(workerProxy) || []
-      workersInUse.set(workerProxy, workerPromises)
+      workersInUse.set(workerProxy, [...workerPromises, taskPromise])
 
 
       const retryFn = async (e:any):Promise<any> => {
@@ -318,6 +318,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
       taskPromise
         .catch(retryFn)
         .finally(() => {
+          const workerPromises = workersInUse.get(workerProxy) || []
           workerPromises.splice(workerPromises.indexOf(taskPromise), 1)
           workersInUse.set(workerProxy, workerPromises)
         })
