@@ -1,5 +1,5 @@
 import process from 'node:process'
-import { bold, gray, red } from 'ansis'
+import { bold, gray, red, yellow } from 'ansis'
 import { cac } from 'cac'
 import { build } from './build'
 
@@ -19,6 +19,14 @@ cli
       process.exit(1)
     }
     await build(ssgOptions, { configFile })
+
+    // ensure build process always exits
+    const waitInSeconds = 15
+    const timeout = setTimeout(() => {
+      console.log(`${gray('[vite-ssg]')} ${yellow(`Build process still running after ${waitInSeconds}s. There might be something misconfigured in your setup. Force exit.`)}`)
+      process.exit(0)
+    }, waitInSeconds * 1000)
+    timeout.unref() // don't wait for timeout
   })
 
 cli.on('command:*', () => {

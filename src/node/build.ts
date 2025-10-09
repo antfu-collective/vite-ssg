@@ -230,14 +230,6 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
   console.log(`\n${gray('[vite-ssg]')} ${green('Build finished.')}`)
 
   await onFinished?.()
-
-  // ensure build process always exits
-  const waitInSeconds = 15
-  const timeout = setTimeout(() => {
-    console.log(`${gray('[vite-ssg]')} ${yellow(`Build process still running after ${waitInSeconds}s. There might be something misconfigured in your setup. Force exit.`)}`)
-    process.exit(0)
-  }, waitInSeconds * 1000)
-  timeout.unref() // don't wait for timeout
 }
 
 async function detectEntry(root: string) {
