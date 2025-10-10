@@ -102,11 +102,11 @@ function createProxy(options:WorkerDataEntry & {format:string}):BuildWorkerProxy
     env: process.env,
     workerData: options,
   })
-  process.on('SIGINT', workerProxy.terminate.bind(workerProxy))
-  process.on('SIGTERM', workerProxy.terminate.bind(workerProxy))
-  process.on('SIGBREAK', workerProxy.terminate.bind(workerProxy))  
-  process.on('beforeExit', workerProxy.terminate.bind(workerProxy))
-  process.on('exit', workerProxy.terminate.bind(workerProxy))
+  process.once('SIGINT', workerProxy.terminate.bind(workerProxy))
+  process.once('SIGTERM', workerProxy.terminate.bind(workerProxy))
+  process.once('SIGBREAK', workerProxy.terminate.bind(workerProxy))  
+  process.once('beforeExit', workerProxy.terminate.bind(workerProxy))
+  process.once('exit', workerProxy.terminate.bind(workerProxy))
   return workerProxy
 }
 
@@ -202,16 +202,27 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
     ...createProxyOptions,
     workerId: index,    
   }))
-  const terminateWorkers = async (onFinished?: () => void | Promise<void>) => {    
+  const workersInUse: Map<BuildWorkerProxy, Promise<any>[]> = new Map()
+
+  const terminateWorker = async (worker:BuildWorkerProxy,onFinished?: () => void | Promise<void>) => {    
     if(onFinished){
-      await Promise.all(workers.map(worker => execInWorker(worker, onFinished)))
+      await execInWorker(worker, onFinished)
     }
-    await Promise.all(workers.splice(0, workers.length).map(worker => worker.terminate()))
+    const  foundIndex = workers.indexOf(worker)
+    if(foundIndex > -1){
+      workers.splice(foundIndex, 1)       
+    }
+    await worker.terminate().finally(() => {
+      workersInUse.delete(worker)
+    })
+  }  
+  const terminateWorkers = async (onFinished?: () => void | Promise<void>) => {    
+      await Promise.all(workers.map(worker => terminateWorker(worker, onFinished)))        
   }
 
   let workerIndex = 0
   const maxTasksPerWorker = Math.ceil(concurrency / numberOfWorkers)
-  const workersInUse: Map<BuildWorkerProxy, Promise<any>[]> = new Map()
+  
   const workerTasksRunning = (w: BuildWorkerProxy) => workersInUse.get(w)?.length || 0
   const selectIdleWorker = () => workers.filter(w => workerTasksRunning(w) < maxTasksPerWorker).sort((a, b) => workerTasksRunning(a) - workerTasksRunning(b))[0]
   const selectWorker = async (workerIndex?: number) => {
@@ -224,9 +235,14 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
     }
     const workerPromises = workersInUse.get(worker) || []
     const delayPromise = new Promise(resolve => setImmediate(resolve))
-    workersInUse.set(worker, [...workerPromises, delayPromise])
+    workerPromises.push(delayPromise)
+    workersInUse.set(worker, workerPromises)
     delayPromise.finally(() => {
-      workerPromises.splice(workerPromises.indexOf(delayPromise), 1)
+      const workerPromises = workersInUse.get(worker) || []
+      const foundIndex = workerPromises.indexOf(delayPromise)
+      if (foundIndex > -1) {
+        workerPromises.splice(foundIndex, 1)      
+      }      
       workersInUse.set(worker, workerPromises)
     })    
     return worker
@@ -278,13 +294,48 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
 
   // const { renderToString }: typeof import('vue/server-renderer') = await import('vue/server-renderer')
 
+
+    /* WeakMap<object,number> */
+    const workerRunCount = new WeakMap()
+  
+  
+    const MAX_RUNS_PER_WORKER=50;  
+    let lastWorkerIndex = workers.length - 1;
+    function replaceWorker(workerProxy:BuildWorkerProxy) {
+      const index = workers.indexOf(workerProxy)
+      if(index === -1){
+        return workerProxy
+      }
+      ++lastWorkerIndex
+      config.logger.info(`${blue("[vite-ssg]")} ${yellow(`Replace worker #${index} => #${lastWorkerIndex}`)}`)
+      
+      const workerPromises = workersInUse.get(workerProxy) || [];
+      const  newWorkerProxy = createProxy({
+        ...createProxyOptions,
+        workerId: lastWorkerIndex
+      })    
+      workers[index] = newWorkerProxy
+      Promise.allSettled(workerPromises).then(async () => {      
+        await terminateWorker(workerProxy, onFinished)
+      })
+      
+      return newWorkerProxy
+    }
+
+
   const queue = new PQueue({ concurrency })
  
   for (const route of routesPaths) {
     await queue.onSizeLessThan(concurrency) // avoid grow the number of tasks in queue
     queue.add(async () => {  
-      const workerProxy = await selectWorker(workerIndex ++ % numberOfWorkers)
-      
+      let workerProxy = await selectWorker(workerIndex ++ % numberOfWorkers)
+      const currentCount = (workerRunCount.get(workerProxy) ?? 0) + 1;
+      workerRunCount.set(workerProxy, currentCount)
+      if (currentCount > MAX_RUNS_PER_WORKER) { 
+        workerRunCount.delete(workerProxy)       
+        workerProxy = replaceWorker(workerProxy)
+      }
+
       let retryCount = 0
       const maxRetries = 3
       const execOpts:ExecuteInWorkerOptions = {      
@@ -304,7 +355,8 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
       const taskPromise = executeTaskInWorker(workerProxy, execOpts)
 
       const workerPromises = workersInUse.get(workerProxy) || []
-      workersInUse.set(workerProxy, [...workerPromises, taskPromise])
+      workerPromises.push(taskPromise)
+      workersInUse.set(workerProxy, workerPromises)
 
 
       const retryFn = async (e:any):Promise<any> => {
@@ -319,7 +371,10 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
         .catch(retryFn)
         .finally(() => {
           const workerPromises = workersInUse.get(workerProxy) || []
-          workerPromises.splice(workerPromises.indexOf(taskPromise), 1)
+          const foundIndex = workerPromises.indexOf(taskPromise)
+          if(foundIndex > -1){
+            workerPromises.splice(foundIndex, 1)
+          }          
           workersInUse.set(workerProxy, workerPromises)
         })
         

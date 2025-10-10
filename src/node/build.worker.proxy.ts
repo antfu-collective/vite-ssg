@@ -47,8 +47,12 @@ export class BuildWorkerProxy {
     this.worker.on(type, listener)
   }
   off(type: string, listener: (...args: any[]) => void) {
-    this.worker.off(type, listener)
+    this.worker.off(type, listener)    
   }
+  once(type: string, listener: (...args: any[]) => void) {
+    this.worker.once(type, listener)
+  }
+  
 
   async send(type: string, args: any[]) : Promise<any> {
     const id = crypto.randomUUID()    
@@ -61,8 +65,10 @@ export class BuildWorkerProxy {
     })
     return promise
   }
-  terminate() {
-    return this.worker.terminate()
+  terminate() {    
+    return this.worker.terminate().finally(() => {
+      this.pending.clear()
+    })
   }
   
 }
