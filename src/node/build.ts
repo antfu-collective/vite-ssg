@@ -299,7 +299,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
     const workerRunCount = new WeakMap()
   
   
-    const MAX_RUNS_PER_WORKER=50;  
+    const MAX_RUNS_PER_WORKER=100;  
     let lastWorkerIndex = workers.length - 1;
     function replaceWorker(workerProxy:BuildWorkerProxy) {
       const index = workers.indexOf(workerProxy)
@@ -307,7 +307,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
         return workerProxy
       }
       ++lastWorkerIndex
-      config.logger.info(`${blue("[vite-ssg]")} ${yellow(`Replace worker #${index} => #${lastWorkerIndex}`)}`)
+      config.logger.info(`${blue("[vite-ssg]")} ${yellow(`Replace worker #${workerProxy.id} => #${lastWorkerIndex}`)}`)
       
       const workerPromises = workersInUse.get(workerProxy) || [];
       const  newWorkerProxy = createProxy({
@@ -315,7 +315,7 @@ export async function build(ssgOptions: Partial<ViteSSGOptions & { 'skip-build'?
         workerId: lastWorkerIndex
       })    
       workers[index] = newWorkerProxy
-      Promise.allSettled(workerPromises).then(async () => {      
+      Promise.allSettled([...workerPromises, Promise.resolve()]).then(async () => {      
         await terminateWorker(workerProxy, onFinished)
       })
       

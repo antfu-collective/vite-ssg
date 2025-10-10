@@ -19,14 +19,17 @@ type Logger = {
 export class BuildWorkerProxy {
   private worker: Worker
   private pending: Map<string, {resolve: (result: any) => void, reject: (error: any) => void}> = new Map()
+  private _id: WorkerDataEntry['workerId']
   constructor(path: WorkerPath, options: WorkerOptions) {
     this.worker = new Worker(path, options)
+    this._id = options.workerData.workerId
     this.worker.on('message', (message) => {
       const {type, level='info', args = []} = message
       if(type !== 'log') return
       const fn = console[level as keyof Logger]?.bind(console)
       // let msg = args.map((arg:any) => typeof arg === 'object' && !!arg ? "[object]" : arg).join(' ')
       const workerId = options.workerData.workerId
+      
       // process.stdout.write(`[${workerId}] ${msg}\n`)
       fn?.(`[woker #${workerId}] `, ...args, reset(''))
     })
@@ -43,6 +46,11 @@ export class BuildWorkerProxy {
       }
     })
   }
+  
+  get id() {
+    return this._id
+  }
+
   on(type: string, listener: (...args: any[]) => void) {
     this.worker.on(type, listener)
   }
@@ -52,7 +60,7 @@ export class BuildWorkerProxy {
   once(type: string, listener: (...args: any[]) => void) {
     this.worker.once(type, listener)
   }
-  
+
 
   async send(type: string, args: any[]) : Promise<any> {
     const id = crypto.randomUUID()    
