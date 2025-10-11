@@ -2,12 +2,18 @@ import fs from 'node:fs/promises'
 import { glob } from 'tinyglobby'
 import { describe, expect, it } from 'vitest'
 
+function sortFiles(files: string[]) {
+  return files.map(f => f.replace(/\\/g, '/')).sort((a, b) => {
+    return a.localeCompare(b)
+  })
+}
+
 describe('multiple-pages', () => {
   it('generates list', async () => {
     const files = await glob('**/*.html', {
       cwd: 'examples/multiple-pages/dist',
     })
-    expect(files).toMatchInlineSnapshot(`
+    expect(sortFiles(files)).toMatchInlineSnapshot(`
       [
         "a.html",
         "b.html",
@@ -28,11 +34,11 @@ describe('multiple-pages-with-store', () => {
     const files = await glob('**/*.html', {
       cwd: 'examples/multiple-pages-with-store/dist',
     })
-    expect(files).toMatchInlineSnapshot(`
+    expect(sortFiles(files)).toMatchInlineSnapshot(`
       [
-        "index.html",
         "a/index.html",
         "b/index.html",
+        "index.html",
         "nested/deep/b/index.html",
       ]
     `)
