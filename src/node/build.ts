@@ -10,7 +10,7 @@ import { dirname, isAbsolute, join, parse, resolve } from 'node:path'
 import process from 'node:process'
 import { pathToFileURL } from 'node:url'
 import { renderDOMHead } from '@unhead/dom'
-import { blue, cyan, dim, gray, green, red, yellow } from 'ansis'
+import { blue, cyan, dim, gray, green, red } from 'ansis'
 import { JSDOM } from 'jsdom'
 import PQueue from 'p-queue'
 import { mergeConfig, resolveConfig, build as viteBuild } from 'vite'
@@ -230,14 +230,6 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
   console.log(`\n${gray('[vite-ssg]')} ${green('Build finished.')}`)
 
   await onFinished?.()
-
-  // ensure build process always exits
-  const waitInSeconds = 15
-  const timeout = setTimeout(() => {
-    console.log(`${gray('[vite-ssg]')} ${yellow(`Build process still running after ${waitInSeconds}s. There might be something misconfigured in your setup. Force exit.`)}`)
-    process.exit(0)
-  }, waitInSeconds * 1000)
-  timeout.unref() // don't wait for timeout
 }
 
 async function detectEntry(root: string) {
