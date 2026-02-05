@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import type { Unhead } from '@unhead/dom'
 import type { InlineConfig, ResolvedConfig } from 'vite'
 import type { VitePluginPWAAPI } from 'vite-plugin-pwa'
 import type { RouteRecordRaw } from 'vue-router'
@@ -9,7 +10,7 @@ import fs from 'node:fs/promises'
 import { dirname, isAbsolute, join, parse, resolve } from 'node:path'
 import process from 'node:process'
 import { pathToFileURL } from 'node:url'
-import { renderDOMHead } from '@unhead/dom'
+import { transformHtmlTemplate } from '@unhead/vue/server'
 import { blue, cyan, dim, gray, green, red } from 'ansis'
 import { JSDOM } from 'jsdom'
 import PQueue from 'p-queue'
@@ -182,16 +183,20 @@ export async function build(ssgOptions: Partial<ViteSSGOptions> = {}, viteConfig
         // render current page's preloadLinks
         renderPreloadLinks(jsdom.window.document, ctx.modules || new Set<string>(), ssrManifest)
 
-        // render head
-        if (head)
-          await renderDOMHead(head, { document: jsdom.window.document })
-
         const html = jsdom.serialize()
         let transformed = (await onPageRendered?.(route, html, appCtx)) || html
         if (beasties)
           transformed = await beasties.process(transformed)
 
-        const formatted = await formatHtml(transformed, formatting)
+        let optimized = html
+        // Under the hood, Unhead uses capo.js to optimize the head tags
+        // @see https://unhead.unjs.io/docs/typescript/head/guides/get-started/installation#_3-setup-server-side-rendering-optional
+        // @see https://unhead.unjs.io/docs/typescript/head/guides/core-concepts/positions#sort-order
+        // @see https://rviscomi.github.io/capo.js/user/rules/
+        if (head)
+          optimized = await transformHtmlTemplate(head as Unhead, transformed)
+
+        const formatted = await formatHtml(optimized, formatting)
 
         const relativeRouteFile = `${(route.endsWith('/')
           ? `${route}index`
