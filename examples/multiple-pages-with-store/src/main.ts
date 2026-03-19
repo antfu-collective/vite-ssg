@@ -24,11 +24,10 @@ export const createApp = ViteSSG(
       pinia.state.value = initialState?.pinia || {}
     }
 
-    router.beforeEach((to, from, next) => {
+    router.beforeEach(() => {
       const store = useRootStore(pinia)
 
       store.initialize()
-      next()
     })
   },
   {
