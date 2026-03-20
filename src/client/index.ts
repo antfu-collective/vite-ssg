@@ -117,3 +117,11 @@ export function ViteSSG(
 
   return createApp
 }
+
+export { ClientOnly }
+
+declare module 'vue' {
+  interface GlobalComponents {
+    ClientOnly: typeof ClientOnly
+  }
+}

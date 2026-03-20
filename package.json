@@ -66,7 +66,7 @@
     "example:single:build": "npm -C examples/single-page run build",
     "example:single:serve": "npm -C examples/single-page run serve",
     "test": "pnpm -r --filter=\"./examples/*\" build && pnpm -C examples/multiple-pages-with-store run build:nested && vitest run",
-    "build": "unbuild",
+    "build": "unbuild && tsx scripts/webTypes.ts",
     "prepublishOnly": "npm run build",
     "typecheck": "vue-tsc --noEmit",
     "release": "bumpp"
@@ -122,5 +122,6 @@
   "resolutions": {
     "semver": "catalog:",
     "vite": "catalog:"
-  }
+  },
+  "web-types": "./dist/web-types.json"
 }
