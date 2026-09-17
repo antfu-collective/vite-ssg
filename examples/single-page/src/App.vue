@@ -4,6 +4,13 @@ import { useRootStore } from './store/root'
 
 useHead({
   title: 'Hello World',
+  htmlAttrs: { lang: 'en' },
+  bodyAttrs: { class: 'single-page' },
+  meta: [{ name: 'description', content: 'A single page example' }],
+  script: [
+    { id: 'body-open', type: 'application/json', innerHTML: '{"position":"open"}', tagPosition: 'bodyOpen' },
+    { id: 'body-close', type: 'application/json', innerHTML: '{"position":"close"}', tagPosition: 'bodyClose' },
+  ],
 })
 
 const store = useRootStore()

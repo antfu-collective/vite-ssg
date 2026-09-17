@@ -90,7 +90,6 @@
     }
   },
   "dependencies": {
-    "@unhead/dom": "catalog:",
     "@unhead/vue": "catalog:",
     "ansis": "catalog:",
     "cac": "catalog:",

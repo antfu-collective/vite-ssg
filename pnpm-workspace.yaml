@@ -13,8 +13,7 @@ catalog:
   '@nuxt/devalue': ^2.0.2
   '@types/html-minifier-terser': ^7.0.2
   '@types/jsdom': ^27.0.0
-  '@unhead/dom': ^2.1.2
-  '@unhead/vue': ^2.1.2
+  '@unhead/vue': ^3.4.1
   '@vitejs/plugin-vue': ^6.0.4
   ansis: ^4.2.0
   beasties: ^0.4.1
